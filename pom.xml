@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>tech.aroma.banana</groupId>
+        <artifactId>banana</artifactId>
+        <version>1.2-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>application-service</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>${project.artifactId}</name>
+    <packaging>jar</packaging>
+
+    <url>https://github.com/AromaTech/banana-application-service</url>
+    <description>
+        Part of the Banana Service Project.
+        Simplicity is paramount.
+        The Application Service is responsible for managing Applications, including receiving messages from
+        Applications, and performing Health Checks where appropriate.
+    </description>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/AromaTech/banana-application-service/issues</url>
+    </issueManagement>
+
+    <scm>
+        <connection>scm:git:git@github.com:AromaTech/banana-application-service.git</connection>
+        <developerConnection>scm:git:git@github.com:AromaTech/banana-application-service.git</developerConnection>
+        <url>git@github.com:AromaTech/banana-application-service.git</url>
+    </scm>
+
+    <inceptionYear>2015</inceptionYear>
+
+    <prerequisites>
+        <maven>3.0.3</maven>
+    </prerequisites>
+
+    <!-- END OF POM METADATA -->
+
+    <dependencies>
+
+        <!--ALCHEMY-->
+        <dependency>
+            <groupId>tech.sirwellington.alchemy</groupId>
+            <artifactId>alchemy-generator</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>tech.sirwellington.alchemy</groupId>
+            <artifactId>alchemy-http</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>tech.sirwellington.alchemy</groupId>
+            <artifactId>alchemy-thrift</artifactId>
+        </dependency>
+
+
+        <!--BANANA-->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>banana-thrift</artifactId>
+            <version>1.4-SNAPSHOT</version>
+        </dependency>
+
+        <!--GUICE-->
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
+
+        <!--LOGGING-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <!--LOGBACK-->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!--TEST DEPENDENCIES-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>tech.sirwellington.alchemy</groupId>
+            <artifactId>alchemy-test</artifactId>
+        </dependency>
+
+
+    </dependencies>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>tech.aroma.banana.service.server.TcpServer</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.10</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>${project.basedir}/src/main/assembly/assembly.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+        </plugins>
+    </build>
+
+</project>
