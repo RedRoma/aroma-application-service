@@ -36,6 +36,7 @@ import static tech.aroma.banana.application.service.ApplicationAssertions.validT
 import static tech.sirwellington.alchemy.annotations.designs.patterns.DecoratorPattern.Role.CONCRETE_DECORATOR;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 
 /**
  * This class Decorates an existing Application Service, providing Authentication of incoming requests against an
@@ -45,17 +46,17 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
  */
 @Internal
 @DecoratorPattern(role = CONCRETE_DECORATOR)
-final class ApplicationServiceAuthentication implements ApplicationService.Iface
+final class AuthenticationLayer implements ApplicationService.Iface
 {
 
-    private final static Logger LOG = LoggerFactory.getLogger(ApplicationServiceAuthentication.class);
+    private final static Logger LOG = LoggerFactory.getLogger(AuthenticationLayer.class);
 
     private final AuthenticationService.Iface authenticationService;
     private final ApplicationService.Iface delegate;
 
     @Inject
-    ApplicationServiceAuthentication(AuthenticationService.Iface authenticationService,
-                                     @DecoratedBy(ApplicationServiceAuthentication.class) ApplicationService.Iface delegate)
+    AuthenticationLayer(AuthenticationService.Iface authenticationService,
+                                     @DecoratedBy(AuthenticationLayer.class) ApplicationService.Iface delegate)
     {
         checkThat(delegate, authenticationService)
             .are(notNull());
