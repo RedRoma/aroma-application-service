@@ -30,6 +30,7 @@ import tech.aroma.banana.thrift.authentication.service.VerifyTokenRequest;
 import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
+import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
@@ -71,6 +72,17 @@ public class AuthenticationDecoratorTest
 
         when(delegate.sendMessage(request))
             .thenReturn(response);
+    }
+
+    @DontRepeat
+    @Test
+    public void testConstructor()
+    {
+        assertThrows(() -> new AuthenticationDecorator(null, delegate))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        assertThrows(() -> new AuthenticationDecorator(authenticationService, null))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
