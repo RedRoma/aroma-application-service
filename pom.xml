@@ -41,51 +41,7 @@
     <!-- END OF POM METADATA -->
 
     <dependencies>
-
-        <!--ALCHEMY-->
-        <dependency>
-            <groupId>tech.sirwellington.alchemy</groupId>
-            <artifactId>alchemy-generator</artifactId>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>tech.sirwellington.alchemy</groupId>
-            <artifactId>alchemy-http</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>tech.sirwellington.alchemy</groupId>
-            <artifactId>alchemy-thrift</artifactId>
-        </dependency>
-
-
-        <!--BANANA-->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>banana-thrift</artifactId>
-            <version>1.5-SNAPSHOT</version>
-        </dependency>
-
-        <!--GUICE-->
-        <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-        </dependency>
-
-        <!--LOGGING-->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-        <!--LOGBACK-->
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
+        
         <!--TEST DEPENDENCIES-->
         <dependency>
             <groupId>junit</groupId>
@@ -107,6 +63,64 @@
             <groupId>tech.sirwellington.alchemy</groupId>
             <artifactId>alchemy-test</artifactId>
         </dependency>
+        <!--====================-->
+
+
+        <!--ALCHEMY-->
+        <dependency>
+            <groupId>tech.sirwellington.alchemy</groupId>
+            <artifactId>alchemy-generator</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>tech.sirwellington.alchemy</groupId>
+            <artifactId>alchemy-http</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>tech.sirwellington.alchemy</groupId>
+            <artifactId>alchemy-thrift</artifactId>
+        </dependency>
+        <!--====================-->
+
+
+        <!--BANANA-->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>banana-thrift</artifactId>
+            <version>1.5-SNAPSHOT</version>
+        </dependency>
+        <!--====================-->
+
+
+        <!--GUICE-->
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
+        <!--DECORATOR LIBRARY-->
+        <dependency>
+            <groupId>tech.sirwellington.decorice</groupId>
+            <artifactId>decorice</artifactId>
+        </dependency>
+        <!--====================-->
+
+        
+
+        <!--LOGGING-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <!--LOGBACK-->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!--====================-->
 
 
     </dependencies>
@@ -122,7 +136,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>tech.aroma.banana.service.server.TcpServer</mainClass>
+                            <mainClass>tech.aroma.banana.application.service.server.TcpServer</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
