@@ -42,13 +42,13 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
 @Internal
 final class ApplicationServiceImpl implements ApplicationService.Iface
 {
-
+    
     private final static Logger LOG = LoggerFactory.getLogger(ApplicationServiceImpl.class);
-
+    
     private final ThriftOperation<SendMessageRequest, SendMessageResponse> sendMessageOperation;
-
+    
     private final ExecutorService executor;
-
+    
     @Inject
     ApplicationServiceImpl(ThriftOperation<SendMessageRequest, SendMessageResponse> sendMessageOperation,
                            ExecutorService executor)
@@ -59,13 +59,13 @@ final class ApplicationServiceImpl implements ApplicationService.Iface
         this.sendMessageOperation = sendMessageOperation;
         this.executor = executor;
     }
-
+    
     @Override
     public double getApiVersion() throws TException
     {
         return ApplicationServiceConstants.API_VERSION;
     }
-
+    
     @Override
     public SendMessageResponse sendMessage(SendMessageRequest request) throws OperationFailedException,
                                                                               InvalidArgumentException,
@@ -73,18 +73,24 @@ final class ApplicationServiceImpl implements ApplicationService.Iface
                                                                               TException
     {
         LOG.debug("Received request to send message: {}", request);
-
+        
         checkThat(request)
             .throwing(withMessage("request is missing"))
             .is(notNull());
-
+        
         return sendMessageOperation.process(request);
     }
-
+    
     @Override
     public void sendMessageAsync(SendMessageRequest request) throws TException
     {
+        if (request == null)
+        {
+            LOG.warn("Received null request");
+            return;
+        }
+        
         executor.submit(() -> this.sendMessage(request));
     }
-
+    
 }
