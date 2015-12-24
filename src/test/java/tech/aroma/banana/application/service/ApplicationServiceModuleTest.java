@@ -20,13 +20,13 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
-import java.util.concurrent.ExecutorService;
 import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import tech.aroma.banana.application.service.operations.ApplicationServiceOperationsModule;
 import tech.aroma.banana.thrift.application.service.ApplicationService;
 import tech.aroma.banana.thrift.application.service.SendMessageRequest;
 import tech.aroma.banana.thrift.application.service.SendMessageResponse;
@@ -53,11 +53,9 @@ public class ApplicationServiceModuleTest
     @Mock
     private ThriftOperation<SendMessageRequest, SendMessageResponse> sendMessageOperation;
 
-    @Mock
-    private ExecutorService executorService;
-    
     private ApplicationServiceModule module;
     private FakeModule fakeModule;
+    private ApplicationServiceOperationsModule operationModule;
     
     @GeneratePojo
     private SendMessageRequest request;
@@ -66,7 +64,8 @@ public class ApplicationServiceModuleTest
     public void setUp()
     {
         module = new ApplicationServiceModule();
-        fakeModule = new FakeModule(authenticationService, sendMessageOperation, executorService);
+        fakeModule = new FakeModule(authenticationService, sendMessageOperation);
+        operationModule = new ApplicationServiceOperationsModule();
     }
 
     @Test
@@ -79,21 +78,25 @@ public class ApplicationServiceModuleTest
         service.sendMessage(request);
         verify(authenticationService).verifyToken(Mockito.any());
     }
+    
+    @Test
+    public void testConfigureWithRealModules() throws Exception
+    {
+        Injector injector = Guice.createInjector(operationModule, module, new AuthenticationModule());
+        assertThat(injector, notNullValue());
+    }
 
     private static class FakeModule extends AbstractModule
     {
 
         private final AuthenticationService.Iface authenticationService;
         private final ThriftOperation<SendMessageRequest, SendMessageResponse> sendMessageOperation;
-        private final ExecutorService executorService;
 
         FakeModule(AuthenticationService.Iface authenticationService,
-                   ThriftOperation<SendMessageRequest, SendMessageResponse> sendMessageOperation,
-                   ExecutorService executorService)
+                   ThriftOperation<SendMessageRequest, SendMessageResponse> sendMessageOperation)
         {
             this.authenticationService = authenticationService;
             this.sendMessageOperation = sendMessageOperation;
-            this.executorService = executorService;
         }
 
         @Override
@@ -103,10 +106,22 @@ public class ApplicationServiceModuleTest
             
             bind(new TypeLiteral<ThriftOperation<SendMessageRequest, SendMessageResponse>>() {})
                 .toInstance(sendMessageOperation);
-            
-            bind(ExecutorService.class).toInstance(executorService);
         }
 
+    }
+    
+    private static class AuthenticationModule extends AbstractModule
+    {
+
+        @Override
+        protected void configure()
+        {
+            AuthenticationService.Iface authenticationService;
+            authenticationService = Mockito.mock(AuthenticationService.Iface.class);
+            
+            bind(AuthenticationService.Iface.class).toInstance(authenticationService);
+        }
+        
     }
 
 }

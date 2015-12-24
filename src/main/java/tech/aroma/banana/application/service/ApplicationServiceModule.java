@@ -20,6 +20,8 @@ package tech.aroma.banana.application.service;
 
 import com.google.inject.AbstractModule;
 import decorice.DecoratorModule;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.thrift.application.service.ApplicationService;
@@ -36,6 +38,8 @@ public final class ApplicationServiceModule extends AbstractModule
     protected void configure()
     {
         install(new ServiceModule());
+        
+        bind(ExecutorService.class).toInstance(Executors.newWorkStealingPool(10));
     }
     
     private static class ServiceModule extends DecoratorModule
