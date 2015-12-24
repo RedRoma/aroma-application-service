@@ -38,24 +38,24 @@ import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
- * Decorates an Application Service, providing Authentication mechanisms against an
+ * This class Decorates an existing Application Service, providing Authentication of incoming requests against an
  * {@linkplain AuthenticationService.Iface Authentication Service}.
  *
  * @author SirWellington
  */
 @Internal
 @DecoratorPattern(role = CONCRETE_DECORATOR)
-final class AuthenticationDecorator implements ApplicationService.Iface
+final class ApplicationServiceAuthentication implements ApplicationService.Iface
 {
 
-    private final static Logger LOG = LoggerFactory.getLogger(AuthenticationDecorator.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ApplicationServiceAuthentication.class);
 
     private final AuthenticationService.Iface authenticationService;
     private final ApplicationService.Iface delegate;
 
     @Inject
-    AuthenticationDecorator(AuthenticationService.Iface authenticationService,
-                            @DecoratedBy(AuthenticationDecorator.class) ApplicationService.Iface delegate)
+    ApplicationServiceAuthentication(AuthenticationService.Iface authenticationService,
+                                     @DecoratedBy(ApplicationServiceAuthentication.class) ApplicationService.Iface delegate)
     {
         checkThat(delegate, authenticationService)
             .are(notNull());
@@ -71,8 +71,10 @@ final class AuthenticationDecorator implements ApplicationService.Iface
     }
 
     @Override
-    public SendMessageResponse sendMessage(SendMessageRequest request) throws OperationFailedException, InvalidArgumentException,
-                                                                              InvalidCredentialsException, TException
+    public SendMessageResponse sendMessage(SendMessageRequest request) throws OperationFailedException,
+                                                                              InvalidArgumentException,
+                                                                              InvalidCredentialsException,
+                                                                              TException
     {
         checkThat(request)
             .is(notNull());

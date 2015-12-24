@@ -47,7 +47,7 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
  */
 @Repeat(100)
 @RunWith(AlchemyTestRunner.class)
-public class AuthenticationDecoratorTest
+public class ApplicationServiceAuthenticationTest
 {
 
     @Mock
@@ -62,12 +62,12 @@ public class AuthenticationDecoratorTest
     @GeneratePojo
     private SendMessageResponse response;
 
-    private AuthenticationDecorator instance;
+    private ApplicationServiceAuthentication instance;
 
     @Before
     public void setUp() throws TException
     {
-        instance = new AuthenticationDecorator(authenticationService, delegate);
+        instance = new ApplicationServiceAuthentication(authenticationService, delegate);
         verifyZeroInteractions(authenticationService, delegate);
 
         when(delegate.sendMessage(request))
@@ -78,10 +78,10 @@ public class AuthenticationDecoratorTest
     @Test
     public void testConstructor()
     {
-        assertThrows(() -> new AuthenticationDecorator(null, delegate))
+        assertThrows(() -> new ApplicationServiceAuthentication(null, delegate))
             .isInstanceOf(IllegalArgumentException.class);
 
-        assertThrows(() -> new AuthenticationDecorator(authenticationService, null))
+        assertThrows(() -> new ApplicationServiceAuthentication(authenticationService, null))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
