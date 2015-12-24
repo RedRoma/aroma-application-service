@@ -49,7 +49,7 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
  */
 @Repeat(100)
 @RunWith(AlchemyTestRunner.class)
-public class BaseApplicationServiceTest
+public class ApplicationServiceBaseTest
 {
 
     @GeneratePojo
@@ -61,7 +61,7 @@ public class BaseApplicationServiceTest
     @Mock
     private ThriftOperation<SendMessageRequest, SendMessageResponse> sendMessageOperation;
 
-    private BaseApplicationService instance;
+    private ApplicationServiceBase instance;
 
     @Mock
     private ExecutorService executor;
@@ -72,7 +72,7 @@ public class BaseApplicationServiceTest
     @Before
     public void setUp() throws TException
     {
-        instance = new BaseApplicationService(sendMessageOperation, executor);
+        instance = new ApplicationServiceBase(sendMessageOperation, executor);
 
         verifyZeroInteractions(sendMessageOperation);
 
@@ -84,10 +84,10 @@ public class BaseApplicationServiceTest
     @Test
     public void testConstructor()
     {
-        assertThrows(() -> new BaseApplicationService(null, executor))
+        assertThrows(() -> new ApplicationServiceBase(null, executor))
             .isInstanceOf(IllegalArgumentException.class);
 
-        assertThrows(() -> new BaseApplicationService(sendMessageOperation, null))
+        assertThrows(() -> new ApplicationServiceBase(sendMessageOperation, null))
             .isInstanceOf(IllegalArgumentException.class);
     }
 

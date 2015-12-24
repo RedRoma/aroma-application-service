@@ -38,7 +38,7 @@ import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
- * The Base Application Service is the Concrete Component. It is fully functional
+ * The  Application Service Base is the Concrete Component. It is fully functional
  * on its own, but can be decorated to add additional features.
  * 
  * @see AuthenticationDecorator
@@ -46,17 +46,17 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
  */
 @Internal
 @DecoratorPattern(role = CONCRETE_COMPONENT)
-final class BaseApplicationService implements ApplicationService.Iface
+final class ApplicationServiceBase implements ApplicationService.Iface
 {
     
-    private final static Logger LOG = LoggerFactory.getLogger(BaseApplicationService.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ApplicationServiceBase.class);
     
     private final ThriftOperation<SendMessageRequest, SendMessageResponse> sendMessageOperation;
     
     private final ExecutorService executor;
     
     @Inject
-    BaseApplicationService(ThriftOperation<SendMessageRequest, SendMessageResponse> sendMessageOperation,
+    ApplicationServiceBase(ThriftOperation<SendMessageRequest, SendMessageResponse> sendMessageOperation,
                            ExecutorService executor)
     {
         checkThat(executor, sendMessageOperation)
