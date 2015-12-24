@@ -19,8 +19,10 @@ package tech.aroma.banana.application.service;
 
 
 import com.google.inject.AbstractModule;
+import decorice.DecoratorModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.aroma.banana.thrift.application.service.ApplicationService;
 
 /**
  *
@@ -33,7 +35,16 @@ public final class ApplicationServiceModule extends AbstractModule
     @Override
     protected void configure()
     {
-        
+        install(new ServiceModule());
     }
-
+    
+    private static class ServiceModule extends DecoratorModule
+    {
+        {
+            bind(ApplicationService.Iface.class)
+                .to(ApplicationServiceImpl.class)
+                .decoratedBy(AuthenticationDecorator.class);
+        }
+    }
+    
 }

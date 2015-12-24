@@ -16,6 +16,7 @@
 
 package tech.aroma.banana.application.service;
 
+import decorice.DecoratedBy;
 import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
@@ -54,7 +55,7 @@ final class AuthenticationDecorator implements ApplicationService.Iface
 
     @Inject
     AuthenticationDecorator(AuthenticationService.Iface authenticationService,
-                            ApplicationService.Iface delegate)
+                            @DecoratedBy(AuthenticationDecorator.class) ApplicationService.Iface delegate)
     {
         checkThat(delegate, authenticationService)
             .are(notNull());
