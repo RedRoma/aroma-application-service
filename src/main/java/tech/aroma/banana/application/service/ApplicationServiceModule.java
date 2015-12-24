@@ -42,7 +42,7 @@ public final class ApplicationServiceModule extends AbstractModule
     {
         {
             bind(ApplicationService.Iface.class)
-                .to(ApplicationServiceImpl.class)
+                .to(BaseApplicationService.class)
                 .decoratedBy(AuthenticationDecorator.class);
         }
     }

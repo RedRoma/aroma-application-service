@@ -29,28 +29,34 @@ import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.banana.thrift.exceptions.InvalidCredentialsException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
+import tech.sirwellington.alchemy.annotations.designs.patterns.DecoratorPattern;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
 import static tech.aroma.banana.application.service.ApplicationAssertions.withMessage;
+import static tech.sirwellington.alchemy.annotations.designs.patterns.DecoratorPattern.Role.CONCRETE_COMPONENT;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
- *
+ * The Base Application Service is the Concrete Component. It is fully functional
+ * on its own, but can be decorated to add additional features.
+ * 
+ * @see AuthenticationDecorator
  * @author SirWellington
  */
 @Internal
-final class ApplicationServiceImpl implements ApplicationService.Iface
+@DecoratorPattern(role = CONCRETE_COMPONENT)
+final class BaseApplicationService implements ApplicationService.Iface
 {
     
-    private final static Logger LOG = LoggerFactory.getLogger(ApplicationServiceImpl.class);
+    private final static Logger LOG = LoggerFactory.getLogger(BaseApplicationService.class);
     
     private final ThriftOperation<SendMessageRequest, SendMessageResponse> sendMessageOperation;
     
     private final ExecutorService executor;
     
     @Inject
-    ApplicationServiceImpl(ThriftOperation<SendMessageRequest, SendMessageResponse> sendMessageOperation,
+    BaseApplicationService(ThriftOperation<SendMessageRequest, SendMessageResponse> sendMessageOperation,
                            ExecutorService executor)
     {
         checkThat(executor, sendMessageOperation)
