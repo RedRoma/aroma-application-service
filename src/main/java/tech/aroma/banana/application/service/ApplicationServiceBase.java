@@ -41,7 +41,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
  * The  Application Service Base is the Concrete Component. It is fully functional
  * on its own, but can be decorated to add additional features.
  * 
- * @see AuthenticationDecorator
+ * @see AuthenticationLayer
  * @author SirWellington
  */
 @Internal
