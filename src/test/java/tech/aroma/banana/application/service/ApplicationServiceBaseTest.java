@@ -25,10 +25,10 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import tech.aroma.banana.thrift.application.service.ApplicationServiceConstants;
 import tech.aroma.banana.thrift.application.service.SendMessageRequest;
 import tech.aroma.banana.thrift.application.service.SendMessageResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
+import tech.aroma.banana.thrift.service.BananaServiceConstants;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
@@ -96,7 +96,7 @@ public class ApplicationServiceBaseTest
     {
         double result = instance.getApiVersion();
 
-        assertThat(result, is(ApplicationServiceConstants.API_VERSION));
+        assertThat(result, is(BananaServiceConstants.API_VERSION));
     }
 
     @Test
