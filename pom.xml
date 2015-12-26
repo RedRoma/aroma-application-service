@@ -8,7 +8,7 @@
         <version>1.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>application-service</artifactId>
+    <artifactId>banana-application-service</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>${project.artifactId}</name>
     <packaging>jar</packaging>
