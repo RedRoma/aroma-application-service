@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
@@ -49,7 +48,6 @@ public class TcpServerTest
         exceptions = Lists.newArrayList();
     }
     
-    @Ignore
     @Test
     public void testMain() throws Exception
     {

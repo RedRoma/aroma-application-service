@@ -19,8 +19,10 @@ package tech.aroma.banana.application.service.server;
 
 
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Provides;
 import java.net.SocketException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.server.TThreadPoolServer;
@@ -31,7 +33,9 @@ import org.slf4j.LoggerFactory;
 import tech.aroma.banana.application.service.ApplicationServiceModule;
 import tech.aroma.banana.application.service.operations.ApplicationServiceOperationsModule;
 import tech.aroma.banana.thrift.application.service.ApplicationService;
-import tech.aroma.banana.thrift.authentication.service.AuthenticationServiceConstants;
+import tech.aroma.banana.thrift.application.service.ApplicationServiceConstants;
+import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
+import tech.aroma.banana.thrift.authentication.service.NoOpAuthenticationService;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -46,11 +50,12 @@ public final class TcpServer
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(TcpServer.class);
-    private static final int PORT = AuthenticationServiceConstants.SERVICE_PORT;
+    private static final int PORT = ApplicationServiceConstants.SERVICE_PORT;
 
     public static void main(String[] args) throws TTransportException, SocketException
     {
-        Injector injector = Guice.createInjector(new ApplicationServiceOperationsModule(),
+        Injector injector = Guice.createInjector(new AuthenticationProvider(),
+                                                 new ApplicationServiceOperationsModule(),
                                                  new ApplicationServiceModule());
 
         ApplicationService.Iface applicationService = injector.getInstance(ApplicationService.Iface.class);
@@ -72,5 +77,21 @@ public final class TcpServer
         TThreadPoolServer server = new TThreadPoolServer(serverArgs);
         server.serve();
         server.stop();
+    }
+    
+    static class AuthenticationProvider extends AbstractModule
+    {
+
+        @Override
+        protected void configure()
+        {
+        }
+        
+        @Provides
+        AuthenticationService.Iface provideAuthenticationService()
+        {
+            return new NoOpAuthenticationService();
+        }
+        
     }
 }
