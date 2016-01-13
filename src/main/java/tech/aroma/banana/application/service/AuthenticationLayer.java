@@ -36,7 +36,6 @@ import static tech.aroma.banana.application.service.ApplicationAssertions.validT
 import static tech.sirwellington.alchemy.annotations.designs.patterns.DecoratorPattern.Role.CONCRETE_DECORATOR;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 
 /**
  * This class Decorates an existing Application Service, providing Authentication of incoming requests against an
