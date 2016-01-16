@@ -19,8 +19,10 @@ package tech.aroma.banana.application.service.operations;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.aroma.banana.application.service.data.MessageRepository;
 import tech.aroma.banana.thrift.application.service.SendMessageRequest;
 import tech.aroma.banana.thrift.application.service.SendMessageResponse;
+import tech.aroma.banana.thrift.notification.service.NotificationService;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
 import static tech.aroma.banana.application.service.ApplicationAssertions.withMessage;
@@ -37,6 +39,8 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(SendMessageOperation.class);
+    private MessageRepository repository;
+    private NotificationService.Iface notificatioService;
 
     @Override
     public SendMessageResponse process(SendMessageRequest request) throws TException
@@ -45,6 +49,10 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
             .throwing(withMessage("missing request"))
             .is(notNull());
         
+        //Store Message
+        //Receive ID
+        //Send out notifications
+        //Return stored ID
         
         SendMessageResponse response = one(pojos(SendMessageResponse.class));
         return response;
