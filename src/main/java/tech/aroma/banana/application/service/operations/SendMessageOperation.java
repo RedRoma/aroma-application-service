@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import tech.aroma.banana.application.service.data.MessageRepository;
 import tech.aroma.banana.thrift.application.service.SendMessageRequest;
 import tech.aroma.banana.thrift.application.service.SendMessageResponse;
+import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
 import tech.aroma.banana.thrift.notification.service.NotificationService;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
@@ -39,6 +40,7 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(SendMessageOperation.class);
+    private AuthenticationService.Iface authenticationService;
     private MessageRepository repository;
     private NotificationService.Iface notificatioService;
 
@@ -49,6 +51,7 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
             .throwing(withMessage("missing request"))
             .is(notNull());
         
+        //Get information about the App from the Token
         //Store Message
         //Receive ID
         //Send out notifications
