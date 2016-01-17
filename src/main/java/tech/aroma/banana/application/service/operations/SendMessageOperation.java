@@ -19,7 +19,7 @@ package tech.aroma.banana.application.service.operations;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.aroma.banana.application.service.data.MessageRepository;
+import tech.aroma.banana.data.MessageRepository;
 import tech.aroma.banana.thrift.application.service.SendMessageRequest;
 import tech.aroma.banana.thrift.application.service.SendMessageResponse;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
