@@ -42,7 +42,7 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
     private final static Logger LOG = LoggerFactory.getLogger(SendMessageOperation.class);
     private AuthenticationService.Iface authenticationService;
     private MessageRepository repository;
-    private NotificationService.Iface notificatioService;
+    private NotificationService.Iface notificationService;
 
     @Override
     public SendMessageResponse process(SendMessageRequest request) throws TException
