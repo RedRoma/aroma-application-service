@@ -37,8 +37,8 @@ import tech.aroma.banana.data.cassandra.ModuleCassandraDevCluster;
 import tech.aroma.banana.thrift.application.service.ApplicationService;
 import tech.aroma.banana.thrift.application.service.ApplicationServiceConstants;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
-import tech.aroma.banana.thrift.authentication.service.NoOpAuthenticationService;
-import tech.aroma.banana.thrift.notification.service.NoOpNotificationService;
+import tech.aroma.banana.thrift.services.NoOpAuthenticationService;
+import tech.aroma.banana.thrift.services.NoOpNotificationService;
 import tech.aroma.banana.thrift.notification.service.NotificationService;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
