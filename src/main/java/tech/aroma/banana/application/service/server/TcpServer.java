@@ -58,7 +58,7 @@ public final class TcpServer
 
     public static void main(String[] args) throws TTransportException, SocketException
     {
-        Injector injector = Guice.createInjector(new SecondaryServicesProvider(),
+        Injector injector = Guice.createInjector(new BananaServicesProvider(),
                                                  new ModuleApplicationServiceOperations(),
                                                  new ModuleApplicationService(),
                                                  new ModuleCassandraDataRepositories(),
@@ -85,7 +85,7 @@ public final class TcpServer
         server.stop();
     }
     
-    private static class SecondaryServicesProvider extends AbstractModule
+    private static class BananaServicesProvider extends AbstractModule
     {
 
         @Override
