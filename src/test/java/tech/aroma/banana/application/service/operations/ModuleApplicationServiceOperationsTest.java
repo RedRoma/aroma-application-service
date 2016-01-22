@@ -31,15 +31,15 @@ import static org.junit.Assert.assertThat;
  * @author SirWellington
  */
 @RunWith(AlchemyTestRunner.class)
-public class ApplicationServiceOperationsModuleTest 
+public class ModuleApplicationServiceOperationsTest 
 {
-    private ApplicationServiceOperationsModule module;
+    private ModuleApplicationServiceOperations module;
     
     
     @Before
     public void setUp()
     {
-        module = new ApplicationServiceOperationsModule();
+        module = new ModuleApplicationServiceOperations();
     }
 
     @Test
