@@ -30,9 +30,9 @@ import tech.aroma.banana.thrift.application.service.ApplicationService;
  *
  * @author SirWellington
  */
-public final class ApplicationServiceModule extends AbstractModule
+public final class ModuleApplicationService extends AbstractModule
 {
-    private final static Logger LOG = LoggerFactory.getLogger(ApplicationServiceModule.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ModuleApplicationService.class);
 
     @Override
     protected void configure()

@@ -60,7 +60,7 @@ public class ApplicationServiceModuleTest
     @Mock
     private ThriftOperation<SendMessageRequest, SendMessageResponse> sendMessageOperation;
 
-    private ApplicationServiceModule module;
+    private ModuleApplicationService module;
     private ModuleMocks moduleFake;
     private ModuleApplicationServiceOperations moduleOperation;
     private ModuleCassandraDataRepositories moduleCassandraData;
@@ -72,7 +72,7 @@ public class ApplicationServiceModuleTest
     @Before
     public void setUp()
     {
-        module = new ApplicationServiceModule();
+        module = new ModuleApplicationService();
         moduleFake = new ModuleMocks(authenticationService, sendMessageOperation);
         moduleOperation = new ModuleApplicationServiceOperations();
         moduleCassandraData = new ModuleCassandraDataRepositories();

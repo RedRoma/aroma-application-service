@@ -30,7 +30,7 @@ import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.aroma.banana.application.service.ApplicationServiceModule;
+import tech.aroma.banana.application.service.ModuleApplicationService;
 import tech.aroma.banana.application.service.operations.ModuleApplicationServiceOperations;
 import tech.aroma.banana.thrift.application.service.ApplicationService;
 import tech.aroma.banana.thrift.application.service.ApplicationServiceConstants;
@@ -56,7 +56,7 @@ public final class TcpServer
     {
         Injector injector = Guice.createInjector(new AuthenticationProvider(),
                                                  new ModuleApplicationServiceOperations(),
-                                                 new ApplicationServiceModule());
+                                                 new ModuleApplicationService());
 
         ApplicationService.Iface applicationService = injector.getInstance(ApplicationService.Iface.class);
         ApplicationService.Processor processor = new ApplicationService.Processor<>(applicationService);
