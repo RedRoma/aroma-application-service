@@ -32,10 +32,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.application.service.ModuleApplicationService;
 import tech.aroma.banana.application.service.operations.ModuleApplicationServiceOperations;
+import tech.aroma.banana.data.cassandra.ModuleCassandraDataRepositories;
+import tech.aroma.banana.data.cassandra.ModuleCassandraDevCluster;
 import tech.aroma.banana.thrift.application.service.ApplicationService;
 import tech.aroma.banana.thrift.application.service.ApplicationServiceConstants;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
 import tech.aroma.banana.thrift.authentication.service.NoOpAuthenticationService;
+import tech.aroma.banana.thrift.notification.service.NoOpNotificationService;
+import tech.aroma.banana.thrift.notification.service.NotificationService;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -54,9 +58,11 @@ public final class TcpServer
 
     public static void main(String[] args) throws TTransportException, SocketException
     {
-        Injector injector = Guice.createInjector(new AuthenticationProvider(),
+        Injector injector = Guice.createInjector(new SecondaryServicesProvider(),
                                                  new ModuleApplicationServiceOperations(),
-                                                 new ModuleApplicationService());
+                                                 new ModuleApplicationService(),
+                                                 new ModuleCassandraDataRepositories(),
+                                                 new ModuleCassandraDevCluster());
 
         ApplicationService.Iface applicationService = injector.getInstance(ApplicationService.Iface.class);
         ApplicationService.Processor processor = new ApplicationService.Processor<>(applicationService);
@@ -79,7 +85,7 @@ public final class TcpServer
         server.stop();
     }
     
-    static class AuthenticationProvider extends AbstractModule
+    private static class SecondaryServicesProvider extends AbstractModule
     {
 
         @Override
@@ -91,6 +97,12 @@ public final class TcpServer
         AuthenticationService.Iface provideAuthenticationService()
         {
             return new NoOpAuthenticationService();
+        }
+        
+        @Provides
+        NotificationService.Iface provideNotificationService()
+        {
+            return new NoOpNotificationService();
         }
         
     }
