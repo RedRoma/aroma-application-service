@@ -134,7 +134,12 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
             throw new OperationFailedException("Could not get token info: " + ex.getMessage());
         }
         
-        checkThat(tokenInfo)
+        checkThat(tokenInfo, tokenInfo.token)
+            .throwing(OperationFailedException.class)
+            .usingMessage("missing Token Info")
+            .are(notNull());
+        
+        checkThat(tokenInfo.token.getApplicationToken())
             .throwing(OperationFailedException.class)
             .usingMessage("missing Token Info")
             .is(notNull());
