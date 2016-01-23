@@ -35,6 +35,7 @@ import tech.aroma.banana.thrift.authentication.TokenType;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
 import tech.aroma.banana.thrift.authentication.service.GetTokenInfoRequest;
 import tech.aroma.banana.thrift.authentication.service.GetTokenInfoResponse;
+import tech.aroma.banana.thrift.functions.TokenFunctions;
 import tech.aroma.banana.thrift.notification.service.NotificationService;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
@@ -75,7 +76,8 @@ public class SendMessageOperationTest
     
     private GetTokenInfoRequest expectedAuthenticationRequest;
     
-    private ApplicationToken token;
+    private ApplicationToken appToken;
+    
     
     @GeneratePojo
     private SendMessageRequest request;
@@ -85,7 +87,8 @@ public class SendMessageOperationTest
     {
         instance = new SendMessageOperation(authenticationService, messageRepository, notificationService);
         
-        token = request.applicationToken;
+        appToken = request.applicationToken;
+        
         setupExpectedAuthRequest();
         setupAuthServiceResponse();
     }
@@ -134,16 +137,15 @@ public class SendMessageOperationTest
     private void setupExpectedAuthRequest()
     {
         expectedAuthenticationRequest = new GetTokenInfoRequest()
-            .setTokenId(token.tokenId)
+            .setTokenId(appToken.tokenId)
             .setTokenType(TokenType.APPLICATION);
 
     }
 
     private void setupAuthServiceResponse() throws Exception
     {
-        AuthenticationToken authToken = new AuthenticationToken();
-        authToken.setApplicationToken(token);
-        
+        AuthenticationToken authToken = TokenFunctions.appTokenToAuthTokenFunction().apply(appToken);
+
         GetTokenInfoResponse response = new GetTokenInfoResponse()
             .setToken(authToken);
         

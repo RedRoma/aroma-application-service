@@ -38,6 +38,7 @@ import tech.aroma.banana.thrift.events.EventType;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
+import tech.aroma.banana.thrift.functions.TokenFunctions;
 import tech.aroma.banana.thrift.message.service.MessageServiceConstants;
 import tech.aroma.banana.thrift.notification.service.NotificationService;
 import tech.aroma.banana.thrift.notification.service.SendNotificationRequest;
@@ -91,11 +92,13 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
             .is(notNull());
 
         GetTokenInfoResponse tokenInfo = tryToGetTokenInfo(request.applicationToken);
-
-        String applicationId = tokenInfo.getToken().getApplicationToken().getApplicationId();
+        
+        ApplicationToken appToken = TokenFunctions.authTokenToAppTokenFunction().apply(tokenInfo.token);
+        
+        String applicationId = appToken.applicationId;
         checkAppId(applicationId);
 
-        Message message = createMessageFrom(request, tokenInfo);
+        Message message = createMessageFrom(request, appToken);
 
         repository.saveMessage(message, MessageServiceConstants.DEFAULT_MESSAGE_LIFETIME);
         LOG.debug("Message successfully stored in repository");
@@ -139,22 +142,21 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
             .usingMessage("missing Token Info")
             .are(notNull());
         
-        checkThat(tokenInfo.token.getApplicationToken())
+        checkThat(tokenInfo.token.ownerId)
             .throwing(OperationFailedException.class)
             .usingMessage("missing Token Info")
-            .is(notNull());
+            .is(nonEmptyString());
 
         return tokenInfo;
     }
 
-    private Message createMessageFrom(SendMessageRequest request, GetTokenInfoResponse tokenInfo)
+    private Message createMessageFrom(SendMessageRequest request, ApplicationToken token)
     {
-        ApplicationToken appToken = tokenInfo.getToken().getApplicationToken();
         UUID messageId = UUIDs.timeBased();
         
         Message message = new Message()
-            .setApplicationId(appToken.applicationId)
-            .setApplicationName(appToken.applicationName)
+            .setApplicationId(token.applicationId)
+            .setApplicationName(token.applicationName)
             .setMessageId(messageId.toString())
             .setBody(request.message)
             .setUrgency(request.urgency)
