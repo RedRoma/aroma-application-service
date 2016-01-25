@@ -23,7 +23,9 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
+import com.google.inject.ProvisionException;
 import java.net.SocketException;
+import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TServerSocket;
@@ -37,9 +39,9 @@ import tech.aroma.banana.data.cassandra.ModuleCassandraDevCluster;
 import tech.aroma.banana.thrift.application.service.ApplicationService;
 import tech.aroma.banana.thrift.application.service.ApplicationServiceConstants;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
-import tech.aroma.banana.thrift.services.NoOpAuthenticationService;
-import tech.aroma.banana.thrift.services.NoOpNotificationService;
 import tech.aroma.banana.thrift.notification.service.NotificationService;
+import tech.aroma.banana.thrift.services.Clients;
+import tech.aroma.banana.thrift.services.NoOpNotificationService;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -96,7 +98,14 @@ public final class TcpServer
         @Provides
         AuthenticationService.Iface provideAuthenticationService()
         {
-            return new NoOpAuthenticationService();
+            try
+            {
+                return Clients.newAuthenticationServiceClient();
+            }
+            catch (TException ex)
+            {
+                throw new ProvisionException("Could not create Banana Service Client", ex);
+            }
         }
         
         @Provides
