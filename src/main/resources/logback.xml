@@ -10,8 +10,8 @@
 
     <appender name="rollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/var/log/aroma/banana_application_service-%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>60</maxHistory>
+            <fileNamePattern>/var/log/aroma/banana_application_service/banana_application_service-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>14</maxHistory>
             <maxFileSize>100MB</maxFileSize>
         </rollingPolicy>
         <encoder>
