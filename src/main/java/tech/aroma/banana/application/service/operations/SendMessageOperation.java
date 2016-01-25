@@ -102,7 +102,9 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
 
         repository.saveMessage(message, MessageServiceConstants.DEFAULT_MESSAGE_LIFETIME);
         LOG.debug("Message successfully stored in repository");
-
+        
+        //Save it in follower's inbox
+        
         SendNotificationRequest sendNotificationRequest = createNotificationRequestFor(message);
 
         tryToSendNotification(sendNotificationRequest);
