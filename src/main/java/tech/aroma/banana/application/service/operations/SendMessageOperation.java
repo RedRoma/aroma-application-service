@@ -139,7 +139,7 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
         
         checkThat(tokenInfo, tokenInfo.token)
             .throwing(OperationFailedException.class)
-            .usingMessage("missing Token Info")
+            .usingMessage("AuthenticationService Response is missing Token Info")
             .are(notNull());
         
         checkThat(tokenInfo.token.ownerId)
