@@ -21,6 +21,7 @@ import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import tech.aroma.banana.thrift.application.service.ApplicationService;
 import tech.aroma.banana.thrift.application.service.SendMessageRequest;
@@ -30,6 +31,7 @@ import tech.aroma.banana.thrift.authentication.AuthenticationToken;
 import tech.aroma.banana.thrift.authentication.TokenType;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
 import tech.aroma.banana.thrift.authentication.service.GetTokenInfoRequest;
+import tech.aroma.banana.thrift.authentication.service.GetTokenInfoResponse;
 import tech.aroma.banana.thrift.authentication.service.VerifyTokenRequest;
 import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
@@ -121,6 +123,7 @@ public class AuthenticationLayerTest
     {
         when(delegate.sendMessage(request)).thenReturn(response);
         when(tokenMapper.apply(authToken)).thenReturn(appToken);
+        when(authenticationService.getTokenInfo(expectedGetTokenRequest)).thenReturn(new GetTokenInfoResponse(authToken));
     }
 
     @DontRepeat
@@ -171,12 +174,38 @@ public class AuthenticationLayerTest
 
         verify(authenticationService).verifyToken(expectedVerifyRequest);
     }
+    
+    @Test
+    public void testSendMessageWhenAppIdMissing() throws Exception
+    {
+        ApplicationToken completeToken = new ApplicationToken(appToken);
+        
+        appToken.unsetApplicationId();
+        expectedVerifyRequest.unsetOwnerId();
+        
+        when(tokenMapper.apply(authToken)).thenReturn(completeToken);
+        
+        
+        SendMessageResponse result = instance.sendMessage(request);
+        
+        assertThat(result, is(response));
+        
+        verify(authenticationService).verifyToken(expectedVerifyRequest);
+        verify(authenticationService).getTokenInfo(expectedGetTokenRequest);
+        
+        ArgumentCaptor<SendMessageRequest> captor = ArgumentCaptor.forClass(SendMessageRequest.class);
+        verify(delegate).sendMessage(captor.capture());
+
+        ApplicationToken expectedToken = new ApplicationToken(appToken).setApplicationId(appId);
+        SendMessageRequest capturedRequest = captor.getValue();
+        assertThat(capturedRequest.applicationToken, is(expectedToken));
+    }
 
     @Test
     public void testSendMessageWithInvalidToken() throws Exception
     {
         setupForBadToken();
-
+        
         assertThrows(() -> instance.sendMessage(request))
             .isInstanceOf(InvalidTokenException.class);
 
