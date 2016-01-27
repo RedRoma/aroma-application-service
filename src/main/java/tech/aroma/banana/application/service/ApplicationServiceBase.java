@@ -50,9 +50,8 @@ final class ApplicationServiceBase implements ApplicationService.Iface
 {
     
     private final static Logger LOG = LoggerFactory.getLogger(ApplicationServiceBase.class);
-    
+
     private final ThriftOperation<SendMessageRequest, SendMessageResponse> sendMessageOperation;
-    
     private final ExecutorService executor;
     
     @Inject
