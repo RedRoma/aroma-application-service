@@ -16,22 +16,28 @@
 
 package tech.aroma.banana.application.service;
 
+import java.util.function.Function;
 import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import tech.aroma.banana.thrift.application.service.ApplicationService;
 import tech.aroma.banana.thrift.application.service.SendMessageRequest;
 import tech.aroma.banana.thrift.application.service.SendMessageResponse;
+import tech.aroma.banana.thrift.authentication.ApplicationToken;
+import tech.aroma.banana.thrift.authentication.AuthenticationToken;
+import tech.aroma.banana.thrift.authentication.TokenType;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
+import tech.aroma.banana.thrift.authentication.service.GetTokenInfoRequest;
 import tech.aroma.banana.thrift.authentication.service.VerifyTokenRequest;
 import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
+import tech.aroma.banana.thrift.functions.TokenFunctions;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
+import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.is;
@@ -40,6 +46,7 @@ import static org.mockito.Mockito.*;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.UUID;
 
 /**
  *
@@ -55,33 +62,78 @@ public class AuthenticationLayerTest
 
     @Mock
     private ApplicationService.Iface delegate;
+    
+    @Mock
+    private Function<AuthenticationToken, ApplicationToken> tokenMapper;
 
     @GeneratePojo
     private SendMessageRequest request;
 
     @GeneratePojo
     private SendMessageResponse response;
+    
+    @GeneratePojo
+    private ApplicationToken appToken;
+    
+    private AuthenticationToken authToken;
+    
+    @GenerateString(UUID)
+    private String appId;
+    
+    private String tokenId;
+    
+    private VerifyTokenRequest expectedVerifyRequest;
+    
+    private GetTokenInfoRequest expectedGetTokenRequest;
 
     private AuthenticationLayer instance;
 
     @Before
     public void setUp() throws TException
     {
-        instance = new AuthenticationLayer(authenticationService, delegate);
+        instance = new AuthenticationLayer(authenticationService, delegate, tokenMapper);
         verifyZeroInteractions(authenticationService, delegate);
+        
+        setupData();
+        setupMocks();
+    }
 
-        when(delegate.sendMessage(request))
-            .thenReturn(response);
+    private void setupData()
+    {
+        appToken.applicationId = appId;
+        
+        authToken = TokenFunctions.appTokenToAuthTokenFunction().apply(appToken);
+        
+        request.applicationToken = appToken;
+        
+        tokenId = appToken.tokenId;
+        
+        expectedVerifyRequest = new VerifyTokenRequest()
+            .setTokenId(tokenId)
+            .setOwnerId(appId);
+        
+        expectedGetTokenRequest = new GetTokenInfoRequest()
+            .setTokenId(tokenId)
+            .setTokenType(TokenType.APPLICATION);
+    }
+    
+    private void setupMocks() throws TException
+    {
+        when(delegate.sendMessage(request)).thenReturn(response);
+        when(tokenMapper.apply(authToken)).thenReturn(appToken);
     }
 
     @DontRepeat
     @Test
     public void testConstructor()
     {
-        assertThrows(() -> new AuthenticationLayer(null, delegate))
+        assertThrows(() -> new AuthenticationLayer(null, delegate, tokenMapper))
             .isInstanceOf(IllegalArgumentException.class);
 
-        assertThrows(() -> new AuthenticationLayer(authenticationService, null))
+        assertThrows(() -> new AuthenticationLayer(authenticationService, null, tokenMapper))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        assertThrows(() -> new AuthenticationLayer(authenticationService, delegate, null))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -117,17 +169,13 @@ public class AuthenticationLayerTest
         assertThat(result, is(response));
         verify(delegate).sendMessage(request);
 
-        VerifyTokenRequest expectedRequest = new VerifyTokenRequest()
-            .setTokenId(request.applicationToken.tokenId);
-
-        verify(authenticationService).verifyToken(expectedRequest);
+        verify(authenticationService).verifyToken(expectedVerifyRequest);
     }
 
     @Test
     public void testSendMessageWithInvalidToken() throws Exception
     {
-        when(authenticationService.verifyToken(Mockito.any()))
-            .thenThrow(new InvalidTokenException());
+        setupForBadToken();
 
         assertThrows(() -> instance.sendMessage(request))
             .isInstanceOf(InvalidTokenException.class);
@@ -142,23 +190,24 @@ public class AuthenticationLayerTest
 
         verify(delegate).sendMessageAsync(request);
 
-        VerifyTokenRequest expectedRequest = new VerifyTokenRequest()
-            .setTokenId(request.applicationToken.tokenId);
-
-        verify(authenticationService).verifyToken(expectedRequest);
-
+        verify(authenticationService).verifyToken(expectedVerifyRequest);
     }
 
     @Test
     public void testSendMessageAsyncWithInvalidToken() throws Exception
     {
-        when(authenticationService.verifyToken(Mockito.any()))
-            .thenThrow(new InvalidTokenException());
+        setupForBadToken();
 
         assertThrows(() -> instance.sendMessageAsync(request))
             .isInstanceOf(InvalidTokenException.class);
 
         verifyZeroInteractions(delegate);
+    }
+
+    private void setupForBadToken() throws InvalidTokenException, TException
+    {
+        when(authenticationService.verifyToken(expectedVerifyRequest))
+            .thenThrow(new InvalidTokenException());
     }
 
 }

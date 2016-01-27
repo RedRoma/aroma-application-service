@@ -17,6 +17,7 @@
 package tech.aroma.banana.application.service;
 
 import decorice.DecoratedBy;
+import java.util.function.Function;
 import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
@@ -24,7 +25,12 @@ import org.slf4j.LoggerFactory;
 import tech.aroma.banana.thrift.application.service.ApplicationService;
 import tech.aroma.banana.thrift.application.service.SendMessageRequest;
 import tech.aroma.banana.thrift.application.service.SendMessageResponse;
+import tech.aroma.banana.thrift.authentication.ApplicationToken;
+import tech.aroma.banana.thrift.authentication.AuthenticationToken;
+import tech.aroma.banana.thrift.authentication.TokenType;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
+import tech.aroma.banana.thrift.authentication.service.GetTokenInfoRequest;
+import tech.aroma.banana.thrift.authentication.service.GetTokenInfoResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.banana.thrift.exceptions.InvalidCredentialsException;
 import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
@@ -33,13 +39,15 @@ import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.designs.patterns.DecoratorPattern;
 
 import static tech.aroma.banana.application.service.ApplicationAssertions.validTokenIn;
+import static tech.aroma.banana.data.assertions.AuthenticationAssertions.completeToken;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.DecoratorPattern.Role.CONCRETE_DECORATOR;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
  * This class Decorates an existing Application Service, providing Authentication of incoming requests against an
- * {@linkplain AuthenticationService.Iface Authentication Service}.
+ * {@linkplain AuthenticationService.Iface Authentication Service}. It also enriches request
+ * to make sure that the Application ID is contained in the Token.
  *
  * @author SirWellington
  */
@@ -52,16 +60,19 @@ final class AuthenticationLayer implements ApplicationService.Iface
 
     private final AuthenticationService.Iface authenticationService;
     private final ApplicationService.Iface delegate;
+    private final Function<AuthenticationToken, ApplicationToken> tokenMapper;
 
     @Inject
     AuthenticationLayer(AuthenticationService.Iface authenticationService,
-                                     @DecoratedBy(AuthenticationLayer.class) ApplicationService.Iface delegate)
+                        @DecoratedBy(AuthenticationLayer.class) ApplicationService.Iface delegate,
+                        Function<AuthenticationToken, ApplicationToken> tokenMapper)
     {
-        checkThat(delegate, authenticationService)
+        checkThat(delegate, authenticationService, tokenMapper)
             .are(notNull());
 
         this.authenticationService = authenticationService;
         this.delegate = delegate;
+        this.tokenMapper = tokenMapper;
     }
 
     @Override
@@ -83,6 +94,12 @@ final class AuthenticationLayer implements ApplicationService.Iface
             .throwing(InvalidTokenException.class)
             .is(validTokenIn(authenticationService));
 
+        if(!request.applicationToken.isSetApplicationId())
+        {
+            ApplicationToken newToken = getAdditionalTokenInfo(request.applicationToken);
+            request.setApplicationToken(newToken);
+        }
+        
         return delegate.sendMessage(request);
     }
 
@@ -98,5 +115,46 @@ final class AuthenticationLayer implements ApplicationService.Iface
 
         delegate.sendMessageAsync(request);
     }
+
+    private ApplicationToken getAdditionalTokenInfo(ApplicationToken applicationToken) throws TException
+    {
+        GetTokenInfoRequest request = new GetTokenInfoRequest()
+            .setTokenId(applicationToken.tokenId)
+            .setTokenType(TokenType.APPLICATION);
+        
+        GetTokenInfoResponse response = tryToGetTokenInfo(request);
+        
+        checkThat(response)
+            .usingMessage("Auth Service returned null response")
+            .throwing(OperationFailedException.class)
+            .is(notNull());
+            
+        checkThat(response.token)
+            .usingMessage("Auth Service returned incomplete token")
+            .throwing(OperationFailedException.class)
+            .is(completeToken());
+
+        ApplicationToken newAppToken = convertToAppToken(response.token);
+        return newAppToken;
+    }
+
+    private GetTokenInfoResponse tryToGetTokenInfo(GetTokenInfoRequest request) throws OperationFailedException
+    {
+        try
+        {
+            return authenticationService.getTokenInfo(request);
+        }
+        catch(TException ex)
+        {
+            LOG.error("Failed to get Additional token info for: {}", request);
+            throw new OperationFailedException("Could not get token infO: " + ex.getMessage());
+        }
+    }
+
+    private ApplicationToken convertToAppToken(AuthenticationToken token)
+    {
+        return tokenMapper.apply(token);
+    }
+
 
 }
