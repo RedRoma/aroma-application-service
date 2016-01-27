@@ -28,7 +28,7 @@ import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.access.NonInstantiable;
-import tech.sirwellington.alchemy.annotations.arguments.NonNull;
+import tech.sirwellington.alchemy.annotations.arguments.Required;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 import tech.sirwellington.alchemy.arguments.ExceptionMapper;
 import tech.sirwellington.alchemy.arguments.FailedAssertionException;
@@ -52,7 +52,7 @@ public final class ApplicationAssertions
         throw new IllegalAccessException("cannot instantiate");
     }
 
-    public static AlchemyAssertion<ApplicationToken> validTokenIn(@NonNull AuthenticationService.Iface authenticationService) 
+    public static AlchemyAssertion<ApplicationToken> validTokenIn(@Required AuthenticationService.Iface authenticationService) 
     {
         checkThat(authenticationService)
             .usingMessage("authentication service is null")
@@ -69,7 +69,8 @@ public final class ApplicationAssertions
                 .is(nonEmptyString());
             
             VerifyTokenRequest request = new VerifyTokenRequest()
-            .setTokenId(token.getTokenId());
+                .setTokenId(token.getTokenId())
+                .setOwnerId(token.applicationId);
             
             VerifyTokenResponse response;
             try
