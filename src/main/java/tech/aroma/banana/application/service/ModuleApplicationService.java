@@ -19,12 +19,17 @@ package tech.aroma.banana.application.service;
 
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 import decorice.DecoratorModule;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.thrift.application.service.ApplicationService;
+import tech.aroma.banana.thrift.authentication.ApplicationToken;
+import tech.aroma.banana.thrift.authentication.AuthenticationToken;
+import tech.aroma.banana.thrift.functions.TokenFunctions;
 
 /**
  *
@@ -40,6 +45,12 @@ public final class ModuleApplicationService extends AbstractModule
         install(new ServiceModule());
         
         bind(ExecutorService.class).toInstance(Executors.newWorkStealingPool(10));
+    }
+    
+    @Provides
+    Function<AuthenticationToken, ApplicationToken> provideTokenMapper()
+    {
+        return TokenFunctions.authTokenToAppTokenFunction();
     }
     
     private static class ServiceModule extends DecoratorModule
