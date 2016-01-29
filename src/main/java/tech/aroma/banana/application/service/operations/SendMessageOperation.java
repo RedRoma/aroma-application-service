@@ -160,7 +160,8 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
             .setApplicationId(token.applicationId)
             .setApplicationName(token.applicationName)
             .setMessageId(messageId.toString())
-            .setBody(request.message)
+            .setBody(request.body)
+            .setTitle(request.title)
             .setUrgency(request.urgency)
             .setTimeOfCreation(request.timeOfMessage)
             .setTimeMessageReceived(Instant.now().getEpochSecond());

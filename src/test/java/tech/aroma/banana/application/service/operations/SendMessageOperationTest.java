@@ -122,7 +122,8 @@ public class SendMessageOperationTest
         Message message = messageCaptor.getValue();
         assertThat(message, notNullValue());
         assertThat(message.messageId, is(response.messageId));
-        assertThat(message.body, is(request.message));
+        assertThat(message.body, is(request.body));
+        assertThat(message.title, is(request.title));
         assertThat(message.urgency, is(request.urgency));
         assertThat(message.timeOfCreation, is(request.timeOfMessage));
     }
