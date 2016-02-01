@@ -125,6 +125,8 @@ public class SendMessageOperationTest
         assertThat(message.body, is(request.body));
         assertThat(message.title, is(request.title));
         assertThat(message.urgency, is(request.urgency));
+        assertThat(message.macAddress, is(request.macAddress));
+        assertThat(message.hostname, is(request.hostname));
         assertThat(message.timeOfCreation, is(request.timeOfMessage));
     }
     
