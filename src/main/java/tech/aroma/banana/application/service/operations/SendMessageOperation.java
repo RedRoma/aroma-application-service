@@ -18,13 +18,22 @@ package tech.aroma.banana.application.service.operations;
 
 import com.datastax.driver.core.utils.UUIDs;
 import java.time.Instant;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.aroma.banana.data.ApplicationRepository;
+import tech.aroma.banana.data.FollowerRepository;
+import tech.aroma.banana.data.InboxRepository;
 import tech.aroma.banana.data.MessageRepository;
+import tech.aroma.banana.data.UserRepository;
+import tech.aroma.banana.thrift.Application;
 import tech.aroma.banana.thrift.Message;
+import tech.aroma.banana.thrift.User;
 import tech.aroma.banana.thrift.application.service.SendMessageRequest;
 import tech.aroma.banana.thrift.application.service.SendMessageResponse;
 import tech.aroma.banana.thrift.authentication.ApplicationToken;
@@ -59,19 +68,31 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
     private final static Logger LOG = LoggerFactory.getLogger(SendMessageOperation.class);
 
     private final AuthenticationService.Iface authenticationService;
-    private final MessageRepository repository;
+    private final ApplicationRepository appRepo;
+    private final InboxRepository inboxRepo;
+    private final MessageRepository messageRepo;
+    private final FollowerRepository followerRepo;
+    private final UserRepository userRepo;
     private final NotificationService.Iface notificationService;
 
     @Inject
     SendMessageOperation(AuthenticationService.Iface authenticationService,
-                         MessageRepository repository,
+                         ApplicationRepository appRepo,
+                         FollowerRepository followerRepo,
+                         InboxRepository inboxRepo,
+                         MessageRepository messageRepo,
+                         UserRepository userRepo,
                          NotificationService.Iface notificationService)
     {
-        checkThat(authenticationService, repository, notificationService)
+        checkThat(authenticationService, appRepo, followerRepo, inboxRepo, messageRepo, userRepo, notificationService)
             .are(notNull());
-        
+
         this.authenticationService = authenticationService;
-        this.repository = repository;
+        this.appRepo = appRepo;
+        this.messageRepo = messageRepo;
+        this.followerRepo = followerRepo;
+        this.inboxRepo = inboxRepo;
+        this.userRepo = userRepo;
         this.notificationService = notificationService;
     }
 
@@ -92,19 +113,18 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
             .is(notNull());
 
         GetTokenInfoResponse tokenInfo = tryToGetTokenInfo(request.applicationToken);
-        
+
         ApplicationToken appToken = TokenFunctions.authTokenToAppTokenFunction().apply(tokenInfo.token);
-        
+
         String applicationId = appToken.applicationId;
         checkAppId(applicationId);
 
         Message message = createMessageFrom(request, appToken);
 
-        repository.saveMessage(message, MessageServiceConstants.DEFAULT_MESSAGE_LIFETIME);
+        messageRepo.saveMessage(message, MessageServiceConstants.DEFAULT_MESSAGE_LIFETIME);
         LOG.debug("Message successfully stored in repository");
-        
-        //Save it in follower's inbox
-        
+
+        storeInFollowerInboxes(message);
         SendNotificationRequest sendNotificationRequest = createNotificationRequestFor(message);
 
         tryToSendNotification(sendNotificationRequest);
@@ -138,12 +158,12 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
             LOG.error("Failed to get info for Token [{}]", applicationToken, ex);
             throw new OperationFailedException("Could not get token info: " + ex.getMessage());
         }
-        
+
         checkThat(tokenInfo, tokenInfo.token)
             .throwing(OperationFailedException.class)
             .usingMessage("AuthenticationService Response is missing Token Info")
             .are(notNull());
-        
+
         checkThat(tokenInfo.token.ownerId)
             .throwing(OperationFailedException.class)
             .usingMessage("missing Token Info")
@@ -155,7 +175,7 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
     private Message createMessageFrom(SendMessageRequest request, ApplicationToken token)
     {
         UUID messageId = UUIDs.timeBased();
-        
+
         Message message = new Message()
             .setApplicationId(token.applicationId)
             .setApplicationName(token.applicationName)
@@ -208,6 +228,54 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
             .usingMessage("Could not get Application ID from Token")
             .is(nonEmptyString())
             .is(stringWithLengthGreaterThanOrEqualTo(10));
+    }
+
+    private void storeInFollowerInboxes(Message message) throws TException
+    {
+        String appId = message.applicationId;
+
+        List<User> followers = followerRepo.getApplicationFollowers(appId);
+
+        Set<User> owners = getOwnerForApp(appId);
+        followers.addAll(owners);
+
+        followers.parallelStream()
+            .forEach(user -> this.tryToSaveInInbox(message, user));
+    }
+
+    private Set<User> getOwnerForApp(String appId) throws TException
+    {
+        Application app = appRepo.getById(appId);
+
+        return app.owners
+            .stream()
+            .map(this::toUser)
+            .collect(Collectors.toSet());
+    }
+
+    private void tryToSaveInInbox(Message message, User user)
+    {
+        try
+        {
+            inboxRepo.saveMessageForUser(user, message);
+        }
+        catch (TException ex)
+        {
+            LOG.error("Failed to save message {} in Inbox of User {}", message, user, ex);
+        }
+    }
+
+    private User toUser(String userId)
+    {
+        try
+        {
+            return userRepo.getUser(userId);
+        }
+        catch (TException ex)
+        {
+            LOG.warn("Could not find user With ID [{}]", userId, ex);
+            return new User().setUserId(userId);
+        }
     }
 
 }
