@@ -18,7 +18,6 @@ package tech.aroma.banana.application.service.operations;
 
 import com.datastax.driver.core.utils.UUIDs;
 import java.time.Instant;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -26,6 +25,7 @@ import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sir.wellington.alchemy.collections.sets.Sets;
 import tech.aroma.banana.data.ApplicationRepository;
 import tech.aroma.banana.data.FollowerRepository;
 import tech.aroma.banana.data.InboxRepository;
@@ -146,11 +146,11 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
         GetTokenInfoResponse tokenInfo;
         try
         {
-            LOG.debug("Obtaining info on Token from Authentication Service for [{}]", applicationToken);
             tokenInfo = authenticationService.getTokenInfo(getTokenInfoRequest);
         }
         catch (InvalidTokenException ex)
         {
+            LOG.warn("Application Token is Invalid: [{}]", applicationToken, ex);
             throw ex;
         }
         catch (TException ex)
@@ -234,13 +234,15 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
     {
         String appId = message.applicationId;
 
-        List<User> followers = followerRepo.getApplicationFollowers(appId);
+        Set<User> followers = Sets.toSet(followerRepo.getApplicationFollowers(appId));
 
         Set<User> owners = getOwnerForApp(appId);
         followers.addAll(owners);
 
         followers.parallelStream()
             .forEach(user -> this.tryToSaveInInbox(message, user));
+
+        LOG.debug("Store Message in the Inboxes of {} users", followers.size());
     }
 
     private Set<User> getOwnerForApp(String appId) throws TException
