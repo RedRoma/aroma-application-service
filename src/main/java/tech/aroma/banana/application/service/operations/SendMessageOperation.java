@@ -184,7 +184,7 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
             .setTitle(request.title)
             .setUrgency(request.urgency)
             .setTimeOfCreation(request.timeOfMessage)
-            .setTimeMessageReceived(Instant.now().getEpochSecond())
+            .setTimeMessageReceived(Instant.now().toEpochMilli())
             .setHostname(request.hostname)
             .setMacAddress(request.macAddress);
 
