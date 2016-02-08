@@ -32,7 +32,9 @@ import tech.aroma.banana.data.InboxRepository;
 import tech.aroma.banana.data.MessageRepository;
 import tech.aroma.banana.data.UserRepository;
 import tech.aroma.banana.thrift.Application;
+import tech.aroma.banana.thrift.LengthOfTime;
 import tech.aroma.banana.thrift.Message;
+import tech.aroma.banana.thrift.TimeUnit;
 import tech.aroma.banana.thrift.User;
 import tech.aroma.banana.thrift.application.service.SendMessageRequest;
 import tech.aroma.banana.thrift.application.service.SendMessageResponse;
@@ -257,9 +259,10 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
 
     private void tryToSaveInInbox(Message message, User user)
     {
+        LengthOfTime lifetime = new LengthOfTime(TimeUnit.HOURS, 12);
         try
         {
-            inboxRepo.saveMessageForUser(user, message);
+            inboxRepo.saveMessageForUser(user, message, lifetime);
         }
         catch (TException ex)
         {
