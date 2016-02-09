@@ -189,7 +189,7 @@ public class SendMessageOperationTest
         assertThat(message.hostname, is(request.hostname));
         assertThat(message.timeOfCreation, is(request.timeOfMessage));
 
-        verify(inboxRepo, atLeastOnce()).saveMessageForUser(Mockito.any(), eq(message));
+        verify(inboxRepo, atLeastOnce()).saveMessageForUser(Mockito.any(), eq(message), Mockito.any());
 
     }
 
