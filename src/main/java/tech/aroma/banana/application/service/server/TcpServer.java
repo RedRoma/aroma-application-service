@@ -100,7 +100,7 @@ public final class TcpServer
         {
             try
             {
-                return Clients.newAuthenticationServiceClient();
+                return Clients.newPerRequestAuthenticationServiceClient();
             }
             catch (TException ex)
             {
