@@ -31,6 +31,7 @@ import tech.aroma.banana.thrift.authentication.TokenType;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
 import tech.aroma.banana.thrift.authentication.service.GetTokenInfoRequest;
 import tech.aroma.banana.thrift.authentication.service.GetTokenInfoResponse;
+import tech.aroma.banana.thrift.authentication.service.VerifyTokenRequest;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.banana.thrift.exceptions.InvalidCredentialsException;
 import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
@@ -38,11 +39,11 @@ import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.designs.patterns.DecoratorPattern;
 
-import static tech.aroma.banana.application.service.ApplicationAssertions.validTokenIn;
 import static tech.aroma.banana.data.assertions.AuthenticationAssertions.completeToken;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.DecoratorPattern.Role.CONCRETE_DECORATOR;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
  * This class Decorates an existing Application Service, providing Authentication of incoming requests against an
@@ -87,12 +88,8 @@ final class AuthenticationLayer implements ApplicationService.Iface
                                                                               InvalidCredentialsException,
                                                                               TException
     {
-        checkThat(request)
-            .is(notNull());
-
-        checkThat(request.applicationToken)
-            .throwing(InvalidTokenException.class)
-            .is(validTokenIn(authenticationService));
+        checkThat(request).is(notNull());
+        checkTokenIsValid(request.applicationToken);
 
         if(!request.applicationToken.isSetApplicationId())
         {
@@ -106,12 +103,8 @@ final class AuthenticationLayer implements ApplicationService.Iface
     @Override
     public void sendMessageAsync(SendMessageRequest request) throws TException
     {
-        checkThat(request)
-            .is(notNull());
-
-        checkThat(request.applicationToken)
-            .throwing(InvalidTokenException.class)
-            .is(validTokenIn(authenticationService));
+        checkThat(request).is(notNull());
+        checkTokenIsValid(request.applicationToken);
 
         delegate.sendMessageAsync(request);
     }
@@ -154,6 +147,37 @@ final class AuthenticationLayer implements ApplicationService.Iface
     private ApplicationToken convertToAppToken(AuthenticationToken token)
     {
         return tokenMapper.apply(token);
+    }
+    
+    private void checkTokenIsValid(ApplicationToken token) throws TException
+    {
+        checkThat(token)
+            .throwing(InvalidTokenException.class)
+            .usingMessage("Request missing token")
+            .is(notNull());
+        
+        checkThat(token.tokenId)
+            .throwing(InvalidTokenException.class)
+            .usingMessage("Request missing tokenId")
+            .is(nonEmptyString());
+        
+        VerifyTokenRequest request = new VerifyTokenRequest()
+            .setTokenId(token.tokenId)
+            .setOwnerId(token.applicationId);
+        
+        try
+        {
+            authenticationService.verifyToken(request);
+        }
+        catch (TException ex)
+        {
+            throw ex;
+        }
+        catch (Exception ex)
+        {
+            LOG.error("Authentication Service call failed", ex);
+            throw new OperationFailedException("Could not reach Authentication Service: " + ex.getMessage());
+        }
     }
 
 
