@@ -76,6 +76,13 @@
         <!--=======================-->
         <dependency>
             <groupId>tech.sirwellington.alchemy</groupId>
+            <artifactId>alchemy-annotations</artifactId>
+            <version>1.5</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>tech.sirwellington.alchemy</groupId>
             <artifactId>alchemy-generator</artifactId>
             <scope>compile</scope>
         </dependency>
