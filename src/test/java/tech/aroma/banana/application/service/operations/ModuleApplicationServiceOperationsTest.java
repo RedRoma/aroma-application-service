@@ -23,9 +23,9 @@ import com.google.inject.Provides;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import tech.aroma.banana.data.memory.ModuleMemoryDataRepositories;
-import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
-import tech.aroma.banana.thrift.notification.service.NotificationService;
+import tech.aroma.data.memory.ModuleMemoryDataRepositories;
+import tech.aroma.thrift.authentication.service.AuthenticationService;
+import tech.aroma.thrift.notification.service.NotificationService;
 import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 

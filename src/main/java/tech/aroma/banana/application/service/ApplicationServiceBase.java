@@ -21,13 +21,13 @@ import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.aroma.banana.thrift.application.service.ApplicationService;
-import tech.aroma.banana.thrift.application.service.SendMessageRequest;
-import tech.aroma.banana.thrift.application.service.SendMessageResponse;
-import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
-import tech.aroma.banana.thrift.exceptions.InvalidCredentialsException;
-import tech.aroma.banana.thrift.exceptions.OperationFailedException;
-import tech.aroma.banana.thrift.service.BananaServiceConstants;
+import tech.aroma.thrift.application.service.ApplicationService;
+import tech.aroma.thrift.application.service.SendMessageRequest;
+import tech.aroma.thrift.application.service.SendMessageResponse;
+import tech.aroma.thrift.exceptions.InvalidArgumentException;
+import tech.aroma.thrift.exceptions.InvalidCredentialsException;
+import tech.aroma.thrift.exceptions.OperationFailedException;
+import tech.aroma.thrift.service.AromaServiceConstants;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.designs.patterns.DecoratorPattern;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
@@ -68,7 +68,7 @@ final class ApplicationServiceBase implements ApplicationService.Iface
     @Override
     public double getApiVersion() throws TException
     {
-        return BananaServiceConstants.API_VERSION;
+        return AromaServiceConstants.API_VERSION;
     }
     
     @Override

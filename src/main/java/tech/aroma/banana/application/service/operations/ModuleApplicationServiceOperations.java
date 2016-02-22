@@ -22,8 +22,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.aroma.banana.thrift.application.service.SendMessageRequest;
-import tech.aroma.banana.thrift.application.service.SendMessageResponse;
+import tech.aroma.thrift.application.service.SendMessageRequest;
+import tech.aroma.thrift.application.service.SendMessageResponse;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
 /**

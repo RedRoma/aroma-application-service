@@ -99,15 +99,15 @@
         <!--BANANA-->
         <!--=======================-->
         <dependency>
-            <groupId>tech.aroma.banana</groupId>
-            <artifactId>banana-thrift</artifactId>
-            <version>1.6</version>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>aroma-thrift</artifactId>
+            <version>1.7-SNAPSHOT</version>
         </dependency>
         
         <dependency>
-            <groupId>tech.aroma.banana</groupId>
-            <artifactId>banana-data-operations</artifactId>
-            <version>1.0</version>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>aroma-data-operations</artifactId>
+            <version>1.1-SNAPSHOT</version>
         </dependency>
 
 

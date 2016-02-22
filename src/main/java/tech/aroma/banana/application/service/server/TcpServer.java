@@ -34,14 +34,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.application.service.ModuleApplicationService;
 import tech.aroma.banana.application.service.operations.ModuleApplicationServiceOperations;
-import tech.aroma.banana.data.cassandra.ModuleCassandraDataRepositories;
-import tech.aroma.banana.data.cassandra.ModuleCassandraDevCluster;
-import tech.aroma.banana.thrift.application.service.ApplicationService;
-import tech.aroma.banana.thrift.application.service.ApplicationServiceConstants;
-import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
-import tech.aroma.banana.thrift.notification.service.NotificationService;
-import tech.aroma.banana.thrift.services.Clients;
-import tech.aroma.banana.thrift.services.NoOpNotificationService;
+import tech.aroma.data.cassandra.ModuleCassandraDataRepositories;
+import tech.aroma.data.cassandra.ModuleCassandraDevCluster;
+import tech.aroma.thrift.application.service.ApplicationService;
+import tech.aroma.thrift.application.service.ApplicationServiceConstants;
+import tech.aroma.thrift.authentication.service.AuthenticationService;
+import tech.aroma.thrift.notification.service.NotificationService;
+import tech.aroma.thrift.services.Clients;
+import tech.aroma.thrift.services.NoOpNotificationService;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -60,7 +60,7 @@ public final class TcpServer
 
     public static void main(String[] args) throws TTransportException, SocketException
     {
-        Injector injector = Guice.createInjector(new BananaServicesProvider(),
+        Injector injector = Guice.createInjector(new AromaServicesProvider(),
                                                  new ModuleApplicationServiceOperations(),
                                                  new ModuleApplicationService(),
                                                  new ModuleCassandraDataRepositories(),
@@ -87,7 +87,7 @@ public final class TcpServer
         server.stop();
     }
     
-    private static class BananaServicesProvider extends AbstractModule
+    private static class AromaServicesProvider extends AbstractModule
     {
 
         @Override
@@ -104,7 +104,7 @@ public final class TcpServer
             }
             catch (TException ex)
             {
-                throw new ProvisionException("Could not create Banana Service Client", ex);
+                throw new ProvisionException("Could not create Aroma Service Client", ex);
             }
         }
         

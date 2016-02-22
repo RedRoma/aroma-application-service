@@ -27,12 +27,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import tech.aroma.banana.application.service.operations.ModuleApplicationServiceOperations;
-import tech.aroma.banana.data.memory.ModuleMemoryDataRepositories;
-import tech.aroma.banana.thrift.application.service.ApplicationService;
-import tech.aroma.banana.thrift.authentication.ApplicationToken;
-import tech.aroma.banana.thrift.authentication.AuthenticationToken;
-import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
-import tech.aroma.banana.thrift.notification.service.NotificationService;
+import tech.aroma.data.memory.ModuleMemoryDataRepositories;
+import tech.aroma.thrift.application.service.ApplicationService;
+import tech.aroma.thrift.authentication.ApplicationToken;
+import tech.aroma.thrift.authentication.AuthenticationToken;
+import tech.aroma.thrift.authentication.service.AuthenticationService;
+import tech.aroma.thrift.notification.service.NotificationService;
 import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
