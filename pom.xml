@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>tech.aroma.banana</groupId>
+        <artifactId>banana</artifactId>
+        <version>1.3</version>
+    </parent>
+
+    <artifactId>banana-application-service</artifactId>
+    <version>1.0</version>
+    <name>${project.artifactId}</name>
+    <packaging>jar</packaging>
+
+    <url>https://github.com/RedRoma/banana-application-service</url>
+    <description>
+        Part of the Banana Service Project.
+        Simplicity is paramount.
+        The Application Service is responsible for managing Applications, including receiving messages from
+        Applications, and performing Health Checks where appropriate.
+    </description>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/RedRoma/banana-application-service/issues</url>
+    </issueManagement>
+
+    <scm>
+        <connection>scm:git:git@github.com:RedRoma/banana-application-service.git</connection>
+        <developerConnection>scm:git:git@github.com:RedRoma/banana-application-service.git</developerConnection>
+        <url>git@github.com:RedRoma/banana-application-service.git</url>
+    </scm>
+
+    <inceptionYear>2015</inceptionYear>
+
+    <prerequisites>
+        <maven>3.0.3</maven>
+    </prerequisites>
+
+    <!-- END OF POM METADATA -->
+
+    <dependencies>
+        
+        <!--=======================-->
+        <!--UNIT TESTING-->
+        <!--=======================-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>tech.sirwellington.alchemy</groupId>
+            <artifactId>alchemy-test</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+        </dependency>
+
+        <!--=======================-->
+        <!--ALCHEMY-->
+        <!--=======================-->
+        <dependency>
+            <groupId>tech.sirwellington.alchemy</groupId>
+            <artifactId>alchemy-annotations</artifactId>
+            <version>1.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>tech.sirwellington.alchemy</groupId>
+            <artifactId>alchemy-generator</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>tech.sirwellington.alchemy</groupId>
+            <artifactId>alchemy-http</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>tech.sirwellington.alchemy</groupId>
+            <artifactId>alchemy-thrift</artifactId>
+        </dependency>
+
+
+        <!--=======================-->
+        <!--BANANA-->
+        <!--=======================-->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>banana-thrift</artifactId>
+            <version>1.6</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>banana-data-operations</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+
+        <!--=======================-->
+        <!--GUICE-->
+        <!--=======================-->
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
+
+
+        <!--=======================-->
+        <!--DECORATOR LIBRARY-->
+        <!--=======================-->
+        <dependency>
+            <groupId>tech.sirwellington.decorice</groupId>
+            <artifactId>decorice</artifactId>
+        </dependency>
+        
+
+        <!--=======================-->
+        <!--LOGGING-->
+        <!--=======================-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+     
+    </dependencies>
+
+    <build>
+
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>tech.aroma.banana.application.service.server.TcpServer</mainClass>
+                            <useUniqueVersions>false</useUniqueVersions>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!--MANAGED PLUGIN-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+            </plugin>
+
+            <!--MANAGED PLUGIN-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+            </plugin>
+
+
+        </plugins>
+    </build>
+
+</project>
