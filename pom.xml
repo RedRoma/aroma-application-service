@@ -9,11 +9,11 @@
     </parent>
 
     <artifactId>banana-application-service</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <name>${project.artifactId}</name>
     <packaging>jar</packaging>
 
-    <url>https://github.com/AromaTech/banana-application-service</url>
+    <url>https://github.com/RedRoma/banana-application-service</url>
     <description>
         Part of the Banana Service Project.
         Simplicity is paramount.
@@ -23,13 +23,13 @@
 
     <issueManagement>
         <system>GitHub Issues</system>
-        <url>https://github.com/AromaTech/banana-application-service/issues</url>
+        <url>https://github.com/RedRoma/banana-application-service/issues</url>
     </issueManagement>
 
     <scm>
-        <connection>scm:git:git@github.com:AromaTech/banana-application-service.git</connection>
-        <developerConnection>scm:git:git@github.com:AromaTech/banana-application-service.git</developerConnection>
-        <url>git@github.com:AromaTech/banana-application-service.git</url>
+        <connection>scm:git:git@github.com:RedRoma/banana-application-service.git</connection>
+        <developerConnection>scm:git:git@github.com:RedRoma/banana-application-service.git</developerConnection>
+        <url>git@github.com:RedRoma/banana-application-service.git</url>
     </scm>
 
     <inceptionYear>2015</inceptionYear>
