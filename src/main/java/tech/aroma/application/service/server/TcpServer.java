@@ -1,5 +1,5 @@
 
-package tech.aroma.banana.application.service.server;
+package tech.aroma.application.service.server;
 
 /*
  * Copyright 2015 Aroma Tech.
@@ -32,8 +32,8 @@ import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.aroma.banana.application.service.ModuleApplicationService;
-import tech.aroma.banana.application.service.operations.ModuleApplicationServiceOperations;
+import tech.aroma.application.service.ModuleApplicationService;
+import tech.aroma.application.service.operations.ModuleApplicationServiceOperations;
 import tech.aroma.data.cassandra.ModuleCassandraDataRepositories;
 import tech.aroma.data.cassandra.ModuleCassandraDevCluster;
 import tech.aroma.thrift.application.service.ApplicationService;

@@ -15,7 +15,7 @@
  */
 
  
-package tech.aroma.banana.application.service;
+package tech.aroma.application.service;
 
 
 import org.slf4j.Logger;

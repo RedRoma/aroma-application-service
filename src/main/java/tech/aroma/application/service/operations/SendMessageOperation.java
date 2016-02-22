@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tech.aroma.banana.application.service.operations;
+package tech.aroma.application.service.operations;
 
 import com.datastax.driver.core.utils.UUIDs;
 import java.time.Instant;

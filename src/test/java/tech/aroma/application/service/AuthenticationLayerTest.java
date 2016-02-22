@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tech.aroma.banana.application.service;
+package tech.aroma.application.service;
 
 import java.util.function.Function;
 import org.apache.thrift.TException;

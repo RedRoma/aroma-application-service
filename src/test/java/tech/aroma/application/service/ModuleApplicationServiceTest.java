@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tech.aroma.banana.application.service;
+package tech.aroma.application.service;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -26,7 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import tech.aroma.banana.application.service.operations.ModuleApplicationServiceOperations;
+import tech.aroma.application.service.operations.ModuleApplicationServiceOperations;
 import tech.aroma.data.memory.ModuleMemoryDataRepositories;
 import tech.aroma.thrift.application.service.ApplicationService;
 import tech.aroma.thrift.authentication.ApplicationToken;

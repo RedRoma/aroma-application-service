@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tech.aroma.banana.application.service.operations;
+package tech.aroma.application.service.operations;
 
 import java.util.List;
 import junit.framework.AssertionFailedError;

@@ -14,7 +14,7 @@
   * limitations under the License.
   */
 
-package tech.aroma.banana.application.service.server;
+package tech.aroma.application.service.server;
 
 import com.google.common.collect.Lists;
 import java.util.List;

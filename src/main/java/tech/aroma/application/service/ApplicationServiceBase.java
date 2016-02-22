@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tech.aroma.banana.application.service;
+package tech.aroma.application.service;
 
 import java.util.concurrent.ExecutorService;
 import javax.inject.Inject;
@@ -32,7 +32,7 @@ import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.designs.patterns.DecoratorPattern;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
-import static tech.aroma.banana.application.service.ApplicationAssertions.withMessage;
+import static tech.aroma.application.service.ApplicationAssertions.withMessage;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.DecoratorPattern.Role.CONCRETE_COMPONENT;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
