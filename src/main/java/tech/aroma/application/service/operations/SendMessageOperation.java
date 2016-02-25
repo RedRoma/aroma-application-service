@@ -238,8 +238,8 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
 
         Set<User> followers = Sets.toSet(followerRepo.getApplicationFollowers(appId));
 
-        Set<User> owners = getOwnerForApp(appId);
-        followers.addAll(owners);
+//        Set<User> owners = getOwnerForApp(appId);
+//        followers.addAll(owners);
 
         followers.parallelStream()
             .forEach(user -> this.tryToSaveInInbox(message, user));
