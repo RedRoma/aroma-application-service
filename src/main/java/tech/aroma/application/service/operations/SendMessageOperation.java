@@ -259,7 +259,7 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
 
     private void tryToSaveInInbox(Message message, User user)
     {
-        LengthOfTime lifetime = new LengthOfTime(TimeUnit.HOURS, 12);
+        LengthOfTime lifetime = new LengthOfTime(TimeUnit.HOURS, 18);
         try
         {
             inboxRepo.saveMessageForUser(user, message, lifetime);
