@@ -10,7 +10,7 @@
 
     <appender name="rollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/var/log/aroma/Aroma_application_service/Aroma_application_service-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>/var/log/aroma/aroma_application_service/aroma_application_service-%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>14</maxHistory>
             <maxFileSize>100MB</maxFileSize>
         </rollingPolicy>
