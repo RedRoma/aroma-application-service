@@ -244,5 +244,6 @@ public class ReactionMatchersTest
         assertThat(matcher, notNullValue());
         assertThat(matcher.matches(message), is(expectedValue));
         assertThat(matcher.matches(emptyMessage), is(false));
+        assertThat(matcher.matches(null), is(false));
     }
 }
