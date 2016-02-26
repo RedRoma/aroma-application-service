@@ -20,12 +20,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.aroma.thrift.Message;
+import tech.aroma.thrift.Urgency;
 import tech.aroma.thrift.reactions.AromaMatcher;
 import tech.aroma.thrift.reactions.MatcherAll;
 import tech.aroma.thrift.reactions.MatcherBodyContains;
 import tech.aroma.thrift.reactions.MatcherBodyIs;
+import tech.aroma.thrift.reactions.MatcherHostnameEquals;
 import tech.aroma.thrift.reactions.MatcherTitleContains;
 import tech.aroma.thrift.reactions.MatcherTitleIs;
+import tech.aroma.thrift.reactions.MatcherUrgencyEquals;
+import tech.sirwellington.alchemy.generator.AlchemyGenerator;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
@@ -34,13 +38,15 @@ import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.EnumGenerators.enumValueOf;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.HEXADECIMAL;
 
 /**
  *
  * @author SirWellington
  */
-@Repeat(10)
+@Repeat(50)
 @RunWith(AlchemyTestRunner.class)
 public class AromaMatcherFactoryImplTest 
 {
@@ -170,6 +176,76 @@ public class AromaMatcherFactoryImplTest
     {
         matcher.setTitleContains(new MatcherTitleContains(randomString));
         
+        ReactionMatcher result = instance.matcherFor(matcher);
+        assertThat(result, notNullValue());
+        assertThat(result.matches(message), is(false));
+    }
+    
+    @Test
+    public void testTitleIsWhenMatch()
+    {
+        String expected = message.title;
+        matcher.setTitleIs(new MatcherTitleIs(expected));
+        
+        ReactionMatcher result = instance.matcherFor(matcher);
+        assertThat(result, notNullValue());
+        assertThat(result.matches(message), is(true));
+    }
+    
+    @Test
+    public void testTitleIsWhenNoMatch()
+    {
+        matcher.setTitleIs(new MatcherTitleIs(randomString));
+        
+        ReactionMatcher result = instance.matcherFor(matcher);
+        assertThat(result, notNullValue());
+        assertThat(result.matches(message), is(false));
+    }
+    
+    @Test
+    public void testHostnameIsWhenMatch()
+    {
+        String expected = message.hostname;
+        matcher.setHostnameEquals(new MatcherHostnameEquals(expected));
+        
+        ReactionMatcher result = instance.matcherFor(matcher);
+        assertThat(result, notNullValue());
+        assertThat(result.matches(message), is(true));
+    }
+    
+    @Test
+    public void testHostnameIsWhenNoMatch()
+    {
+        matcher.setHostnameEquals(new MatcherHostnameEquals(randomString));
+        
+        ReactionMatcher result = instance.matcherFor(matcher);
+        assertThat(result, notNullValue());
+        assertThat(result.matches(message), is(false));
+    }
+    
+    @Test
+    public void testUrgencyIsWhenMatch()
+    {
+        Urgency expected = message.urgency;
+        matcher.setUrgencyEquals(new MatcherUrgencyEquals(expected));
+        
+        ReactionMatcher result = instance.matcherFor(matcher);
+        assertThat(result, notNullValue());
+        assertThat(result.matches(message), is(true));
+    }
+    
+    @Test
+    public void testUrgencyIsWhenNoMatch()
+    {
+        AlchemyGenerator<Urgency> urgencies = enumValueOf(Urgency.class);
+        Urgency expected = one(urgencies);
+        
+        while(expected == message.urgency)
+        {
+            expected = one(urgencies);
+        }
+        
+        matcher.setUrgencyEquals(new MatcherUrgencyEquals(expected));
         ReactionMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
