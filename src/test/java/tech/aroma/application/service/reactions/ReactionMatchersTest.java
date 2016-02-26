@@ -20,6 +20,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.aroma.thrift.Message;
+import tech.aroma.thrift.Urgency;
+import tech.sirwellington.alchemy.generator.AlchemyGenerator;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
@@ -28,6 +30,8 @@ import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.EnumGenerators.enumValueOf;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.HEXADECIMAL;
 
 /**
@@ -56,6 +60,7 @@ public class ReactionMatchersTest
     private void setupData() throws Exception
     {
         emptyMessage = new Message();
+        emptyMessage.unsetUrgency();
     }
 
     @Test
@@ -146,16 +151,42 @@ public class ReactionMatchersTest
     @Test
     public void testHostnameEqualsWhenMatch()
     {
+        String expected = message.hostname;
+        
+        ReactionMatcher matcher = ReactionMatchers.hostnameEquals(expected);
+        assertMatchIs(matcher, true);
     }
 
     @Test
     public void testHostnameEqualsWhenNoMatch()
     {
+        ReactionMatcher matcher = ReactionMatchers.hostnameEquals(randomString);
+        assertMatchIs(matcher, false);
     }
 
     @Test
-    public void testUrgencyEquals()
+    public void testUrgencyEqualsWhenMatch()
     {
+        Urgency expected = message.urgency;
+        
+        ReactionMatcher matcher = ReactionMatchers.urgencyEquals(expected);
+        assertMatchIs(matcher, true);
+    }
+    
+    @Test
+    public void testUrgencyEqualsWhenNoMatch()
+    {
+        AlchemyGenerator<Urgency> urgencies = enumValueOf(Urgency.class);
+        
+        Urgency urgency = one(urgencies);
+        
+        while(urgency == message.urgency)
+        {
+            urgency = one(urgencies);
+        }
+        
+        ReactionMatcher matcher = ReactionMatchers.urgencyEquals(urgency);
+        assertMatchIs(matcher, false);
     }
 
     private void assertMatchIs(ReactionMatcher matcher, boolean expectedValue)
