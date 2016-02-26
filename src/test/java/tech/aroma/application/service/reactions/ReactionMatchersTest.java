@@ -36,17 +36,17 @@ import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.
  */
 @Repeat(10)
 @RunWith(AlchemyTestRunner.class)
-public class ReactionMatchersTest 
+public class ReactionMatchersTest
 {
 
     @GeneratePojo
     private Message message;
-    
+
     private Message emptyMessage;
-    
+
     @GenerateString(HEXADECIMAL)
     private String randomString;
-    
+
     @Before
     public void setUp() throws Exception
     {
@@ -63,7 +63,7 @@ public class ReactionMatchersTest
     {
         ReactionMatcher matcher = ReactionMatchers.matchesAll();
         assertThat(matcher, notNullValue());
-        
+
         assertThat(matcher.matches(null), is(true));
         assertThat(matcher.matches(emptyMessage), is(true));
         assertThat(matcher.matches(message), is(true));
@@ -73,41 +73,57 @@ public class ReactionMatchersTest
     public void testMatchesNone()
     {
         ReactionMatcher matcher = ReactionMatchers.matchesNone();
-        assertThat(matcher, notNullValue());
-        
+
+        assertMatchIs(matcher, false);
         assertThat(matcher.matches(null), is(false));
-        assertThat(matcher.matches(emptyMessage), is(false));
-        assertThat(matcher.matches(message), is(false));
     }
 
     @Test
     public void testTitleContainsWhenMatch()
     {
         String substring = message.title.substring(message.title.length() / 2);
-        
+
         ReactionMatcher matcher = ReactionMatchers.titleContains(substring);
-        assertThat(matcher, notNullValue());
-        assertThat(matcher.matches(message), is(true));
-        assertThat(matcher.matches(emptyMessage), is(false));
+        assertMatchIs(matcher, true);
     }
-    
+
     @Test
     public void testTitleContainsWhenNoMatch()
     {
         ReactionMatcher matcher = ReactionMatchers.titleContains(randomString);
-        assertThat(matcher, notNullValue());
-        assertThat(matcher.matches(emptyMessage), is(false));
-        assertThat(matcher.matches(message), is(false));
+        assertMatchIs(matcher, false);
     }
 
     @Test
-    public void testTitleEquals()
+    public void testTitleEqualsWhenMatch()
     {
+        String expected = message.title;
+
+        ReactionMatcher matcher = ReactionMatchers.titleEquals(expected);
+        assertMatchIs(matcher, true);
     }
 
     @Test
-    public void testBodyContains()
+    public void testTitleEqualsWhenNoMatch()
     {
+        ReactionMatcher matcher = ReactionMatchers.titleEquals(randomString);
+        assertMatchIs(matcher, false);
+    }
+
+    @Test
+    public void testBodyContainsWhenMatch()
+    {
+        String substring = message.body.substring(message.body.length() / 2);
+
+        ReactionMatcher matcher = ReactionMatchers.bodyContains(substring);
+        assertMatchIs(matcher, true);
+    }
+    
+    @Test
+    public void testBodyContainsWhenNoMatch()
+    {
+        ReactionMatcher matcher = ReactionMatchers.bodyContains(randomString);
+        assertMatchIs(matcher, false);
     }
 
     @Test
@@ -125,4 +141,10 @@ public class ReactionMatchersTest
     {
     }
 
+    private void assertMatchIs(ReactionMatcher matcher, boolean expectedValue)
+    {
+        assertThat(matcher, notNullValue());
+        assertThat(matcher.matches(message), is(expectedValue));
+        assertThat(matcher.matches(emptyMessage), is(false));
+    }
 }
