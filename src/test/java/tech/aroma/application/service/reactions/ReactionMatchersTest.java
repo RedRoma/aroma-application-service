@@ -149,6 +149,14 @@ public class ReactionMatchersTest
         assertMatchIs(matcher, false);
     }
 
+    @DontRepeat
+    @Test
+    public void testBodyContainsWithBadArgs()
+    {
+        assertThrows(() -> ReactionMatchers.bodyContains(""))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
     @Test
     public void testBodyEqualsWhenMatch()
     {
@@ -166,6 +174,14 @@ public class ReactionMatchersTest
         assertMatchIs(matcher, false);
     }
 
+    @DontRepeat
+    @Test
+    public void testBodyEqualsWithBadArgs()
+    {
+        assertThrows(() -> ReactionMatchers.bodyEquals(""))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
     @Test
     public void testHostnameEqualsWhenMatch()
     {
@@ -180,6 +196,14 @@ public class ReactionMatchersTest
     {
         ReactionMatcher matcher = ReactionMatchers.hostnameEquals(randomString);
         assertMatchIs(matcher, false);
+    }
+    
+    @DontRepeat
+    @Test
+    public void testHostnameEqualsWithBadArgs()
+    {
+        assertThrows(() -> ReactionMatchers.hostnameEquals(""))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -205,6 +229,14 @@ public class ReactionMatchersTest
 
         ReactionMatcher matcher = ReactionMatchers.urgencyEquals(urgency);
         assertMatchIs(matcher, false);
+    }
+    
+    @DontRepeat
+    @Test
+    public void testUrgencyEqualsWithBadArgs()
+    {
+        assertThrows(() -> ReactionMatchers.urgencyEquals(null))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     private void assertMatchIs(ReactionMatcher matcher, boolean expectedValue)
