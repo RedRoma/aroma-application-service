@@ -127,12 +127,29 @@ public class ReactionMatchersTest
     }
 
     @Test
-    public void testBodyEquals()
+    public void testBodyEqualsWhenMatch()
+    {
+        String expected = message.body;
+        
+        ReactionMatcher matcher = ReactionMatchers.bodyEquals(expected);
+        assertMatchIs(matcher, true);
+    }
+
+    @Test
+    public void testBodyEqualsWhenNoMatch()
+    {
+        ReactionMatcher matcher = ReactionMatchers.bodyEquals(randomString);
+        
+        assertMatchIs(matcher, false);
+    }
+
+    @Test
+    public void testHostnameEqualsWhenMatch()
     {
     }
 
     @Test
-    public void testHostnameEquals()
+    public void testHostnameEqualsWhenNoMatch()
     {
     }
 
