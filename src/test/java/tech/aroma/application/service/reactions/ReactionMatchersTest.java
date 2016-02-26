@@ -81,8 +81,23 @@ public class ReactionMatchersTest
     }
 
     @Test
-    public void testTitleContains()
+    public void testTitleContainsWhenMatch()
     {
+        String substring = message.title.substring(message.title.length() / 2);
+        
+        ReactionMatcher matcher = ReactionMatchers.titleContains(substring);
+        assertThat(matcher, notNullValue());
+        assertThat(matcher.matches(message), is(true));
+        assertThat(matcher.matches(emptyMessage), is(false));
+    }
+    
+    @Test
+    public void testTitleContainsWhenNoMatch()
+    {
+        ReactionMatcher matcher = ReactionMatchers.titleContains(randomString);
+        assertThat(matcher, notNullValue());
+        assertThat(matcher.matches(emptyMessage), is(false));
+        assertThat(matcher.matches(message), is(false));
     }
 
     @Test
