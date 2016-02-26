@@ -23,6 +23,7 @@ import tech.aroma.thrift.Message;
 import tech.aroma.thrift.Urgency;
 import tech.sirwellington.alchemy.generator.AlchemyGenerator;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
+import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
@@ -32,6 +33,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.EnumGenerators.enumValueOf;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.HEXADECIMAL;
 
 /**
@@ -99,6 +101,14 @@ public class ReactionMatchersTest
         assertMatchIs(matcher, false);
     }
 
+    @DontRepeat
+    @Test
+    public void testTitleContainsWithBadArgs()
+    {
+        assertThrows(() -> ReactionMatchers.titleContains(""))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
     @Test
     public void testTitleEqualsWhenMatch()
     {
@@ -115,6 +125,14 @@ public class ReactionMatchersTest
         assertMatchIs(matcher, false);
     }
 
+    @DontRepeat
+    @Test
+    public void testTitleEqualsWithBadArgs()
+    {
+        assertThrows(() -> ReactionMatchers.titleEquals(""))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
     @Test
     public void testBodyContainsWhenMatch()
     {
@@ -123,7 +141,7 @@ public class ReactionMatchersTest
         ReactionMatcher matcher = ReactionMatchers.bodyContains(substring);
         assertMatchIs(matcher, true);
     }
-    
+
     @Test
     public void testBodyContainsWhenNoMatch()
     {
@@ -135,7 +153,7 @@ public class ReactionMatchersTest
     public void testBodyEqualsWhenMatch()
     {
         String expected = message.body;
-        
+
         ReactionMatcher matcher = ReactionMatchers.bodyEquals(expected);
         assertMatchIs(matcher, true);
     }
@@ -144,7 +162,7 @@ public class ReactionMatchersTest
     public void testBodyEqualsWhenNoMatch()
     {
         ReactionMatcher matcher = ReactionMatchers.bodyEquals(randomString);
-        
+
         assertMatchIs(matcher, false);
     }
 
@@ -152,7 +170,7 @@ public class ReactionMatchersTest
     public void testHostnameEqualsWhenMatch()
     {
         String expected = message.hostname;
-        
+
         ReactionMatcher matcher = ReactionMatchers.hostnameEquals(expected);
         assertMatchIs(matcher, true);
     }
@@ -168,23 +186,23 @@ public class ReactionMatchersTest
     public void testUrgencyEqualsWhenMatch()
     {
         Urgency expected = message.urgency;
-        
+
         ReactionMatcher matcher = ReactionMatchers.urgencyEquals(expected);
         assertMatchIs(matcher, true);
     }
-    
+
     @Test
     public void testUrgencyEqualsWhenNoMatch()
     {
         AlchemyGenerator<Urgency> urgencies = enumValueOf(Urgency.class);
-        
+
         Urgency urgency = one(urgencies);
-        
-        while(urgency == message.urgency)
+
+        while (urgency == message.urgency)
         {
             urgency = one(urgencies);
         }
-        
+
         ReactionMatcher matcher = ReactionMatchers.urgencyEquals(urgency);
         assertMatchIs(matcher, false);
     }
