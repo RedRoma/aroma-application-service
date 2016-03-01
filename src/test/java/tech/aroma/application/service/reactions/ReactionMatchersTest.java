@@ -197,7 +197,7 @@ public class ReactionMatchersTest
         ReactionMatcher matcher = ReactionMatchers.hostnameEquals(randomString);
         assertMatchIs(matcher, false);
     }
-    
+
     @DontRepeat
     @Test
     public void testHostnameEqualsWithBadArgs()
@@ -230,13 +230,41 @@ public class ReactionMatchersTest
         ReactionMatcher matcher = ReactionMatchers.urgencyEquals(urgency);
         assertMatchIs(matcher, false);
     }
-    
+
     @DontRepeat
     @Test
     public void testUrgencyEqualsWithBadArgs()
     {
         assertThrows(() -> ReactionMatchers.urgencyEquals(null))
             .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DontRepeat
+    @Test
+    public void testNotWithBadArgs()
+    {
+        assertThrows(() -> ReactionMatchers.not(null))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void testNotWhenMatch()
+    {
+        ReactionMatcher neverMatch = ReactionMatchers.matchesNone();
+        ReactionMatcher result = ReactionMatchers.not(neverMatch);
+       
+        assertThat(result, notNullValue());
+        assertThat(result.matches(message), is(true));
+        assertThat(result.matches(emptyMessage), is(true));
+
+    }
+
+    @Test
+    public void testNotWhenNoMatch()
+    {
+        ReactionMatcher alwaysMatch = ReactionMatchers.matchesAll();
+        ReactionMatcher result = ReactionMatchers.not(alwaysMatch);
+        assertMatchIs(result, false);
     }
 
     private void assertMatchIs(ReactionMatcher matcher, boolean expectedValue)
@@ -246,4 +274,5 @@ public class ReactionMatchersTest
         assertThat(matcher.matches(emptyMessage), is(false));
         assertThat(matcher.matches(null), is(false));
     }
+
 }

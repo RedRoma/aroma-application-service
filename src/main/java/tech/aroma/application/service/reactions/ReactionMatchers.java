@@ -21,6 +21,7 @@ package tech.aroma.application.service.reactions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.thrift.Urgency;
+import tech.sirwellington.alchemy.annotations.access.NonInstantiable;
 import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
@@ -33,7 +34,8 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
  *
  * @author SirWellington
  */
-class ReactionMatchers 
+@NonInstantiable
+final class ReactionMatchers 
 {
     private final static Logger LOG = LoggerFactory.getLogger(ReactionMatchers.class);
     
@@ -46,6 +48,16 @@ class ReactionMatchers
     static ReactionMatcher matchesNone()
     {
         return message -> false;
+    }
+    
+    static ReactionMatcher not(@Required ReactionMatcher matcher)
+    {
+        checkThat(matcher).is(notNull());
+        
+        return message ->
+        {
+            return !matcher.matches(message);
+        };
     }
     
     static ReactionMatcher titleContains(@NonEmpty String substring)
