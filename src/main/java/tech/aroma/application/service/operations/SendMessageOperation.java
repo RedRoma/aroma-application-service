@@ -196,15 +196,19 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
     private SendNotificationRequest createNotificationRequestFor(Message message)
     {
         ApplicationSentMessage applicationSentMessage = new ApplicationSentMessage()
-            .setApplicationId(message.applicationId)
-            .setApplicationName(message.applicationName)
+            .setMessage(message.messageId)
             .setMessage(message.body);
 
         EventType eventType = new EventType();
         eventType.setApplicationSentMessage(applicationSentMessage);
 
+        String appId = message.applicationId;
+        Application app = new Application().setApplicationId(appId);
+        
         Event event = new Event()
-            .setTimestamp(Instant.now().getEpochSecond())
+            .setApplication(app)
+            .setApplicationId(appId)
+            .setTimestamp(Instant.now().toEpochMilli())
             .setEventId("")
             .setEventType(eventType);
 
