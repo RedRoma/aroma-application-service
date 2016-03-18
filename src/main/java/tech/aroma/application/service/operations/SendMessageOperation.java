@@ -34,7 +34,6 @@ import tech.aroma.data.UserRepository;
 import tech.aroma.thrift.Application;
 import tech.aroma.thrift.LengthOfTime;
 import tech.aroma.thrift.Message;
-import tech.aroma.thrift.TimeUnit;
 import tech.aroma.thrift.User;
 import tech.aroma.thrift.application.service.SendMessageRequest;
 import tech.aroma.thrift.application.service.SendMessageResponse;
@@ -53,6 +52,7 @@ import tech.aroma.thrift.functions.TokenFunctions;
 import tech.aroma.thrift.message.service.MessageServiceConstants;
 import tech.aroma.thrift.notification.service.NotificationService;
 import tech.aroma.thrift.notification.service.SendNotificationRequest;
+import tech.aroma.thrift.service.AromaServiceConstants;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
@@ -242,9 +242,6 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
 
         Set<User> followers = Sets.toSet(followerRepo.getApplicationFollowers(appId));
 
-//        Set<User> owners = getOwnerForApp(appId);
-//        followers.addAll(owners);
-
         followers.parallelStream()
             .forEach(user -> this.tryToSaveInInbox(message, user));
 
@@ -263,7 +260,8 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
 
     private void tryToSaveInInbox(Message message, User user)
     {
-        LengthOfTime lifetime = new LengthOfTime(TimeUnit.HOURS, 18);
+        LengthOfTime lifetime = AromaServiceConstants.DEFAULT_INBOX_LIFETIME;
+        
         try
         {
             inboxRepo.saveMessageForUser(user, message, lifetime);
