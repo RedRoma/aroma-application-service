@@ -55,7 +55,9 @@ import tech.aroma.thrift.notification.service.SendNotificationRequest;
 import tech.aroma.thrift.service.AromaServiceConstants;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
+import static tech.aroma.thrift.application.service.ApplicationServiceConstants.MAX_CHARACTERS_IN_BODY;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Checks.Internal.isNullOrEmpty;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.stringWithLengthGreaterThanOrEqualTo;
@@ -178,11 +180,18 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
     {
         UUID messageId = UUIDs.timeBased();
 
+        String body = request.body;
+
+        if (!isNullOrEmpty(body) && body.length() > MAX_CHARACTERS_IN_BODY)
+        {
+            body = body.substring(0, MAX_CHARACTERS_IN_BODY);
+        }
+
         Message message = new Message()
             .setApplicationId(token.applicationId)
             .setApplicationName(token.applicationName)
             .setMessageId(messageId.toString())
-            .setBody(request.body)
+            .setBody(body)
             .setTitle(request.title)
             .setUrgency(request.urgency)
             .setTimeOfCreation(request.timeOfMessage)

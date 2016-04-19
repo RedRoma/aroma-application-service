@@ -32,6 +32,7 @@ import tech.aroma.data.InboxRepository;
 import tech.aroma.data.MessageRepository;
 import tech.aroma.data.UserRepository;
 import tech.aroma.thrift.Application;
+import tech.aroma.thrift.LengthOfTime;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.User;
 import tech.aroma.thrift.application.service.SendMessageRequest;
@@ -54,13 +55,17 @@ import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static tech.aroma.data.assertions.RequestAssertions.validMessageId;
+import static tech.aroma.thrift.application.service.ApplicationServiceConstants.MAX_CHARACTERS_IN_BODY;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.UUID;
 
@@ -198,6 +203,32 @@ public class SendMessageOperationTest
     {
         when(authenticationService.getTokenInfo(expectedAuthenticationRequest))
             .thenThrow(new TApplicationException());
+    }
+    
+    
+    @Test
+    public void testWhenBodyExceedsLimit() throws Exception
+    {
+        String extraLongBody = one(alphabeticString(MAX_CHARACTERS_IN_BODY * 2));
+        String truncatedBody = extraLongBody.substring(0, MAX_CHARACTERS_IN_BODY);
+
+        request.setBody(extraLongBody);
+        
+        SendMessageResponse response = instance.process(request);
+        
+        checkThat(response.messageId)
+            .throwing(AssertionFailedError.class)
+            .is(validMessageId());
+        
+        verify(messageRepo).saveMessage(messageCaptor.capture(), any(LengthOfTime.class));
+        
+        Message savedMessage = messageCaptor.getValue();
+        
+        assertThat(savedMessage.body, is(truncatedBody));
+        assertThat(savedMessage.messageId, is(response.messageId));
+        
+        verify(inboxRepo, atLeastOnce())
+            .saveMessageForUser(any(User.class), eq(savedMessage), any(LengthOfTime.class));
     }
 
     private void setupExpectedAuthRequest()
