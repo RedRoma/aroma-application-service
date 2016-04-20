@@ -18,12 +18,19 @@
 package tech.aroma.application.service.reactions;
 
 import tech.aroma.thrift.Message;
+import tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPattern;
+import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
+
+import static tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPattern.Role.PRODUCT;
+import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.INTERFACE;
 
 
 /**
  *
  * @author SirWellington
  */
+@FactoryPattern(role = PRODUCT)
+@StrategyPattern(role = INTERFACE)
 public interface ReactionMatcher
 {
     boolean matches(Message message);

@@ -22,7 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.thrift.Urgency;
 import tech.aroma.thrift.reactions.AromaMatcher;
+import tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPattern;
 
+import static tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPattern.Role.FACTORY;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
@@ -31,6 +33,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
  *
  * @author SirWellington
  */
+@FactoryPattern(role = FACTORY)
 final class AromaMatcherFactoryImpl implements AromaMatcherFactory
 {
     private final static Logger LOG = LoggerFactory.getLogger(AromaMatcherFactoryImpl.class);
@@ -100,9 +103,9 @@ final class AromaMatcherFactoryImpl implements AromaMatcherFactory
             return ReactionMatchers.urgencyEquals(expectedUrgency);
         }
         
-        if(matcher.isSetHostnameEquals())
+        if(matcher.isSetHostnameIs())
         {
-            String expectedHostname = matcher.getHostnameEquals().getExpectedHostname();
+            String expectedHostname = matcher.getHostnameIs().getExpectedHostname();
             
             checkThat(expectedHostname)
                 .usingMessage("Expected Hostname cannote be empty")

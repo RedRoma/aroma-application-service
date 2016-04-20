@@ -25,10 +25,10 @@ import tech.aroma.thrift.reactions.AromaMatcher;
 import tech.aroma.thrift.reactions.MatcherAll;
 import tech.aroma.thrift.reactions.MatcherBodyContains;
 import tech.aroma.thrift.reactions.MatcherBodyIs;
-import tech.aroma.thrift.reactions.MatcherHostnameEquals;
+import tech.aroma.thrift.reactions.MatcherHostnameIs;
 import tech.aroma.thrift.reactions.MatcherTitleContains;
 import tech.aroma.thrift.reactions.MatcherTitleIs;
-import tech.aroma.thrift.reactions.MatcherUrgencyEquals;
+import tech.aroma.thrift.reactions.MatcherUrgencyIs;
 import tech.sirwellington.alchemy.generator.AlchemyGenerator;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
@@ -206,7 +206,7 @@ public class AromaMatcherFactoryImplTest
     public void testHostnameIsWhenMatch()
     {
         String expected = message.hostname;
-        matcher.setHostnameEquals(new MatcherHostnameEquals(expected));
+        matcher.setHostnameIs(new MatcherHostnameIs(expected));
         
         ReactionMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
@@ -216,7 +216,7 @@ public class AromaMatcherFactoryImplTest
     @Test
     public void testHostnameIsWhenNoMatch()
     {
-        matcher.setHostnameEquals(new MatcherHostnameEquals(randomString));
+        matcher.setHostnameIs(new MatcherHostnameIs(randomString));
         
         ReactionMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
@@ -227,7 +227,7 @@ public class AromaMatcherFactoryImplTest
     public void testUrgencyIsWhenMatch()
     {
         Urgency expected = message.urgency;
-        matcher.setUrgencyEquals(new MatcherUrgencyEquals(expected));
+        matcher.setUrgencyEquals(new MatcherUrgencyIs(expected));
         
         ReactionMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
@@ -245,7 +245,7 @@ public class AromaMatcherFactoryImplTest
             expected = one(urgencies);
         }
         
-        matcher.setUrgencyEquals(new MatcherUrgencyEquals(expected));
+        matcher.setUrgencyEquals(new MatcherUrgencyIs(expected));
         ReactionMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
