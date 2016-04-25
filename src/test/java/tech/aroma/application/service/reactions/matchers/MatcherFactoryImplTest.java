@@ -28,6 +28,7 @@ import tech.aroma.thrift.reactions.MatcherApplicationIsNot;
 import tech.aroma.thrift.reactions.MatcherBodyContains;
 import tech.aroma.thrift.reactions.MatcherBodyDoesNotContain;
 import tech.aroma.thrift.reactions.MatcherBodyIs;
+import tech.aroma.thrift.reactions.MatcherHostnameContains;
 import tech.aroma.thrift.reactions.MatcherHostnameIs;
 import tech.aroma.thrift.reactions.MatcherTitleContains;
 import tech.aroma.thrift.reactions.MatcherTitleDoesNotContain;
@@ -63,7 +64,7 @@ public class MatcherFactoryImplTest
 
     @GenerateString(UUID)
     private String appId;
-    
+
     @GeneratePojo
     private Message message;
 
@@ -83,7 +84,7 @@ public class MatcherFactoryImplTest
     private void setupData() throws Exception
     {
         message.applicationId = appId;
-        
+
         matcher = new AromaMatcher();
     }
 
@@ -155,7 +156,7 @@ public class MatcherFactoryImplTest
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(true));
     }
-    
+
     @Test
     public void testApplicationIsNotWhenNoMatch()
     {
@@ -164,18 +165,18 @@ public class MatcherFactoryImplTest
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
     }
-    
+
     @DontRepeat
     @Test
-    public void testApplicationIsNotWithBadArgs() 
+    public void testApplicationIsNotWithBadArgs()
     {
         matcher.setApplicationIsNot(new MatcherApplicationIsNot());
         assertThrows(() -> instance.matcherFor(matcher));
-        
+
         matcher.setApplicationIsNot(new MatcherApplicationIsNot(randomString));
         assertThrows(() -> instance.matcherFor(matcher));
     }
-    
+
     @Test
     public void testBodyContainsWhenMatches()
     {
@@ -253,8 +254,6 @@ public class MatcherFactoryImplTest
         assertThat(result.matches(message), is(false));
     }
 
-  
-
     @Test
     public void testTitleIsWhenMatch()
     {
@@ -275,7 +274,7 @@ public class MatcherFactoryImplTest
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
     }
-    
+
     @DontRepeat
     @Test
     public void testTitleIsWithBadArgs()
@@ -304,7 +303,7 @@ public class MatcherFactoryImplTest
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
     }
-    
+
     @DontRepeat
     @Test
     public void testTitleContainsWithBadArgs()
@@ -366,7 +365,32 @@ public class MatcherFactoryImplTest
         matcher.setHostnameIs(new MatcherHostnameIs());
         assertThrows(() -> instance.matcherFor(matcher));
     }
-    
+
+    @Test
+    public void testHostnameContainsWhenMatch()
+    {
+        String substring = halfOf(message.hostname);
+        matcher.setHostnameContains(new MatcherHostnameContains(substring));
+        MessageMatcher result = instance.matcherFor(matcher);
+        assertThat(result.matches(message), is(true));
+    }
+
+    @Test
+    public void testHostnameContainsWhenNoMatch()
+    {
+        matcher.setHostnameContains(new MatcherHostnameContains(randomString));
+        MessageMatcher result = instance.matcherFor(matcher);
+        assertThat(result.matches(message), is(false));
+    }
+
+    @DontRepeat
+    @Test
+    public void testHostnameContainsWithBadArgs()
+    {
+        matcher.setHostnameContains(new MatcherHostnameContains());
+        assertThrows(() -> instance.matcherFor(matcher));
+    }
+
     @Test
     public void testUrgencyIsWhenMatch()
     {
