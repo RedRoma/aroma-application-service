@@ -155,6 +155,25 @@ public class MatcherFactoryImplTest
         assertThat(result.matches(message), is(true));
     }
     
+    @Test
+    public void testApplicationIsNotWhenNoMatch()
+    {
+        matcher.setApplicationIsNot(new MatcherApplicationIsNot(appId));
+        MessageMatcher result = instance.matcherFor(matcher);
+        assertThat(result, notNullValue());
+        assertThat(result.matches(message), is(false));
+    }
+    
+    @DontRepeat
+    @Test
+    public void testApplicationIsNotWithBadArgs() 
+    {
+        matcher.setApplicationIsNot(new MatcherApplicationIsNot());
+        assertThrows(() -> instance.matcherFor(matcher));
+        
+        matcher.setApplicationIsNot(new MatcherApplicationIsNot(randomString));
+        assertThrows(() -> instance.matcherFor(matcher));
+    }
     
     @Test
     public void testBodyContainsWhenMatches()
