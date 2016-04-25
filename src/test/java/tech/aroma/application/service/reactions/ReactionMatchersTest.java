@@ -86,9 +86,7 @@ public class ReactionMatchersTest
         ReactionMatcher matcher = ReactionMatchers.matchesNone();
 
         assertMatchIs(matcher, false);
-        assertThat(matcher.matches(null), is(false));
         assertMatchersDoesNotMatchNullOrEmpty(matcher);
-
     }
 
     @Test
@@ -98,6 +96,7 @@ public class ReactionMatchersTest
 
         ReactionMatcher matcher = ReactionMatchers.titleContains(substring);
         assertMatchIs(matcher, true);
+        assertMatchersDoesNotMatchNullOrEmpty(matcher);
     }
 
     @Test
@@ -122,6 +121,7 @@ public class ReactionMatchersTest
 
         ReactionMatcher matcher = ReactionMatchers.bodyContains(substring);
         assertMatchIs(matcher, true);
+        assertMatchersDoesNotMatchNullOrEmpty(matcher);
     }
 
     @Test
@@ -146,6 +146,7 @@ public class ReactionMatchersTest
 
         ReactionMatcher matcher = ReactionMatchers.bodyIs(expected);
         assertMatchIs(matcher, true);
+        assertMatchersDoesNotMatchNullOrEmpty(matcher);
     }
 
     @Test
@@ -171,6 +172,7 @@ public class ReactionMatchersTest
 
         ReactionMatcher matcher = ReactionMatchers.hostnameIs(expected);
         assertMatchIs(matcher, true);
+        assertMatchersDoesNotMatchNullOrEmpty(matcher);
     }
 
     @Test
