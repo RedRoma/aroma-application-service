@@ -274,6 +274,7 @@ public class MessageReactorImplTest
         assertThat(actions, not(hasItem(actionToStore)));
     }
     
+    @DontRepeat
     @Test
     public void testWithBadArgs() throws Exception
     {
