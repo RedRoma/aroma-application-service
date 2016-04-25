@@ -18,8 +18,10 @@
 package tech.aroma.application.service.reactions;
 
 
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sir.wellington.alchemy.collections.sets.Sets;
 import tech.aroma.thrift.Urgency;
 import tech.sirwellington.alchemy.annotations.access.NonInstantiable;
 import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
@@ -82,7 +84,7 @@ final class ReactionMatchers
         
     }
     
-    static ReactionMatcher titleEquals(@NonEmpty String title)
+    static ReactionMatcher titleIs(@NonEmpty String title)
     {
         checkThat(title)
             .is(nonEmptyString());
@@ -101,6 +103,11 @@ final class ReactionMatchers
             
             return message.title.equals(title);
         };
+    } 
+    
+    static ReactionMatcher titleIsNot(@NonEmpty String title)
+    {
+        return not(titleIs(title));
     }
     
     static ReactionMatcher bodyContains(@NonEmpty String substring)
@@ -124,8 +131,12 @@ final class ReactionMatchers
         };
     }
     
+    static ReactionMatcher bodyDoesNotContain(@NonEmpty String substring)
+    {
+        return not(bodyContains(substring));
+    }
     
-    static ReactionMatcher bodyEquals(@NonEmpty String expectedBody)
+    static ReactionMatcher bodyIs(@NonEmpty String expectedBody)
     {
         checkThat(expectedBody)
             .usingMessage("Expected Body cannot be empty")
@@ -147,7 +158,7 @@ final class ReactionMatchers
         };
     }
     
-    static ReactionMatcher hostnameEquals(@NonEmpty String expectedHostname)
+    static ReactionMatcher hostnameIs(@NonEmpty String expectedHostname)
     {
         checkThat(expectedHostname)
             .usingMessage("Expected Hostname cannot be empty")
@@ -168,8 +179,35 @@ final class ReactionMatchers
             return message.hostname.equals(expectedHostname);
         };
     }
+ 
+    static ReactionMatcher hostnameContains(@NonEmpty final String substring)
+    {
+        checkThat(substring)
+            .usingMessage("Hostname string cannot be empty")
+            .is(nonEmptyString());
+        
+        return message ->
+        {
+            if (message == null)
+            {
+                return false;
+            }
+            
+            if (isNullOrEmpty(message.hostname))
+            {
+                return false;
+            }
+            
+            return message.hostname.contains(substring);
+        };
+    }
     
-    static ReactionMatcher urgencyEquals(@Required Urgency urgency)
+    static ReactionMatcher hostnameDoesNotContain(@NonEmpty final String substring)
+    {
+        return not(hostnameContains(substring));
+    }
+
+    static ReactionMatcher urgencyIs(@Required Urgency urgency)
     {
         checkThat(urgency)
             .usingMessage("Urgency cannot be null")
@@ -188,6 +226,27 @@ final class ReactionMatchers
             }
             
             return message.urgency == urgency;
+        };
+    }
+    
+    static ReactionMatcher urgencyIsOneOf(@Required Set<Urgency> urgencies)
+    {
+        checkThat(urgencies).is(notNull());
+        
+        return message ->
+        {
+            //Interpreting no urgencies is matching all
+            if (Sets.isEmpty(urgencies))
+            {
+                return true;
+            }
+            
+            if (!message.isSetUrgency())
+            {
+                return false;
+            }
+            
+            return urgencies.contains(message.urgency);
         };
     }
 }
