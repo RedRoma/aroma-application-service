@@ -90,8 +90,8 @@ final class MessageReactorImpl implements MessageReactor
         
         LOG.debug("Found {} applicable actions for Message {}", applicableActions.size(), message);
         
-        boolean runThroughInboxes = true;
-        boolean storeMessage = true;
+        boolean shouldRunThroughInboxes = true;
+        boolean shouldStoreMessage = true;
         
         List<Action> initialActions = Lists.create();
         
@@ -99,13 +99,13 @@ final class MessageReactorImpl implements MessageReactor
         {
             if (action.isSetSkipInbox())
             {
-                runThroughInboxes = false;
+                shouldRunThroughInboxes = false;
                 continue;
             }
             
             if (action.isSetDontStoreMessage())
             {
-                storeMessage = false;
+                shouldStoreMessage = false;
                 continue;
             }
             
@@ -113,21 +113,21 @@ final class MessageReactorImpl implements MessageReactor
             initialActions.add(newAction);
         }
         
-        if (storeMessage)
+        if (shouldStoreMessage)
         {
             Action actionToStoreMessage = actionFactory.actionToStoreMessage(message);
             initialActions.add(actionToStoreMessage);
         }
         
-        if (runThroughInboxes)
+        if (shouldRunThroughInboxes)
         {
             Action actionToRunThroughFollowerInboxes = actionFactory.actionToRunThroughFollowerInboxes(message);
             initialActions.add(actionToRunThroughFollowerInboxes);
         }
         
-        LOG.debug("Beginning Message Processing with {} initial actions", initialActions.size());
+        LOG.debug("Processing Message with {} initial actions: [{}]", initialActions.size(), message.messageId);
         int totalActions = actionRunner.runThroughActions(message, initialActions);
-        LOG.debug("Ran through {} total actions for Message {}", totalActions, message);
+        LOG.debug("Ran through {} total actions for Message {}", totalActions, message.messageId);
         
         return new SendMessageResponse().setMessageId(message.messageId);
     }
