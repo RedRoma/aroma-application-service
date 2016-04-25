@@ -272,6 +272,7 @@ public class ReactionMatchersTest
 
         ReactionMatcher matcher = ReactionMatchers.titleIs(expected);
         assertMatchIs(matcher, true);
+        assertMatchersDoesNotMatchNullOrEmpty(matcher);
     }
 
     @Test
@@ -297,6 +298,7 @@ public class ReactionMatchersTest
 
         ReactionMatcher matcher = ReactionMatchers.titleIsNot(anotherRandomString);
         assertMatchIs(matcher, true);
+        assertMatchersMatchesNullOrEmpty(matcher);
     }
 
     @Test
@@ -305,6 +307,13 @@ public class ReactionMatchersTest
         message.title = randomString;
         ReactionMatcher matcher = ReactionMatchers.titleIsNot(randomString);
         assertMatchIs(matcher, false);
+    }
+    
+    @DontRepeat
+    @Test
+    public void testTitleIsNotWithBadArgs()
+    {
+        assertThrows(() -> ReactionMatchers.titleIsNot(""));
     }
 
     @Test
