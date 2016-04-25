@@ -15,7 +15,7 @@
  */
 
  
-package tech.aroma.application.service.reactions;
+package tech.aroma.application.service.reactions.matchers;
 
 
 import java.util.Set;

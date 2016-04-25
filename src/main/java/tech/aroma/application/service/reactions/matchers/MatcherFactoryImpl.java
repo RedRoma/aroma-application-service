@@ -15,7 +15,7 @@
  */
 
  
-package tech.aroma.application.service.reactions;
+package tech.aroma.application.service.reactions.matchers;
 
 
 import org.slf4j.Logger;
@@ -28,9 +28,6 @@ import static tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPat
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 
 /**
  *

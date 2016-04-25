@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tech.aroma.application.service.reactions;
+package tech.aroma.application.service.reactions.matchers;
 
 import java.util.Set;
 import org.junit.Before;

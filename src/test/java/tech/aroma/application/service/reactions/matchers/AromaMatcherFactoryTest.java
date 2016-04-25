@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package tech.aroma.application.service.reactions;
+package tech.aroma.application.service.reactions.matchers;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tech.aroma.application.service.operations.reactions;
+package tech.aroma.application.service.reactions;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,11 +22,11 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
-import tech.aroma.application.service.reactions.MatchAlgorithm;
 import tech.aroma.application.service.reactions.actions.Action;
 import tech.aroma.application.service.reactions.actions.ActionFactory;
 import tech.aroma.application.service.reactions.actions.ActionMapper;
 import tech.aroma.application.service.reactions.actions.ActionRunner;
+import tech.aroma.application.service.reactions.matchers.MatchAlgorithm;
 import tech.aroma.data.ReactionRepository;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.application.service.SendMessageResponse;
@@ -85,6 +85,7 @@ final class MessageReactorImpl implements MessageReactor
             if (action.isSetDontStoreMessage())
             {
                 storeMessage = false;
+                continue;
             }
             
             Action newAction = actionMapper.create(message, action);

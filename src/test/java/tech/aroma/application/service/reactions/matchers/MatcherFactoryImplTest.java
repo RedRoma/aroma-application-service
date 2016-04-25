@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tech.aroma.application.service.reactions;
+package tech.aroma.application.service.reactions.matchers;
 
 import org.junit.Before;
 import org.junit.Test;

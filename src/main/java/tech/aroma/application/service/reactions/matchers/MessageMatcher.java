@@ -14,22 +14,24 @@
  * limitations under the License.
  */
 
-package tech.aroma.application.service.operations.reactions;
 
-import com.google.inject.ImplementedBy;
-import org.apache.thrift.TException;
+package tech.aroma.application.service.reactions.matchers;
+
 import tech.aroma.thrift.Message;
-import tech.aroma.thrift.application.service.SendMessageResponse;
-import tech.sirwellington.alchemy.annotations.arguments.Required;
+import tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPattern;
+import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
+
+import static tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPattern.Role.PRODUCT;
+import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.INTERFACE;
 
 
 /**
  *
  * @author SirWellington
  */
-@ImplementedBy(MessageReactorImpl.class)
-public interface MessageReactor
+@FactoryPattern(role = PRODUCT)
+@StrategyPattern(role = INTERFACE)
+public interface MessageMatcher
 {
-    SendMessageResponse reactToMessage(@Required Message message) throws TException;
-
+    boolean matches(Message message);
 }

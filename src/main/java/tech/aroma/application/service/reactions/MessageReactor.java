@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-
 package tech.aroma.application.service.reactions;
 
 import com.google.inject.ImplementedBy;
-import tech.aroma.thrift.reactions.AromaMatcher;
+import org.apache.thrift.TException;
+import tech.aroma.thrift.Message;
+import tech.aroma.thrift.application.service.SendMessageResponse;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 
@@ -26,13 +27,9 @@ import tech.sirwellington.alchemy.annotations.arguments.Required;
  *
  * @author SirWellington
  */
-@ImplementedBy(MatcherFactoryImpl.class)
-public interface MatcherFactory 
+@ImplementedBy(MessageReactorImpl.class)
+public interface MessageReactor
 {
-    MessageMatcher matcherFor(@Required AromaMatcher matcher);
-    
-    static MatcherFactory newInstance()
-    {
-        return new MatcherFactoryImpl();
-    }
+    SendMessageResponse reactToMessage(@Required Message message) throws TException;
+
 }
