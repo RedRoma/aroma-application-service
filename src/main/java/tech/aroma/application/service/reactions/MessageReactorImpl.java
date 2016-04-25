@@ -18,6 +18,7 @@ package tech.aroma.application.service.reactions;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,23 +34,45 @@ import tech.aroma.thrift.reactions.AromaAction;
 import tech.aroma.thrift.reactions.Reaction;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
+import tech.sirwellington.alchemy.annotations.concurrency.ThreadSafe;
 
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
- *
+ * This Message Reactor creates the initial {@linkplain Action Actions}
+ * for an incoming message, and begins the 
+ * {@linkplain ActionRunner#runThroughActions(tech.aroma.thrift.Message, java.util.List) execution process}.
+ * 
  * @author SirWellington
  */
 @Internal
+@ThreadSafe
 final class MessageReactorImpl implements MessageReactor
 {
-
+    
     private final static Logger LOG = LoggerFactory.getLogger(MessageReactorImpl.class);
     
-    private ActionRunner actionRunner;
-    private ActionFactory factory;
-    private MatchAlgorithm matchAlgorithm;
-    private ReactionRepository reactionRepo;
-
+    private final ActionRunner actionRunner;
+    private final ActionFactory actionFactory;
+    private final MatchAlgorithm matchAlgorithm;
+    private final ReactionRepository reactionRepo;
+    
+    @Inject
+    MessageReactorImpl(ActionRunner actionRunner,
+                       ActionFactory actionFactory,
+                       MatchAlgorithm matchAlgorithm,
+                       ReactionRepository reactionRepo)
+    {
+        checkThat(actionRunner, actionFactory, matchAlgorithm, reactionRepo)
+            .are(notNull());
+        
+        this.actionRunner = actionRunner;
+        this.actionFactory = actionFactory;
+        this.matchAlgorithm = matchAlgorithm;
+        this.reactionRepo = reactionRepo;
+    }
+    
     @Override
     public SendMessageResponse reactToMessage(@Required Message message) throws TException
     {
@@ -57,7 +80,7 @@ final class MessageReactorImpl implements MessageReactor
         
         String appId = message.applicationId;
         List<Reaction> reactions = reactionRepo.getReactionsForApplication(appId);
-       
+        
         List<AromaAction> applicableActions = Lists.nullToEmpty(reactions)
             .stream()
             .filter((reaction) -> matchAlgorithm.matches(message, reaction.matchers))
@@ -71,7 +94,7 @@ final class MessageReactorImpl implements MessageReactor
         boolean storeMessage = true;
         
         List<Action> initialActions = Lists.create();
-      
+        
         for (AromaAction action : applicableActions)
         {
             if (action.isSetSkipInbox())
@@ -86,19 +109,19 @@ final class MessageReactorImpl implements MessageReactor
                 continue;
             }
             
-            Action newAction = factory.actionFor(action);
+            Action newAction = actionFactory.actionFor(action);
             initialActions.add(newAction);
         }
         
         if (storeMessage)
         {
-            Action actionToStoreMessage = factory.actionToStoreMessage(message);
+            Action actionToStoreMessage = actionFactory.actionToStoreMessage(message);
             initialActions.add(actionToStoreMessage);
         }
         
         if (runThroughInboxes)
         {
-            Action actionToRunThroughFollowerInboxes = factory.actionToRunThroughFollowerInboxes(message);
+            Action actionToRunThroughFollowerInboxes = actionFactory.actionToRunThroughFollowerInboxes(message);
             initialActions.add(actionToRunThroughFollowerInboxes);
         }
         
@@ -108,5 +131,5 @@ final class MessageReactorImpl implements MessageReactor
         
         return new SendMessageResponse().setMessageId(message.messageId);
     }
-
+    
 }

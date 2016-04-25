@@ -18,18 +18,32 @@ package tech.aroma.application.service.reactions;
 
 import com.google.inject.ImplementedBy;
 import org.apache.thrift.TException;
+import tech.aroma.application.service.reactions.actions.ActionFactory;
+import tech.aroma.application.service.reactions.actions.ActionRunner;
+import tech.aroma.application.service.reactions.matchers.MatchAlgorithm;
+import tech.aroma.data.ReactionRepository;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.application.service.SendMessageResponse;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
+import tech.sirwellington.alchemy.annotations.concurrency.ThreadSafe;
 
 
 /**
- *
+ * The {@link MessageReaction} reacts to every valid message sent to the Application Service.
+ * 
  * @author SirWellington
  */
 @ImplementedBy(MessageReactorImpl.class)
+@ThreadSafe
 public interface MessageReactor
 {
     SendMessageResponse reactToMessage(@Required Message message) throws TException;
 
+    static MessageReactor newInstance(@Required ActionFactory actionFactory, 
+                                      @Required ActionRunner actionRunner,
+                                      @Required MatchAlgorithm matchAlgorithm,
+                                      @Required ReactionRepository reactionRepo)
+    {
+        return new MessageReactorImpl(actionRunner, actionFactory, matchAlgorithm, reactionRepo);
+    }
 }
