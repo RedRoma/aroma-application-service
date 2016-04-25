@@ -29,6 +29,7 @@ import tech.aroma.thrift.reactions.MatcherBodyContains;
 import tech.aroma.thrift.reactions.MatcherBodyDoesNotContain;
 import tech.aroma.thrift.reactions.MatcherBodyIs;
 import tech.aroma.thrift.reactions.MatcherHostnameContains;
+import tech.aroma.thrift.reactions.MatcherHostnameDoesNotContain;
 import tech.aroma.thrift.reactions.MatcherHostnameIs;
 import tech.aroma.thrift.reactions.MatcherTitleContains;
 import tech.aroma.thrift.reactions.MatcherTitleDoesNotContain;
@@ -388,6 +389,31 @@ public class MatcherFactoryImplTest
     public void testHostnameContainsWithBadArgs()
     {
         matcher.setHostnameContains(new MatcherHostnameContains());
+        assertThrows(() -> instance.matcherFor(matcher));
+    }
+    
+    @Test
+    public void testHostnameDoesNotContainWhenMatch()
+    {
+        matcher.setHostnameDoesNotContain(new MatcherHostnameDoesNotContain(randomString));
+        MessageMatcher result = instance.matcherFor(matcher);
+        assertThat(result.matches(message), is(true));
+    }
+    
+    @Test
+    public void testHostnameDoesNotContainWhenNoMatch()
+    {
+        String substring = halfOf(message.hostname);
+        matcher.setHostnameDoesNotContain(new MatcherHostnameDoesNotContain(substring));
+        MessageMatcher result = instance.matcherFor(matcher);
+        assertThat(result.matches(message), is(false));
+    }
+    
+    @DontRepeat
+    @Test
+    public void testHostnameDoesNotContainWithBadArgs()
+    {
+        matcher.setHostnameDoesNotContain(new MatcherHostnameDoesNotContain());
         assertThrows(() -> instance.matcherFor(matcher));
     }
 
