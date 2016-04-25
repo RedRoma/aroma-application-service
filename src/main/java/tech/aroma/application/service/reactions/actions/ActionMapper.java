@@ -46,17 +46,17 @@ public interface ActionMapper
 
             if (action.isSetForwardToSlackChannel())
             {
-                return factory.actionToSendToSlackChannel(message, action.getForwardToSlackChannel());
+                return factory.actionToSendToSlackChannel(action.getForwardToSlackChannel());
             }
 
             if (action.isSetForwardToSlackUser())
             {
-                return factory.actionToSendToSlackUser(message, action.getForwardToSlackUser());
+                return factory.actionToSendToSlackUser(action.getForwardToSlackUser());
             }
 
             if (action.isSetSendEmail())
             {
-                return factory.actionToSendEmail(message, action.getSendEmail());
+                return factory.actionToSendEmail(action.getSendEmail());
             }
             
             

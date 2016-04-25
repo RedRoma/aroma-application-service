@@ -32,19 +32,19 @@ public interface ActionFactory
 
     Action actionToDoNothing();
 
-    Action actionToSendToSlackChannel(@Required Message message, @Required ActionForwardToSlackChannel slack);
+    Action actionToSendToSlackChannel(@Required ActionForwardToSlackChannel slack);
 
-    Action actionToSendToSlackUser(@Required Message message, @Required ActionForwardToSlackUser slack);
+    Action actionToSendToSlackUser(@Required ActionForwardToSlackUser slack);
 
     Action actionToSendNotifications(@Required Message message);
 
     Action actionToRunThroughFollowerInboxes(@Required Message message);
 
-    Action actionToRunThroughInbox(@Required Message message, @Required User user);
+    Action actionToRunThroughInbox(@Required User user);
 
     Action actionToStoreMessage(@Required Message message);
 
-    Action actionToStoreInInbox(@Required Message message, @Required User user);
+    Action actionToStoreInInbox(@Required User user);
 
-    Action actionToSendEmail(@Required Message message, @Required ActionSendEmail sendEmail);
+    Action actionToSendEmail(@Required ActionSendEmail sendEmail);
 }

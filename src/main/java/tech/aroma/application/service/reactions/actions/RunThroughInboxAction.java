@@ -21,7 +21,6 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
-import tech.aroma.application.service.reactions.MessageReactor;
 import tech.aroma.application.service.reactions.matchers.MatchAlgorithm;
 import tech.aroma.data.ReactionRepository;
 import tech.aroma.thrift.Message;
@@ -33,26 +32,43 @@ import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
 import static java.util.stream.Collectors.toList;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
- * This step runs the message through a follower's Inbox and any 
- * Reactions it may have.
- * 
+ * This step runs the message through a follower's Inbox and any Reactions it may have.
+ *
  * @author SirWellington
  */
 @StrategyPattern(role = CONCRETE_BEHAVIOR)
 @Internal
 class RunThroughInboxAction implements Action
 {
-
+    
     private final static Logger LOG = LoggerFactory.getLogger(RunThroughInboxAction.class);
-
-    private ActionFactory actionFactory;
-    private MessageReactor creator;
-    private MatchAlgorithm matchAlgorithm;
-    private ReactionRepository reactionRepo;
-    private User user;
-
+    
+    private final ActionFactory actionFactory;
+    private final ActionMapper actionMapper;
+    private final MatchAlgorithm matchAlgorithm;
+    private final ReactionRepository reactionRepo;
+    private final User user;
+    
+    RunThroughInboxAction(ActionFactory actionFactory,
+                          ActionMapper actionMapper,
+                          MatchAlgorithm matchAlgorithm,
+                          ReactionRepository reactionRepo,
+                          User user)
+    {
+        checkThat(actionFactory, actionMapper, matchAlgorithm, reactionRepo, user)
+            .are(notNull());
+        
+        this.actionFactory = actionFactory;
+        this.actionMapper = actionMapper;
+        this.matchAlgorithm = matchAlgorithm;
+        this.reactionRepo = reactionRepo;
+        this.user = user;
+    }
+    
     @Override
     public List<Action> actOnMessage(Message message) throws TException
     {
@@ -71,22 +87,23 @@ class RunThroughInboxAction implements Action
         
         for (AromaAction action : matchingActions)
         {
-            if (action.isSetSkipInbox())
+            if (action.isSetSkipInbox() || action.isSetDontStoreMessage())
             {
                 shouldStoreInInbox = false;
                 continue;
             }
             
+            Action newAction = actionMapper.create(message, action);
+            newActions.add(newAction);
         }
-        
         
         if (shouldStoreInInbox)
         {
-            Action actionToSaveInInbox = actionFactory.actionToStoreInInbox(message, user);
+            Action actionToSaveInInbox = actionFactory.actionToStoreInInbox(user);
             newActions.add(actionToSaveInInbox);
         }
         
         return newActions;
     }
-
+    
 }

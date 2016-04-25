@@ -44,52 +44,52 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
 @StrategyPattern(role = CONCRETE_BEHAVIOR)
 final class SendNotificationAction implements Action
 {
-    
+
     private final static Logger LOG = LoggerFactory.getLogger(SendNotificationAction.class);
-    
+
     private final NotificationService.Iface notificationService;
-    
+
     SendNotificationAction(NotificationService.Iface notificationService)
     {
         checkThat(notificationService)
             .is(notNull());
         this.notificationService = notificationService;
     }
-    
+
     @Override
     public List<Action> actOnMessage(Message message) throws TException
     {
         Action.checkMessage(message);
-        
+
         SendNotificationRequest request = createNotificationRequestFor(message);
-        
+
         tryToSendNotification(request);
-        
+
         return Lists.emptyList();
     }
-    
+
     private SendNotificationRequest createNotificationRequestFor(Message message)
     {
         ApplicationSentMessage applicationSentMessage = new ApplicationSentMessage()
             .setMessage(message.messageId)
             .setMessage(message.body);
-        
+
         EventType eventType = new EventType();
         eventType.setApplicationSentMessage(applicationSentMessage);
-        
+
         String appId = message.applicationId;
         Application app = new Application().setApplicationId(appId);
-        
+
         Event event = new Event()
             .setApplication(app)
             .setApplicationId(appId)
             .setTimestamp(Instant.now().toEpochMilli())
             .setEventId("")
             .setEventType(eventType);
-        
+
         return new SendNotificationRequest().setEvent(event);
     }
-    
+
     private void tryToSendNotification(SendNotificationRequest sendNotificationRequest)
     {
         try
@@ -101,5 +101,5 @@ final class SendNotificationAction implements Action
             LOG.warn("Failed to send Notification request: {}", sendNotificationRequest, ex);
         }
     }
-    
+
 }
