@@ -16,6 +16,7 @@
 
 package tech.aroma.application.service.reactions.actions;
 
+import com.google.inject.ImplementedBy;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.User;
 import tech.aroma.thrift.reactions.ActionForwardToSlackChannel;
@@ -30,6 +31,7 @@ import tech.sirwellington.alchemy.annotations.concurrency.ThreadSafe;
  * @author SirWellington
  */
 @ThreadSafe
+@ImplementedBy(ActionFactoryImpl.class)
 public interface ActionFactory
 {
 
