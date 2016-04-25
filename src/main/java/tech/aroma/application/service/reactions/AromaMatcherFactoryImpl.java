@@ -65,7 +65,7 @@ final class AromaMatcherFactoryImpl implements AromaMatcherFactory
                 .usingMessage("Expected Body cannot be empty")
                 .is(nonEmptyString());
             
-            return ReactionMatchers.bodyEquals(expectedBody);
+            return ReactionMatchers.bodyIs(expectedBody);
         }
         
         if(matcher.isSetTitleContains())
@@ -100,7 +100,7 @@ final class AromaMatcherFactoryImpl implements AromaMatcherFactory
                 .usingMessage("Expected Urgency cannot be null")
                 .is(notNull());
             
-            return ReactionMatchers.urgencyEquals(expectedUrgency);
+            return ReactionMatchers.urgencyIs(expectedUrgency);
         }
         
         if(matcher.isSetHostnameIs())
@@ -111,7 +111,7 @@ final class AromaMatcherFactoryImpl implements AromaMatcherFactory
                 .usingMessage("Expected Hostname cannote be empty")
                 .is(nonEmptyString());
             
-            return ReactionMatchers.hostnameEquals(expectedHostname);
+            return ReactionMatchers.hostnameIs(expectedHostname);
         }
         
         return ReactionMatchers.matchesNone();
