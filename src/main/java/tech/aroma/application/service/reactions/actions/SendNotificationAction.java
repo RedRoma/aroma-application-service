@@ -53,6 +53,7 @@ final class SendNotificationAction implements Action
     {
         checkThat(notificationService)
             .is(notNull());
+        
         this.notificationService = notificationService;
     }
 

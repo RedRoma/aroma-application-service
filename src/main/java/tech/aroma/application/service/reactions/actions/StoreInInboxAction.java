@@ -62,7 +62,7 @@ final class StoreInInboxAction implements Action
         Action.checkMessage(message);
 
         inboxRepo.saveMessageForUser(user, message, AromaServiceConstants.DEFAULT_INBOX_LIFETIME);
-        LOG.debug("Saved Message {} in Inbox of User {}", message, user);
+        LOG.debug("Saved Message {} in Inbox of User {}", message.messageId, user);
 
         return Lists.emptyList();
     }

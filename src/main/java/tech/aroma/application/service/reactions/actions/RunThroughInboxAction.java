@@ -71,19 +71,21 @@ class RunThroughInboxAction implements Action
     {
         Action.checkMessage(message);
 
-        List<Action> newActions = Lists.create();
-        List<Reaction> reactions = reactionRepo.getReactionsForUser(user.userId);
-
+        List<AromaAction> applicableActions = getApplicationActionsFor(message, user);
+        
+        LOG.debug("Found {} application actions for message {} through Inbox of user {}",
+                  applicableActions.size(), 
+                  message.messageId,
+                  user.userId);
+        
+        //This Action is assumed true unless otherwise excluded.
         boolean shouldStoreInInbox = true;
 
-        List<AromaAction> matchingActions = reactions.stream()
-            .filter(r -> matchAlgorithm.matches(message, r.matchers))
-            .flatMap(r -> r.getActions().stream())
-            .distinct()
-            .collect(toList());
+        List<Action> newActions = Lists.create();
 
-        for (AromaAction action : matchingActions)
+        for (AromaAction action : applicableActions)
         {
+            //We will take any one of these to signify that the message should not be stored in the Inbox
             if (action.isSetSkipInbox() || action.isSetDontStoreMessage())
             {
                 shouldStoreInInbox = false;
@@ -103,10 +105,22 @@ class RunThroughInboxAction implements Action
         return newActions;
     }
 
+  
+    private List<AromaAction> getApplicationActionsFor(Message message, User user) throws TException
+    {
+        List<Reaction> reactions = reactionRepo.getReactionsForUser(user.userId);
+        reactions = Lists.nullToEmpty(reactions);
+
+        return reactions.stream()
+            .filter(r -> matchAlgorithm.matches(message, r.matchers))
+            .flatMap(r -> r.getActions().stream())
+            .distinct()
+            .collect(toList());
+    }
+
     @Override
     public String toString()
     {
         return "RunThroughInboxAction{" + "actionFactory=" + actionFactory + ", matchAlgorithm=" + matchAlgorithm + ", reactionRepo=" + reactionRepo + ", user=" + user + '}';
     }
-
 }

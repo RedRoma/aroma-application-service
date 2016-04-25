@@ -43,7 +43,7 @@ final class IgnoreInbox implements Action
     {
         Action.checkMessage(message);
 
-        LOG.debug("Skipping Inbox for Message {}", message);
+        LOG.debug("Skipping Inbox for Message {}", message.messageId);
 
         return Lists.emptyList();
     }
