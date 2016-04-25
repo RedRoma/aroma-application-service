@@ -32,8 +32,10 @@ import tech.aroma.thrift.reactions.ActionForwardToSlackUser;
 import tech.aroma.thrift.reactions.ActionSendEmail;
 import tech.aroma.thrift.reactions.AromaAction;
 import tech.sirwellington.alchemy.annotations.access.Internal;
+import tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPattern;
 import tech.sirwellington.alchemy.http.AlchemyHttp;
 
+import static tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPattern.Role.FACTORY;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
@@ -42,6 +44,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
  * @author SirWellington
  */
 @Internal
+@FactoryPattern(role = FACTORY)
 final class ActionFactoryImpl implements ActionFactory
 {
 

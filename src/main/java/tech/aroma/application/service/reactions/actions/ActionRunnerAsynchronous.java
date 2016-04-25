@@ -52,20 +52,23 @@ final class ActionRunnerAsynchronous implements ActionRunner
 
         while (!queue.isEmpty())
         {
+            ++totalRuns;
+
             List<Action> additionalActions = queue.parallelStream()
-                .map(action -> this.runAction(message, action))
+                .map(action -> this.tryToRunActionOnMessage(action, message))
                 .flatMap(List::stream)
                 .collect(toList());
+            
+            LOG.debug("Pass {} complete with {} additional actions to run through.", totalRuns, additionalActions.size());
 
             queue.addAll(additionalActions);
 
-            ++totalRuns;
         }
 
         return totalRuns;
     }
 
-    private List<Action> runAction(Message message, Action action)
+    private List<Action> tryToRunActionOnMessage(Action action, Message message)
     {
         try
         {

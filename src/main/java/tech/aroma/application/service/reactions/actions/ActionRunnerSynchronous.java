@@ -57,11 +57,12 @@ final class ActionRunnerSynchronous implements ActionRunner
             {
                 break;
             }
+            ++totalRuns;
             
             List<Action> additionalActions = runAction(message, nextAction);
             queue.addAll(additionalActions);
-            
-            ++totalRuns;
+
+            LOG.debug("Pass {} complete with {} additional actions to run through.", totalRuns, additionalActions.size());
         }
 
         return totalRuns;

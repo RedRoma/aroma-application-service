@@ -16,9 +16,11 @@
 
 package tech.aroma.application.service.reactions.actions;
 
+import com.google.inject.ImplementedBy;
 import java.util.List;
 import tech.aroma.thrift.Message;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
+import tech.sirwellington.alchemy.annotations.concurrency.ThreadSafe;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.INTERFACE;
@@ -28,6 +30,8 @@ import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPa
  * @author SirWellington
  */
 @StrategyPattern(role = INTERFACE)
+@ThreadSafe
+@ImplementedBy(ActionRunnerAsynchronous.class)
 public interface ActionRunner
 {
     
@@ -37,7 +41,7 @@ public interface ActionRunner
      * @param message The message to process.
      * @param actions The Actions to perform based on the message. Can be empty but not null.
      * 
-     * @return The number of actions executed.
+     * @return The total number of actions executed.
      */
     int runThroughActions(@Required Message message, @Required List<Action> actions);
 

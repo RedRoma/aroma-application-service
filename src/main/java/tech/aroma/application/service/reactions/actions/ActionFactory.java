@@ -23,11 +23,13 @@ import tech.aroma.thrift.reactions.ActionForwardToSlackUser;
 import tech.aroma.thrift.reactions.ActionSendEmail;
 import tech.aroma.thrift.reactions.AromaAction;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
+import tech.sirwellington.alchemy.annotations.concurrency.ThreadSafe;
 
 /**
  *
  * @author SirWellington
  */
+@ThreadSafe
 public interface ActionFactory
 {
 

@@ -22,9 +22,12 @@ import org.apache.thrift.TException;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.exceptions.InvalidArgumentException;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
+import tech.sirwellington.alchemy.annotations.concurrency.ThreadSafe;
+import tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPattern;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
 import static tech.aroma.data.assertions.RequestAssertions.validApplicationId;
+import static tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPattern.Role.PRODUCT;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.INTERFACE;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -39,7 +42,9 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
  * 
  * @author SirWellington
  */
+@ThreadSafe
 @StrategyPattern(role = INTERFACE)
+@FactoryPattern(role = PRODUCT)
 public interface Action
 {
     /**
