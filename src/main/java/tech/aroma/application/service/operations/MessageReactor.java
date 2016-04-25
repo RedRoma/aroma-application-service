@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-
 package tech.aroma.application.service.operations;
 
-import java.util.List;
-import sir.wellington.alchemy.collections.lists.Lists;
-import tech.aroma.application.service.reactions.actions.Action;
-import tech.aroma.application.service.reactions.actions.AromaActionFactory;
+import org.apache.thrift.TException;
 import tech.aroma.thrift.Message;
-import tech.aroma.thrift.reactions.AromaAction;
-import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
+import tech.aroma.thrift.application.service.SendMessageResponse;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 
@@ -31,58 +26,8 @@ import tech.sirwellington.alchemy.annotations.arguments.Required;
  *
  * @author SirWellington
  */
-public interface MessageReactor 
+public interface MessageReactor
 {
-    List<Action> createActionsFor(@Required Message message, @NonEmpty List<AromaAction> actions);
-    
-    class Impl implements MessageReactor
-    {
-        private AromaActionFactory factory;
-        
-        @Override
-        public List<Action> createActionsFor(Message message, List<AromaAction> actions)
-        {
-            if (message == null)
-            {
-                return Lists.emptyList();
-            }
-            
-            boolean runThroughInbox = true;
-            boolean storeMessage = true;
-            
-            List<Action> initialActions = Lists.create();
-            
-            for (AromaAction action : actions)
-            {
-                if (action.isSetSkipInbox())
-                {
-                    runThroughInbox = false;
-                    continue;
-                }
-                
-                if (action.isSetDontStoreMessage())
-                {
-                    storeMessage = false;
-                }
-            }
-            
-            
-            if (storeMessage)
-            {
-                Action actionToStoreMessage = factory.actionToStoreMessage(message);
-                initialActions.add(actionToStoreMessage);
-            }
-            
-            if (runThroughInbox)
-            {
-                Action actionToRunThroughFollowerInboxes = factory.actionToRunThroughFollowerInboxes(message, this);
-                initialActions.add(actionToRunThroughFollowerInboxes);
-            }
-            
-            
-            return initialActions;
-            
-        }
-        
-    }
+    SendMessageResponse reactToMessage(@Required Message message) throws TException;
+
 }

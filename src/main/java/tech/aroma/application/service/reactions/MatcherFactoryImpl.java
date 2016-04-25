@@ -28,6 +28,9 @@ import static tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPat
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 
 /**
  *
@@ -39,11 +42,11 @@ final class MatcherFactoryImpl implements MatcherFactory
     private final static Logger LOG = LoggerFactory.getLogger(MatcherFactoryImpl.class);
 
     @Override
-    public ReactionMatcher matcherFor(AromaMatcher matcher)
+    public MessageMatcher matcherFor(AromaMatcher matcher)
     {
         if(matcher == null || matcher.isSetAll())
         {
-            return ReactionMatchers.matchesAll();
+            return MessageMatchers.matchesAll();
         }
         
         if (matcher.isSetBodyContains())
@@ -54,7 +57,7 @@ final class MatcherFactoryImpl implements MatcherFactory
                 .usingMessage("Matcher substring cannot be empty")
                 .is(nonEmptyString());
             
-            return ReactionMatchers.bodyContains(substring);
+            return MessageMatchers.bodyContains(substring);
         }
         
         if(matcher.isSetBodyIs())
@@ -65,7 +68,7 @@ final class MatcherFactoryImpl implements MatcherFactory
                 .usingMessage("Expected Body cannot be empty")
                 .is(nonEmptyString());
             
-            return ReactionMatchers.bodyIs(expectedBody);
+            return MessageMatchers.bodyIs(expectedBody);
         }
         
         if(matcher.isSetTitleContains())
@@ -76,7 +79,7 @@ final class MatcherFactoryImpl implements MatcherFactory
                 .usingMessage("Matcher substring cannot be empty")
                 .is(nonEmptyString());
             
-            return ReactionMatchers.titleContains(substring);
+            return MessageMatchers.titleContains(substring);
         }
         
         
@@ -88,7 +91,7 @@ final class MatcherFactoryImpl implements MatcherFactory
                 .usingMessage("Expected Message Title cannot be empty")
                 .is(nonEmptyString());
             
-            return ReactionMatchers.titleContains(expectedTitle);
+            return MessageMatchers.titleContains(expectedTitle);
         }
         
         
@@ -100,7 +103,7 @@ final class MatcherFactoryImpl implements MatcherFactory
                 .usingMessage("Expected Urgency cannot be null")
                 .is(notNull());
             
-            return ReactionMatchers.urgencyIs(expectedUrgency);
+            return MessageMatchers.urgencyIs(expectedUrgency);
         }
         
         if(matcher.isSetHostnameIs())
@@ -111,10 +114,10 @@ final class MatcherFactoryImpl implements MatcherFactory
                 .usingMessage("Expected Hostname cannote be empty")
                 .is(nonEmptyString());
             
-            return ReactionMatchers.hostnameIs(expectedHostname);
+            return MessageMatchers.hostnameIs(expectedHostname);
         }
         
-        return ReactionMatchers.matchesNone();
+        return MessageMatchers.matchesNone();
     }
 
 }

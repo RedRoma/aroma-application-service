@@ -47,7 +47,7 @@ class RunThroughInboxAction implements Action
 
     private final static Logger LOG = LoggerFactory.getLogger(RunThroughInboxAction.class);
 
-    private AromaActionFactory actionFactory;
+    private ActionFactory actionFactory;
     private MessageReactor creator;
     private MatchAlgorithm matchAlgorithm;
     private ReactionRepository reactionRepo;

@@ -91,7 +91,7 @@ public class MatcherFactoryImplTest
     @Test
     public void testNull() throws Exception
     {
-        ReactionMatcher result = instance.matcherFor(null);
+        MessageMatcher result = instance.matcherFor(null);
         assertThat(result, notNullValue());
         
         assertThat(result.matches(message), is(true));
@@ -100,7 +100,7 @@ public class MatcherFactoryImplTest
     @Test
     public void testEmpty()
     {
-        ReactionMatcher result = instance.matcherFor(matcher);
+        MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         
         assertThat(result.matches(message), is(false));
@@ -112,7 +112,7 @@ public class MatcherFactoryImplTest
     {
         matcher.setAll(new MatcherAll());
         
-        ReactionMatcher result = instance.matcherFor(matcher);
+        MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         
         assertThat(result.matches(message), is(true));
@@ -124,7 +124,7 @@ public class MatcherFactoryImplTest
         String substring = message.body.substring(message.body.length() / 2);
         matcher.setBodyContains(new MatcherBodyContains(substring));
         
-        ReactionMatcher result = instance.matcherFor(matcher);
+        MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(true));
     }
@@ -134,7 +134,7 @@ public class MatcherFactoryImplTest
     {
         matcher.setBodyContains(new MatcherBodyContains(randomString));
         
-        ReactionMatcher result = instance.matcherFor(matcher);
+        MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
     }
@@ -145,7 +145,7 @@ public class MatcherFactoryImplTest
         String expected = message.body;
         matcher.setBodyIs(new MatcherBodyIs(expected));
         
-        ReactionMatcher result = instance.matcherFor(matcher);
+        MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(true));
     }
@@ -155,7 +155,7 @@ public class MatcherFactoryImplTest
     {
         matcher.setBodyIs(new MatcherBodyIs(randomString));
         
-        ReactionMatcher result = instance.matcherFor(matcher);
+        MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
     }
@@ -166,7 +166,7 @@ public class MatcherFactoryImplTest
         String substring = message.title.substring(message.title.length() / 2);
         matcher.setTitleContains(new MatcherTitleContains(substring));
         
-        ReactionMatcher result = instance.matcherFor(matcher);
+        MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(true));
     }
@@ -176,7 +176,7 @@ public class MatcherFactoryImplTest
     {
         matcher.setTitleContains(new MatcherTitleContains(randomString));
         
-        ReactionMatcher result = instance.matcherFor(matcher);
+        MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
     }
@@ -187,7 +187,7 @@ public class MatcherFactoryImplTest
         String expected = message.title;
         matcher.setTitleIs(new MatcherTitleIs(expected));
         
-        ReactionMatcher result = instance.matcherFor(matcher);
+        MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(true));
     }
@@ -197,7 +197,7 @@ public class MatcherFactoryImplTest
     {
         matcher.setTitleIs(new MatcherTitleIs(randomString));
         
-        ReactionMatcher result = instance.matcherFor(matcher);
+        MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
     }
@@ -208,7 +208,7 @@ public class MatcherFactoryImplTest
         String expected = message.hostname;
         matcher.setHostnameIs(new MatcherHostnameIs(expected));
         
-        ReactionMatcher result = instance.matcherFor(matcher);
+        MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(true));
     }
@@ -218,7 +218,7 @@ public class MatcherFactoryImplTest
     {
         matcher.setHostnameIs(new MatcherHostnameIs(randomString));
         
-        ReactionMatcher result = instance.matcherFor(matcher);
+        MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
     }
@@ -229,7 +229,7 @@ public class MatcherFactoryImplTest
         Urgency expected = message.urgency;
         matcher.setUrgencyEquals(new MatcherUrgencyIs(expected));
         
-        ReactionMatcher result = instance.matcherFor(matcher);
+        MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(true));
     }
@@ -246,7 +246,7 @@ public class MatcherFactoryImplTest
         }
         
         matcher.setUrgencyEquals(new MatcherUrgencyIs(expected));
-        ReactionMatcher result = instance.matcherFor(matcher);
+        MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
     }

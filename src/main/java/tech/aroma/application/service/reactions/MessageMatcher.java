@@ -31,7 +31,7 @@ import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPa
  */
 @FactoryPattern(role = PRODUCT)
 @StrategyPattern(role = INTERFACE)
-public interface ReactionMatcher
+public interface MessageMatcher
 {
     boolean matches(Message message);
 }

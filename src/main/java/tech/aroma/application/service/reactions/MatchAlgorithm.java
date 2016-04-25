@@ -52,7 +52,7 @@ public interface MatchAlgorithm
                 return false;
             }
 
-            List<ReactionMatcher> reactionMatchers = matchers
+            List<MessageMatcher> reactionMatchers = matchers
                 .stream()
                 .map(matcherFactory::matcherFor)
                 .filter(Objects::nonNull)

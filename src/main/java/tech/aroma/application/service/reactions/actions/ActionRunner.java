@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 
+package tech.aroma.application.service.reactions.actions;
 
-package tech.aroma.application.service.reactions;
+import java.util.List;
+import tech.aroma.thrift.Message;
+import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
-import com.google.inject.ImplementedBy;
-import tech.aroma.thrift.reactions.AromaMatcher;
-import tech.sirwellington.alchemy.annotations.arguments.Required;
-
+import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.INTERFACE;
 
 /**
  *
  * @author SirWellington
  */
-@ImplementedBy(MatcherFactoryImpl.class)
-public interface MatcherFactory 
+@StrategyPattern(role = INTERFACE)
+public interface ActionRunner
 {
-    MessageMatcher matcherFor(@Required AromaMatcher matcher);
-    
-    static MatcherFactory newInstance()
-    {
-        return new MatcherFactoryImpl();
-    }
+
+    int runThroughActions(Message message, List<Action> actions);
+
 }

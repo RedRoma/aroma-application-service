@@ -28,7 +28,7 @@ import tech.sirwellington.alchemy.annotations.arguments.Required;
  *
  * @author SirWellington
  */
-public interface AromaActionFactory
+public interface ActionFactory
 {
 
     Action actionToDoNothing();

@@ -34,7 +34,7 @@ public interface ActionMapper
     
     class Impl implements ActionMapper
     {
-        private AromaActionFactory factory;
+        private ActionFactory factory;
         
         @Override
         public Action create(Message message, AromaAction action)

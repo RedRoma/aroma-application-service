@@ -31,6 +31,7 @@ import static java.util.stream.Collectors.toList;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 
 /**
  *
@@ -43,10 +44,10 @@ final class RunThroughFollowerInboxesActions implements Action
 
     private final static Logger LOG = LoggerFactory.getLogger(RunThroughFollowerInboxesActions.class);
 
-    private final AromaActionFactory factory;
+    private final ActionFactory factory;
     private final FollowerRepository followerRepo;
 
-    RunThroughFollowerInboxesActions(AromaActionFactory factory, FollowerRepository followerRepo)
+    RunThroughFollowerInboxesActions(ActionFactory factory, FollowerRepository followerRepo)
     {
         checkThat(factory, followerRepo)
             .are(notNull());
