@@ -33,7 +33,7 @@ import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPa
  * @author SirWellington
  */
 @StrategyPattern(role = INTERFACE)
-@ImplementedBy(AndMatchAlgorithm.class)
+@ImplementedBy(MatchAlgorithmAnd.class)
 public interface MatchAlgorithm
 {
     
@@ -48,7 +48,7 @@ public interface MatchAlgorithm
      */
     static MatchAlgorithm and(MatcherFactory matcherFactory) throws IllegalArgumentException
     {
-        return new AndMatchAlgorithm(matcherFactory);
+        return new MatchAlgorithmAnd(matcherFactory);
     }
     
     /**
@@ -60,6 +60,6 @@ public interface MatchAlgorithm
      */
     static MatchAlgorithm or(MatcherFactory matcherFactory) throws IllegalArgumentException
     {
-        return new OrMatchAlgorithm(matcherFactory);
+        return new MatchAlgorithmOr(matcherFactory);
     }
 }

@@ -31,6 +31,7 @@ import static java.util.stream.Collectors.toList;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 
 /**
  *
@@ -38,14 +39,14 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
  */
 @Internal
 @StrategyPattern(role = CONCRETE_BEHAVIOR)
-final class OrMatchAlgorithm implements MatchAlgorithm
+final class MatchAlgorithmOr implements MatchAlgorithm
 {
 
-    private final static Logger LOG = LoggerFactory.getLogger(OrMatchAlgorithm.class);
+    private final static Logger LOG = LoggerFactory.getLogger(MatchAlgorithmOr.class);
     private final MatcherFactory matcherFactory;
 
     @Inject
-    OrMatchAlgorithm(MatcherFactory matcherFactory)
+    MatchAlgorithmOr(MatcherFactory matcherFactory)
     {
         checkThat(matcherFactory)
             .is(notNull());
