@@ -30,6 +30,7 @@ import tech.aroma.thrift.reactions.MatcherBodyDoesNotContain;
 import tech.aroma.thrift.reactions.MatcherBodyIs;
 import tech.aroma.thrift.reactions.MatcherHostnameIs;
 import tech.aroma.thrift.reactions.MatcherTitleContains;
+import tech.aroma.thrift.reactions.MatcherTitleDoesNotContain;
 import tech.aroma.thrift.reactions.MatcherTitleIs;
 import tech.aroma.thrift.reactions.MatcherUrgencyIs;
 import tech.sirwellington.alchemy.generator.AlchemyGenerator;
@@ -313,6 +314,31 @@ public class MatcherFactoryImplTest
     }
 
     @Test
+    public void testTitleDoesNotContainWhenMatch()
+    {
+        matcher.setTitleDoesNotContain(new MatcherTitleDoesNotContain(randomString));
+        MessageMatcher result = instance.matcherFor(matcher);
+        assertThat(result.matches(message), is(true));
+    }
+
+    @Test
+    public void testTitleDoesNotContainWhenNoMatch()
+    {
+        String substring = halfOf(message.title);
+        matcher.setTitleDoesNotContain(new MatcherTitleDoesNotContain(substring));
+        MessageMatcher result = instance.matcherFor(matcher);
+        assertThat(result.matches(message), is(false));
+    }
+
+    @DontRepeat
+    @Test
+    public void testTitleDoesNotContainWithBadArgs()
+    {
+        matcher.setTitleDoesNotContain(new MatcherTitleDoesNotContain());
+        assertThrows(() -> instance.matcherFor(matcher));
+    }
+
+    @Test
     public void testHostnameIsWhenMatch()
     {
         String expected = message.hostname;
@@ -333,6 +359,14 @@ public class MatcherFactoryImplTest
         assertThat(result.matches(message), is(false));
     }
 
+    @DontRepeat
+    @Test
+    public void testHostnameIsWithBadArgs()
+    {
+        matcher.setHostnameIs(new MatcherHostnameIs());
+        assertThrows(() -> instance.matcherFor(matcher));
+    }
+    
     @Test
     public void testUrgencyIsWhenMatch()
     {
