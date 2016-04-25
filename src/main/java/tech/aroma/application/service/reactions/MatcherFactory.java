@@ -26,13 +26,13 @@ import tech.sirwellington.alchemy.annotations.arguments.Required;
  *
  * @author SirWellington
  */
-@ImplementedBy(AromaMatcherFactoryImpl.class)
-public interface AromaMatcherFactory 
+@ImplementedBy(MatcherFactoryImpl.class)
+public interface MatcherFactory 
 {
     ReactionMatcher matcherFor(@Required AromaMatcher matcher);
     
-    static AromaMatcherFactory newInstance()
+    static MatcherFactory newInstance()
     {
-        return new AromaMatcherFactoryImpl();
+        return new MatcherFactoryImpl();
     }
 }

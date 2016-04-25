@@ -60,7 +60,7 @@ public class AromaMatcherFactoryTest
     @Test
     public void testNewInstance()
     {
-        AromaMatcherFactory instance = AromaMatcherFactory.newInstance();
+        MatcherFactory instance = MatcherFactory.newInstance();
         assertThat(instance, notNullValue());
     }
 

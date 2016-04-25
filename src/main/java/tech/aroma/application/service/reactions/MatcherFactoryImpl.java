@@ -34,9 +34,9 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
  * @author SirWellington
  */
 @FactoryPattern(role = FACTORY)
-final class AromaMatcherFactoryImpl implements AromaMatcherFactory
+final class MatcherFactoryImpl implements MatcherFactory
 {
-    private final static Logger LOG = LoggerFactory.getLogger(AromaMatcherFactoryImpl.class);
+    private final static Logger LOG = LoggerFactory.getLogger(MatcherFactoryImpl.class);
 
     @Override
     public ReactionMatcher matcherFor(AromaMatcher matcher)

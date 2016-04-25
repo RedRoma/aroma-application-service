@@ -48,7 +48,7 @@ import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.
  */
 @Repeat(50)
 @RunWith(AlchemyTestRunner.class)
-public class AromaMatcherFactoryImplTest 
+public class MatcherFactoryImplTest 
 {
 
     private AromaMatcher matcher;
@@ -72,14 +72,14 @@ public class AromaMatcherFactoryImplTest
     private String randomString;
     
     
-    private AromaMatcherFactoryImpl instance;
+    private MatcherFactoryImpl instance;
     
     @Before
     public void setUp() throws Exception
     {
         setupData();
         
-        instance = new AromaMatcherFactoryImpl();
+        instance = new MatcherFactoryImpl();
     }
 
     private void setupData() throws Exception
