@@ -16,9 +16,11 @@
 
 package tech.aroma.application.service.reactions;
 
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import sir.wellington.alchemy.collections.sets.Sets;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.Urgency;
 import tech.sirwellington.alchemy.generator.AlchemyGenerator;
@@ -308,7 +310,7 @@ public class ReactionMatchersTest
         ReactionMatcher matcher = ReactionMatchers.titleIsNot(randomString);
         assertMatchIs(matcher, false);
     }
-    
+
     @DontRepeat
     @Test
     public void testTitleIsNotWithBadArgs()
@@ -347,7 +349,8 @@ public class ReactionMatchersTest
         ReactionMatcher matcher = ReactionMatchers.hostnameContains(randomString);
         assertMatchIs(matcher, false);
     }
-
+    
+    @DontRepeat
     @Test
     public void testHostnameContainsWithBadArgs()
     {
@@ -370,13 +373,32 @@ public class ReactionMatchersTest
     }
 
     @Test
-    public void testUrgencyIs()
+    public void testUrgencyIsOneOfWhenMatch()
     {
+        AlchemyGenerator<Urgency> generator = enumValueOf(Urgency.class);
+        
+        Set<Urgency> urgencies = Sets.createFrom(generator.get(), generator.get());
+        message.urgency = Sets.oneOf(urgencies);
+        
+        ReactionMatcher matcher = ReactionMatchers.urgencyIsOneOf(urgencies);
+        assertMatchIs(matcher, true);
+        assertMatchersDoesNotMatchNullOrEmpty(matcher);
     }
 
-    @Test
-    public void testUrgencyIsOneOf()
+    public void testUrgencyIsOneOfWhenNoMatch()
     {
+        AlchemyGenerator<Urgency> generator = enumValueOf(Urgency.class);
+        Set<Urgency> urgencies = Sets.createFrom(generator.get(), generator.get());
+        
+        while (urgencies.contains(message.urgency))
+        {
+            message.urgency = generator.get();
+        }
+        
+        ReactionMatcher matcher = ReactionMatchers.urgencyIsOneOf(urgencies);
+        assertMatchIs(matcher, false);
+        assertMatchersDoesNotMatchNullOrEmpty(matcher);
+        
     }
 
     private void assertMatchIs(ReactionMatcher matcher, boolean expectedValue)

@@ -235,6 +235,11 @@ final class ReactionMatchers
         
         return message ->
         {
+            if (message == null)
+            {
+                return false;
+            }
+            
             //Interpreting no urgencies is matching all
             if (Sets.isEmpty(urgencies))
             {
