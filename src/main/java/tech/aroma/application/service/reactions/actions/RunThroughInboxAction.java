@@ -16,12 +16,12 @@
 
 package tech.aroma.application.service.reactions.actions;
 
-import tech.aroma.application.service.operations.MessageReactor;
 import java.util.List;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
+import tech.aroma.application.service.operations.reactions.MessageReactor;
 import tech.aroma.application.service.reactions.MatchAlgorithm;
 import tech.aroma.data.ReactionRepository;
 import tech.aroma.thrift.Message;
@@ -56,7 +56,7 @@ class RunThroughInboxAction implements Action
     @Override
     public List<Action> actOnMessage(Message message) throws TException
     {
-        checkMessage(message);
+        Action.checkMessage(message);
         
         List<Action> newActions = Lists.create();
         List<Reaction> reactions = reactionRepo.getReactionsForUser(user.userId);

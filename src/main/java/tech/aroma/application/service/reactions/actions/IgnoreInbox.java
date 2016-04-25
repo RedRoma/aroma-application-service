@@ -41,7 +41,7 @@ final class IgnoreInbox implements Action
     @Override
     public List<Action> actOnMessage(Message message) throws TException
     {
-        checkMessage(message);
+        Action.checkMessage(message);
 
         LOG.debug("Skipping Inbox for Message {}", message);
 

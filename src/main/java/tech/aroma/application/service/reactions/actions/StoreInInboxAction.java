@@ -59,7 +59,7 @@ final class StoreInInboxAction implements Action
     @Override
     public List<Action> actOnMessage(Message message) throws TException
     {
-        checkMessage(message);
+        Action.checkMessage(message);
 
         inboxRepo.saveMessageForUser(user, message, AromaServiceConstants.DEFAULT_INBOX_LIFETIME);
         LOG.debug("Saved Message {} in Inbox of User {}", message, user);

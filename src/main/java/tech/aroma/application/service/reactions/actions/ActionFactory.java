@@ -16,7 +16,6 @@
 
 package tech.aroma.application.service.reactions.actions;
 
-import tech.aroma.application.service.operations.MessageReactor;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.User;
 import tech.aroma.thrift.reactions.ActionForwardToSlackChannel;
@@ -39,7 +38,7 @@ public interface ActionFactory
 
     Action actionToSendNotifications(@Required Message message);
 
-    Action actionToRunThroughFollowerInboxes(@Required Message message, MessageReactor orchestrator);
+    Action actionToRunThroughFollowerInboxes(@Required Message message);
 
     Action actionToRunThroughInbox(@Required Message message, @Required User user);
 

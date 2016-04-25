@@ -31,7 +31,6 @@ import static java.util.stream.Collectors.toList;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 
 /**
  *
@@ -59,7 +58,7 @@ final class RunThroughFollowerInboxesActions implements Action
     @Override
     public List<Action> actOnMessage(Message message) throws TException
     {
-        checkMessage(message);
+        Action.checkMessage(message);
 
         String appId = message.applicationId;
 

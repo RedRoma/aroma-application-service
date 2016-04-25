@@ -18,6 +18,7 @@ package tech.aroma.application.service.reactions.actions;
 
 import java.util.List;
 import tech.aroma.thrift.Message;
+import tech.sirwellington.alchemy.annotations.arguments.Required;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.INTERFACE;
@@ -29,7 +30,15 @@ import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPa
 @StrategyPattern(role = INTERFACE)
 public interface ActionRunner
 {
-
-    int runThroughActions(Message message, List<Action> actions);
+    
+    /**
+     * Runs through all of the Actions supplied, and all subsequently created actions until non are left.
+     * 
+     * @param message The message to process.
+     * @param actions The Actions to perform based on the message. Can be empty but not null.
+     * 
+     * @return The number of actions executed.
+     */
+    int runThroughActions(@Required Message message, @Required List<Action> actions);
 
 }

@@ -25,12 +25,18 @@ import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.thrift.Message;
 import tech.sirwellington.alchemy.annotations.access.Internal;
+import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
+
+import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;
 
 /**
- *
+ * This is a concrete implementation of the {@link ActionRunner} interface
+ * that executes {@linkplain Action Actions} in a FI-FO manner.
+ * 
  * @author SirWellington
  */
 @Internal
+@StrategyPattern(role = CONCRETE_BEHAVIOR)
 final class ActionRunnerSynchronous implements ActionRunner
 {
 
@@ -39,7 +45,7 @@ final class ActionRunnerSynchronous implements ActionRunner
     @Override
     public int runThroughActions(Message message, List<Action> actions)
     {
-
+        
         int totalRuns = 0;
         Queue<Action> queue = Queues.newLinkedBlockingDeque(actions);
 

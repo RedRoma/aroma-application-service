@@ -56,7 +56,7 @@ final class StoreMessageAction implements Action
     @Override
     public List<Action> actOnMessage(Message message) throws TException
     {
-        checkMessage(message);
+        Action.checkMessage(message);
 
         messageRepo.saveMessage(message, new LengthOfTime(TimeUnit.HOURS, 18));
         LOG.debug("Saved message in Message Repo: {}", message);

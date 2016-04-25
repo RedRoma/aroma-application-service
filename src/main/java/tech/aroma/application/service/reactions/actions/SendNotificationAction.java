@@ -59,7 +59,7 @@ final class SendNotificationAction implements Action
     @Override
     public List<Action> actOnMessage(Message message) throws TException
     {
-        checkMessage(message);
+        Action.checkMessage(message);
         
         SendNotificationRequest request = createNotificationRequestFor(message);
         
