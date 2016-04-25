@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tech.aroma.application.service.operations;
+package tech.aroma.application.service.operations.reactions;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,24 +24,17 @@ import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.application.service.reactions.MatchAlgorithm;
 import tech.aroma.application.service.reactions.actions.Action;
+import tech.aroma.application.service.reactions.actions.ActionFactory;
 import tech.aroma.application.service.reactions.actions.ActionMapper;
 import tech.aroma.application.service.reactions.actions.ActionRunner;
 import tech.aroma.data.ReactionRepository;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.application.service.SendMessageResponse;
-import tech.aroma.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.thrift.reactions.AromaAction;
 import tech.aroma.thrift.reactions.Reaction;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
-import static tech.aroma.data.assertions.RequestAssertions.validApplicationId;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
-import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
-
-import tech.aroma.application.service.reactions.actions.ActionFactory;
-
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 
 /**
  *
@@ -62,13 +55,7 @@ final class MessageReactorImpl implements MessageReactor
     @Override
     public SendMessageResponse reactToMessage(@Required Message message) throws TException
     {
-        checkThat(message)
-            .throwing(InvalidArgumentException.class)
-            .is(notNull());
-        
-        checkThat(message.messageId)
-            .throwing(InvalidArgumentException.class)
-            .is(validApplicationId());
+        Action.checkMessage(message);
         
         String appId = message.applicationId;
         List<Reaction> reactions = reactionRepo.getReactionsForApplication(appId);
@@ -80,7 +67,9 @@ final class MessageReactorImpl implements MessageReactor
             .distinct()
             .collect(Collectors.toList());
         
-        boolean runThroughInbox = true;
+        LOG.debug("Found {} applicable actions for Message {}", applicableActions.size(), message);
+        
+        boolean runThroughInboxes = true;
         boolean storeMessage = true;
         
         List<Action> initialActions = Lists.create();
@@ -89,7 +78,7 @@ final class MessageReactorImpl implements MessageReactor
         {
             if (action.isSetSkipInbox())
             {
-                runThroughInbox = false;
+                runThroughInboxes = false;
                 continue;
             }
             
@@ -108,9 +97,9 @@ final class MessageReactorImpl implements MessageReactor
             initialActions.add(actionToStoreMessage);
         }
         
-        if (runThroughInbox)
+        if (runThroughInboxes)
         {
-            Action actionToRunThroughFollowerInboxes = factory.actionToRunThroughFollowerInboxes(message, this);
+            Action actionToRunThroughFollowerInboxes = factory.actionToRunThroughFollowerInboxes(message);
             initialActions.add(actionToRunThroughFollowerInboxes);
         }
         

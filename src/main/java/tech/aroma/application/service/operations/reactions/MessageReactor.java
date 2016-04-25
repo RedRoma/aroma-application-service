@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package tech.aroma.application.service.operations;
+package tech.aroma.application.service.operations.reactions;
 
+import com.google.inject.ImplementedBy;
 import org.apache.thrift.TException;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.application.service.SendMessageResponse;
@@ -26,6 +27,7 @@ import tech.sirwellington.alchemy.annotations.arguments.Required;
  *
  * @author SirWellington
  */
+@ImplementedBy(MessageReactorImpl.class)
 public interface MessageReactor
 {
     SendMessageResponse reactToMessage(@Required Message message) throws TException;
