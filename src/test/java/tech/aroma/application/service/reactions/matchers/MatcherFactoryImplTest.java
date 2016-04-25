@@ -303,6 +303,14 @@ public class MatcherFactoryImplTest
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
     }
+    
+    @DontRepeat
+    @Test
+    public void testTitleContainsWithBadArgs()
+    {
+        matcher.setTitleContains(new MatcherTitleContains());
+        assertThrows(() -> instance.matcherFor(matcher));
+    }
 
     @Test
     public void testHostnameIsWhenMatch()
