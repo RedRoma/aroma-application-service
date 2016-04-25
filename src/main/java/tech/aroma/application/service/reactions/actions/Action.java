@@ -24,6 +24,7 @@ import tech.aroma.thrift.exceptions.InvalidArgumentException;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
+import static tech.aroma.data.assertions.RequestAssertions.validApplicationId;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.INTERFACE;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -50,11 +51,15 @@ public interface Action
      */
     public List<Action> actOnMessage(@Required Message message) throws TException;
     
-    default void checkMessage(Message message) throws InvalidArgumentException
+    static void checkMessage(Message message) throws InvalidArgumentException
     {
         checkThat(message)
             .throwing(InvalidArgumentException.class)
             .usingMessage("missing message")
             .is(notNull());
+        
+        checkThat(message.applicationId)
+            .throwing(InvalidArgumentException.class)
+            .is(validApplicationId());
     }
 }
