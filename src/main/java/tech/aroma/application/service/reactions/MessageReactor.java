@@ -42,7 +42,7 @@ public interface MessageReactor
     static MessageReactor newInstance(@Required ActionFactory actionFactory, 
                                       @Required ActionRunner actionRunner,
                                       @Required MatchAlgorithm matchAlgorithm,
-                                      @Required ReactionRepository reactionRepo)
+                                      @Required ReactionRepository reactionRepo) throws IllegalArgumentException
     {
         return new MessageReactorImpl(actionRunner, actionFactory, matchAlgorithm, reactionRepo);
     }

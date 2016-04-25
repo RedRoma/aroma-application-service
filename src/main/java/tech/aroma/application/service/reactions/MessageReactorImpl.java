@@ -78,18 +78,11 @@ final class MessageReactorImpl implements MessageReactor
     {
         Action.checkMessage(message);
         
-        String appId = message.applicationId;
-        List<Reaction> reactions = reactionRepo.getReactionsForApplication(appId);
+        List<AromaAction> applicableActions = getAllActionsApplicableToMessage(message);
         
-        List<AromaAction> applicableActions = Lists.nullToEmpty(reactions)
-            .stream()
-            .filter((reaction) -> matchAlgorithm.matches(message, reaction.matchers))
-            .flatMap(reaction -> Lists.nullToEmpty(reaction.actions).stream())
-            .distinct()
-            .collect(Collectors.toList());
+        LOG.debug("Found {} applicable actions for Message {}", applicableActions.size(), message.messageId);
         
-        LOG.debug("Found {} applicable actions for Message {}", applicableActions.size(), message);
-        
+        //Unlike other Actions, these are assumed to be true unless otherwise excluded.
         boolean shouldRunThroughInboxes = true;
         boolean shouldStoreMessage = true;
         
@@ -131,5 +124,19 @@ final class MessageReactorImpl implements MessageReactor
         
         return new SendMessageResponse().setMessageId(message.messageId);
     }
-    
+
+    private List<AromaAction> getAllActionsApplicableToMessage(Message message) throws TException
+    {
+        String appId = message.applicationId;
+
+        List<Reaction> reactions = reactionRepo.getReactionsForApplication(appId);
+
+        return Lists.nullToEmpty(reactions)
+            .stream()
+            .filter((reaction) -> matchAlgorithm.matches(message, reaction.matchers))
+            .flatMap(reaction -> Lists.nullToEmpty(reaction.actions).stream())
+            .distinct()
+            .collect(Collectors.toList());
+    }
+
 }
