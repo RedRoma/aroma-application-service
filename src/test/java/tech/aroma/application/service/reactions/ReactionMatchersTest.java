@@ -398,7 +398,13 @@ public class ReactionMatchersTest
         ReactionMatcher matcher = ReactionMatchers.urgencyIsOneOf(urgencies);
         assertMatchIs(matcher, false);
         assertMatchersDoesNotMatchNullOrEmpty(matcher);
-        
+    }
+    
+    @DontRepeat
+    @Test
+    public void testUrgencyIsOneOfWithBadArgs()
+    {
+        assertThrows(() -> ReactionMatchers.urgencyIsOneOf(null));
     }
 
     private void assertMatchIs(ReactionMatcher matcher, boolean expectedValue)
