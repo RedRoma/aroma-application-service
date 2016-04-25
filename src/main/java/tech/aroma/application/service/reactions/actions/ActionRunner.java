@@ -32,7 +32,7 @@ public interface ActionRunner
 {
     
     /**
-     * Runs through all of the Actions supplied, and all subsequently created actions until non are left.
+     * Runs through all of the Actions supplied, and all subsequently created actions until none are left.
      * 
      * @param message The message to process.
      * @param actions The Actions to perform based on the message. Can be empty but not null.
