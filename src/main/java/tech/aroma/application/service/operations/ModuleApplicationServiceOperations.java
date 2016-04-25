@@ -47,7 +47,7 @@ public final class ModuleApplicationServiceOperations extends AbstractModule
     }
 
     @Provides
-    Function<AuthenticationToken, ApplicationToken> provideAuthToApplicationTokenMapper()
+    Function<AuthenticationToken, ApplicationToken> provideAuthToAppTokenMapper()
     {
         return TokenFunctions.authTokenToAppTokenFunction();
     }

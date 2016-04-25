@@ -20,13 +20,17 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
+import java.util.function.Function;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.aroma.data.memory.ModuleMemoryDataRepositories;
+import tech.aroma.thrift.authentication.ApplicationToken;
+import tech.aroma.thrift.authentication.AuthenticationToken;
 import tech.aroma.thrift.authentication.service.AuthenticationService;
 import tech.aroma.thrift.notification.service.NotificationService;
 import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
+import tech.sirwellington.alchemy.http.AlchemyHttp;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
 import static org.hamcrest.Matchers.notNullValue;
@@ -44,24 +48,31 @@ public class ModuleApplicationServiceOperationsTest
 
     private ModuleMocks moduleMocks;
     private ModuleMemoryDataRepositories moduleData;
-    private ModuleApplicationServiceOperations module;
+    private ModuleApplicationServiceOperations instance;
 
     @Before
     public void setUp()
     {
         moduleMocks = new ModuleMocks();
         moduleData = new ModuleMemoryDataRepositories();
-        module = new ModuleApplicationServiceOperations();
+        instance = new ModuleApplicationServiceOperations();
     }
 
     @Test
     public void testConfigure()
     {
-        Injector injector = Guice.createInjector(module, moduleMocks, moduleData);
+        Injector injector = Guice.createInjector(instance, moduleMocks, moduleData);
 
         assertThat(injector, notNullValue());
     }
 
+    @Test
+    public void testProvideAuthToAppTokenMapper()
+    {
+        Function<AuthenticationToken, ApplicationToken> mapper = instance.provideAuthToAppTokenMapper();
+        assertThat(mapper, notNullValue());
+    }
+    
     private static class ModuleMocks extends AbstractModule
     {
 
@@ -81,6 +92,12 @@ public class ModuleApplicationServiceOperationsTest
         NotificationService.Iface provideMockNotificationService()
         {
             return mock(NotificationService.Iface.class);
+        }
+        
+        @Provides
+        AlchemyHttp provideAlchemyHttp()
+        {
+            return mock(AlchemyHttp.class);
         }
     }
 

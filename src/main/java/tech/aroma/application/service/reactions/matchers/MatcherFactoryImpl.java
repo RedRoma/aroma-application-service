@@ -125,7 +125,7 @@ final class MatcherFactoryImpl implements MatcherFactory
 
         if (matcher.isSetUrgencyEquals())
         {
-            List<Urgency> urgencies = Lists.nullToEmpty(matcher.getUrgencyEquals().getUrgencies());
+            List<Urgency> urgencies = Lists.copy(matcher.getUrgencyEquals().getUrgencies());
             
             Urgency expectedUrgency = matcher.getUrgencyEquals().getUrgency();
             if (expectedUrgency != null)

@@ -21,7 +21,6 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Provides;
-import java.util.function.Function;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,8 +28,6 @@ import org.mockito.Mockito;
 import tech.aroma.application.service.operations.ModuleApplicationServiceOperations;
 import tech.aroma.data.memory.ModuleMemoryDataRepositories;
 import tech.aroma.thrift.application.service.ApplicationService;
-import tech.aroma.thrift.authentication.ApplicationToken;
-import tech.aroma.thrift.authentication.AuthenticationToken;
 import tech.aroma.thrift.authentication.service.AuthenticationService;
 import tech.aroma.thrift.notification.service.NotificationService;
 import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
@@ -87,13 +84,6 @@ public class ModuleApplicationServiceTest
         
         ApplicationService.Iface service = injector.getInstance(ApplicationService.Iface.class);
         assertThat(service, notNullValue());
-    }
-
-    @Test
-    public void testProvideTokenMapper()
-    {
-        Function<AuthenticationToken, ApplicationToken> mapper = instance.provideTokenMapper();
-        assertThat(mapper, notNullValue());
     }
 
     @Test
