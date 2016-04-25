@@ -48,6 +48,23 @@ final class MatcherFactoryImpl implements MatcherFactory
         {
             return MessageMatchers.matchesAll();
         }
+        
+        if (matcher.isSetApplicationIs())
+        {
+            String appId = matcher.getApplicationIs().getAppId();
+            checkThat(appId)
+                .is(validApplicationId());
+            
+            return MessageMatchers.applicationIs(appId);
+        }
+        
+        if (matcher.isSetApplicationIsNot())
+        {
+            String appId = matcher.getApplicationIsNot().getAppId();
+            checkThat(appId).is(validApplicationId());
+            
+            return MessageMatchers.applicationIsNot(appId);
+        }
 
         if (matcher.isSetBodyContains())
         {
@@ -172,14 +189,6 @@ final class MatcherFactoryImpl implements MatcherFactory
             return MessageMatchers.hostnameDoesNotContain(substring);
         }
         
-        if(matcher.isSetApplicationIs())
-        {
-            String appId = matcher.getApplicationIs().getAppId();
-            checkThat(appId)
-                .is(validApplicationId());
-            
-        }
-
         return MessageMatchers.matchesNone();
     }
 

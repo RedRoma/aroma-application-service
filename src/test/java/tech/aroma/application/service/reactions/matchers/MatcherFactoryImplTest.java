@@ -23,6 +23,8 @@ import tech.aroma.thrift.Message;
 import tech.aroma.thrift.Urgency;
 import tech.aroma.thrift.reactions.AromaMatcher;
 import tech.aroma.thrift.reactions.MatcherAll;
+import tech.aroma.thrift.reactions.MatcherApplicationIs;
+import tech.aroma.thrift.reactions.MatcherApplicationIsNot;
 import tech.aroma.thrift.reactions.MatcherBodyContains;
 import tech.aroma.thrift.reactions.MatcherBodyDoesNotContain;
 import tech.aroma.thrift.reactions.MatcherBodyIs;
@@ -32,6 +34,7 @@ import tech.aroma.thrift.reactions.MatcherTitleIs;
 import tech.aroma.thrift.reactions.MatcherUrgencyIs;
 import tech.sirwellington.alchemy.generator.AlchemyGenerator;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
+import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
@@ -41,7 +44,10 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.EnumGenerators.enumValueOf;
+import static tech.sirwellington.alchemy.generator.StringGenerators.uuids;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.HEXADECIMAL;
+import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.UUID;
 
 /**
  *
@@ -49,32 +55,35 @@ import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.
  */
 @Repeat(50)
 @RunWith(AlchemyTestRunner.class)
-public class MatcherFactoryImplTest 
+public class MatcherFactoryImplTest
 {
 
     private AromaMatcher matcher;
 
+    @GenerateString(UUID)
+    private String appId;
+    
     @GeneratePojo
     private Message message;
 
     @GenerateString(HEXADECIMAL)
     private String randomString;
 
-    
     private MatcherFactoryImpl instance;
-    
+
     @Before
     public void setUp() throws Exception
     {
         setupData();
-        
+
         instance = new MatcherFactoryImpl();
     }
 
     private void setupData() throws Exception
     {
+        message.applicationId = appId;
+        
         matcher = new AromaMatcher();
-
     }
 
     @Test
@@ -82,7 +91,7 @@ public class MatcherFactoryImplTest
     {
         MessageMatcher result = instance.matcherFor(null);
         assertThat(result, notNullValue());
-        
+
         assertThat(result.matches(message), is(true));
     }
 
@@ -91,43 +100,91 @@ public class MatcherFactoryImplTest
     {
         MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
-        
+
         assertThat(result.matches(message), is(false));
     }
 
-    
     @Test
     public void testAll()
     {
         matcher.setAll(new MatcherAll());
-        
+
         MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
-        
+
         assertThat(result.matches(message), is(true));
     }
+
+    @Test
+    public void testApplicationIsWhenMatches()
+    {
+        matcher.setApplicationIs(new MatcherApplicationIs(appId));
+        MessageMatcher result = instance.matcherFor(matcher);
+        assertThat(result, notNullValue());
+        assertThat(result.matches(message), is(true));
+    }
+
+    @Test
+    public void testApplicationIsWhenNoMatch()
+    {
+        String anotherId = one(uuids);
+        matcher.setApplicationIs(new MatcherApplicationIs(anotherId));
+        MessageMatcher result = instance.matcherFor(matcher);
+        assertThat(result, notNullValue());
+        assertThat(result.matches(message), is(false));
+    }
+
+    @DontRepeat
+    @Test
+    public void testApplicationIsWithBadArgs()
+    {
+        matcher.setApplicationIs(new MatcherApplicationIs(randomString));
+        assertThrows(() -> instance.matcherFor(matcher));
+
+        matcher.setApplicationIs(new MatcherApplicationIs());
+        assertThrows(() -> instance.matcherFor(matcher));
+    }
+
+    @Test
+    public void testApplicationIsNotWhenMatch()
+    {
+        String anotherId = one(uuids);
+        matcher.setApplicationIsNot(new MatcherApplicationIsNot(anotherId));
+        MessageMatcher result = instance.matcherFor(matcher);
+        assertThat(result, notNullValue());
+        assertThat(result.matches(message), is(true));
+    }
+    
     
     @Test
     public void testBodyContainsWhenMatches()
     {
         String substring = halfOf(message.body);
         matcher.setBodyContains(new MatcherBodyContains(substring));
-        
+
         MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(true));
     }
-    
+
     @Test
     public void testBodyContainsWhenNoMatch()
     {
         matcher.setBodyContains(new MatcherBodyContains(randomString));
-        
+
         MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
     }
-    
+
+    @DontRepeat
+    @Test
+    public void testBodyContainsWithBadArgs()
+    {
+        matcher.setBodyContains(new MatcherBodyContains());
+        assertThrows(() -> instance.matcherFor(matcher));
+    }
+
     @Test
     public void testBodyDoesNotContainWhenMatches()
     {
@@ -136,7 +193,7 @@ public class MatcherFactoryImplTest
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(true));
     }
-    
+
     @Test
     public void testBodyDoesNotContainWhenNoMatch()
     {
@@ -146,119 +203,127 @@ public class MatcherFactoryImplTest
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
     }
-    
+
+    @DontRepeat
+    @Test
+    public void testBodyDoesNotContainWithBadArgs()
+    {
+        matcher.setBodyDoesNotContain(new MatcherBodyDoesNotContain());
+        assertThrows(() -> instance.matcherFor(matcher));
+    }
+
     @Test
     public void testBodyIsWhenMatches()
     {
         String expected = message.body;
         matcher.setBodyIs(new MatcherBodyIs(expected));
-        
+
         MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(true));
     }
-    
+
     @Test
     public void testBodyIsWhenNoMatch()
     {
         matcher.setBodyIs(new MatcherBodyIs(randomString));
-        
+
         MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
     }
-    
+
     @Test
     public void testTitleContainsWhenMatch()
     {
         String substring = halfOf(message.title);
         matcher.setTitleContains(new MatcherTitleContains(substring));
-        
+
         MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(true));
     }
-    
+
     @Test
     public void testTitleContainsWhenNoMatch()
     {
         matcher.setTitleContains(new MatcherTitleContains(randomString));
-        
+
         MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
     }
-    
+
     @Test
     public void testTitleIsWhenMatch()
     {
         String expected = message.title;
         matcher.setTitleIs(new MatcherTitleIs(expected));
-        
+
         MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(true));
     }
-    
+
     @Test
     public void testTitleIsWhenNoMatch()
     {
         matcher.setTitleIs(new MatcherTitleIs(randomString));
-        
+
         MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
     }
-    
+
     @Test
     public void testHostnameIsWhenMatch()
     {
         String expected = message.hostname;
         matcher.setHostnameIs(new MatcherHostnameIs(expected));
-        
+
         MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(true));
     }
-    
+
     @Test
     public void testHostnameIsWhenNoMatch()
     {
         matcher.setHostnameIs(new MatcherHostnameIs(randomString));
-        
+
         MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
     }
-    
+
     @Test
     public void testUrgencyIsWhenMatch()
     {
         Urgency expected = message.urgency;
         matcher.setUrgencyEquals(new MatcherUrgencyIs(expected));
-        
+
         MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(true));
     }
-    
+
     @Test
     public void testUrgencyIsWhenNoMatch()
     {
         AlchemyGenerator<Urgency> urgencies = enumValueOf(Urgency.class);
         Urgency expected = one(urgencies);
-        
-        while(expected == message.urgency)
+
+        while (expected == message.urgency)
         {
             expected = one(urgencies);
         }
-        
+
         matcher.setUrgencyEquals(new MatcherUrgencyIs(expected));
         MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
     }
-    
+
     private String halfOf(String string)
     {
         return string.substring(0, string.length() / 2);
