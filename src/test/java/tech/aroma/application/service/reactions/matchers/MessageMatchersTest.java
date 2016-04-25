@@ -40,8 +40,10 @@ import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.BooleanGenerators.booleans;
 import static tech.sirwellington.alchemy.generator.EnumGenerators.enumValueOf;
 import static tech.sirwellington.alchemy.generator.StringGenerators.hexadecimalString;
+import static tech.sirwellington.alchemy.generator.StringGenerators.uuids;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.HEXADECIMAL;
+import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.UUID;
 
 /**
  *
@@ -52,6 +54,9 @@ import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.
 public class MessageMatchersTest
 {
 
+    @GenerateString(UUID)
+    private String appId;
+        
     @GeneratePojo
     private Message message;
 
@@ -70,6 +75,8 @@ public class MessageMatchersTest
     {
         emptyMessage = new Message();
         emptyMessage.unsetUrgency();
+        
+        message.applicationId = appId;
     }
 
     @Test
@@ -430,4 +437,52 @@ public class MessageMatchersTest
         return string.substring(string.length() / 2);
     }
 
+    @Test
+    public void testApplicationIsWhenMatch()
+    {
+        MessageMatcher matcher = MessageMatchers.applicationIs(appId);
+        assertMatchIs(matcher, true);
+        assertMatchersDoesNotMatchNullOrEmpty(matcher);
+    }
+
+    @Test
+    public void testApplicationIsWhenNoMatch()
+    {
+        String otherId = one(uuids);
+        MessageMatcher matcher = MessageMatchers.applicationIs(otherId);
+        assertMatchIs(matcher, false);
+        assertMatchersDoesNotMatchNullOrEmpty(matcher);
+    }
+
+    @Test
+    public void testApplicationIsWithBadArgs()
+    {
+        assertThrows(() -> MessageMatchers.applicationIs(null));
+        assertThrows(() -> MessageMatchers.applicationIs(""));
+        assertThrows(() -> MessageMatchers.applicationIs(randomString));
+    }
+
+    @Test
+    public void testApplicationIsNotWhenMatch()
+    {
+        String otherId = one(uuids);
+        
+        MessageMatcher matcher = MessageMatchers.applicationIsNot(otherId);
+        assertMatchIs(matcher, true);
+    }
+
+    @Test
+    public void testApplicationIsNotWhenNoMatch()
+    {
+        MessageMatcher matcher = MessageMatchers.applicationIsNot(appId);
+        assertMatchIs(matcher, false);
+    }
+
+    @Test
+    public void testApplicationIsNotWithBadArgs()
+    {
+        assertThrows(() -> MessageMatchers.applicationIs(null));
+        assertThrows(() -> MessageMatchers.applicationIs(""));
+        assertThrows(() -> MessageMatchers.applicationIs(randomString));
+    }
 }

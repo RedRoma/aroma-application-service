@@ -18,6 +18,7 @@
 package tech.aroma.application.service.reactions.matchers;
 
 
+import java.util.Objects;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 import static tech.aroma.data.assertions.RequestAssertions.isNullOrEmpty;
+import static tech.aroma.data.assertions.RequestAssertions.validApplicationId;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
@@ -50,6 +52,27 @@ final class MessageMatchers
     static MessageMatcher matchesNone()
     {
         return message -> false;
+    }
+    
+    static MessageMatcher applicationIs(@NonEmpty String appId)
+    {
+        checkThat(appId)
+            .is(validApplicationId());
+        
+        return message ->
+        {
+            if(message == null)
+            {
+                return false;
+            }
+            
+            return Objects.equals(message.applicationId, appId);
+        };
+    }
+    
+    static MessageMatcher applicationIsNot(@NonEmpty String appId)
+    {
+        return not(applicationIs(appId));
     }
     
     static MessageMatcher not(@Required MessageMatcher matcher)
