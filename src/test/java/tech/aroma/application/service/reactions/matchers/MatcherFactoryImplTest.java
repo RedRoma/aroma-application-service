@@ -52,25 +52,13 @@ public class MatcherFactoryImplTest
 {
 
     private AromaMatcher matcher;
-    
-    @GeneratePojo
-    private MatcherBodyContains bodyContains;
-    
-    @GeneratePojo
-    private MatcherBodyIs bodyIs;
-    
-    @GeneratePojo
-    private MatcherTitleContains titleContains;
-    
-    @GeneratePojo
-    private MatcherTitleIs titleIs;
-    
+
     @GeneratePojo
     private Message message;
-    
+
     @GenerateString(HEXADECIMAL)
     private String randomString;
-    
+
     
     private MatcherFactoryImpl instance;
     
