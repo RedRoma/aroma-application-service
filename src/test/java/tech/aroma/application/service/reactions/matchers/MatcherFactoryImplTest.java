@@ -252,26 +252,7 @@ public class MatcherFactoryImplTest
         assertThat(result.matches(message), is(false));
     }
 
-    @Test
-    public void testTitleContainsWhenMatch()
-    {
-        String substring = halfOf(message.title);
-        matcher.setTitleContains(new MatcherTitleContains(substring));
-
-        MessageMatcher result = instance.matcherFor(matcher);
-        assertThat(result, notNullValue());
-        assertThat(result.matches(message), is(true));
-    }
-
-    @Test
-    public void testTitleContainsWhenNoMatch()
-    {
-        matcher.setTitleContains(new MatcherTitleContains(randomString));
-
-        MessageMatcher result = instance.matcherFor(matcher);
-        assertThat(result, notNullValue());
-        assertThat(result.matches(message), is(false));
-    }
+  
 
     @Test
     public void testTitleIsWhenMatch()
@@ -288,6 +269,35 @@ public class MatcherFactoryImplTest
     public void testTitleIsWhenNoMatch()
     {
         matcher.setTitleIs(new MatcherTitleIs(randomString));
+
+        MessageMatcher result = instance.matcherFor(matcher);
+        assertThat(result, notNullValue());
+        assertThat(result.matches(message), is(false));
+    }
+    
+    @DontRepeat
+    @Test
+    public void testTitleIsWithBadArgs()
+    {
+        matcher.setTitleIs(new MatcherTitleIs());
+        assertThrows(() -> instance.matcherFor(matcher));
+    }
+
+    @Test
+    public void testTitleContainsWhenMatch()
+    {
+        String substring = halfOf(message.title);
+        matcher.setTitleContains(new MatcherTitleContains(substring));
+
+        MessageMatcher result = instance.matcherFor(matcher);
+        assertThat(result, notNullValue());
+        assertThat(result.matches(message), is(true));
+    }
+
+    @Test
+    public void testTitleContainsWhenNoMatch()
+    {
+        matcher.setTitleContains(new MatcherTitleContains(randomString));
 
         MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
