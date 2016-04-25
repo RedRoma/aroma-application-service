@@ -29,7 +29,7 @@ import tech.sirwellington.alchemy.annotations.concurrency.ThreadSafe;
 
 
 /**
- * The {@link MessageReaction} reacts to every valid message sent to the Application Service.
+ * The {@link MessageReactor} reacts to every valid message sent to the Application Service.
  * 
  * @author SirWellington
  */
