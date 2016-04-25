@@ -71,7 +71,7 @@ final class MatchAlgorithmOr implements MatchAlgorithm
             .filter(matcher -> matcher.matches(message))
             .count();
 
-        return totalMatches == matchers.size();
+        return totalMatches >= 1;
     }
 
     @Override
