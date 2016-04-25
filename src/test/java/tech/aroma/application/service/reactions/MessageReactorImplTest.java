@@ -17,6 +17,7 @@
 package tech.aroma.application.service.reactions;
 
 import java.util.List;
+import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -271,6 +272,13 @@ public class MessageReactorImplTest
         List<Action> actions = actionCaptor.getValue();
         assertThat(actions, hasItems(genericAction, actionRunThroughInboxes));
         assertThat(actions, not(hasItem(actionToStore)));
+    }
+    
+    @Test
+    public void testWithBadArgs() throws Exception
+    {
+        assertThrows(() -> instance.reactToMessage(null))
+            .isInstanceOf(TException.class);
     }
 
 }
