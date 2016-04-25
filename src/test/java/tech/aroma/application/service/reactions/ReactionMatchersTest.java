@@ -76,9 +76,8 @@ public class ReactionMatchersTest
         ReactionMatcher matcher = ReactionMatchers.matchesAll();
         assertThat(matcher, notNullValue());
 
-        assertThat(matcher.matches(null), is(true));
-        assertThat(matcher.matches(emptyMessage), is(true));
-        assertThat(matcher.matches(message), is(true));
+        assertMatchIs(matcher, true);
+        assertMatchersMatchesNullOrEmpty(matcher);
     }
 
     @Test
@@ -88,12 +87,14 @@ public class ReactionMatchersTest
 
         assertMatchIs(matcher, false);
         assertThat(matcher.matches(null), is(false));
+        assertMatchersDoesNotMatchNullOrEmpty(matcher);
+
     }
 
     @Test
     public void testTitleContainsWhenMatch()
     {
-        String substring = message.title.substring(message.title.length() / 2);
+        String substring = halfOf(message.title);
 
         ReactionMatcher matcher = ReactionMatchers.titleContains(substring);
         assertMatchIs(matcher, true);
@@ -117,7 +118,7 @@ public class ReactionMatchersTest
     @Test
     public void testBodyContainsWhenMatch()
     {
-        String substring = message.body.substring(message.body.length() / 2);
+        String substring = halfOf(message.body);
 
         ReactionMatcher matcher = ReactionMatchers.bodyContains(substring);
         assertMatchIs(matcher, true);
@@ -234,10 +235,8 @@ public class ReactionMatchersTest
         ReactionMatcher neverMatch = ReactionMatchers.matchesNone();
         ReactionMatcher result = ReactionMatchers.not(neverMatch);
 
-        assertThat(result, notNullValue());
-        assertThat(result.matches(message), is(true));
+        assertMatchIs(result, true);
         assertThat(result.matches(emptyMessage), is(true));
-
     }
 
     @Test
@@ -248,52 +247,21 @@ public class ReactionMatchersTest
         assertMatchIs(result, false);
     }
 
-    private void assertMatchIs(ReactionMatcher matcher, boolean expectedValue)
-    {
-        assertThat(matcher, notNullValue());
-        assertThat(matcher.matches(message), is(expectedValue));
-        assertThat(matcher.matches(emptyMessage), is(false));
-        assertThat(matcher.matches(null), is(false));
-    }
-
     @Test
     public void testNot()
     {
         ReactionMatcher fakeMatcher = mock(ReactionMatcher.class);
-        
+
         boolean value = one(booleans());
         when(fakeMatcher.matches(message)).thenReturn(value);
-        
+
         ReactionMatcher matcher = ReactionMatchers.not(fakeMatcher);
         assertThat(matcher, notNullValue());
-        
+
         assertThat(matcher.matches(message), is(!value));
         verify(fakeMatcher).matches(message);
     }
 
-    @Test
-    public void testTitleContains()
-    {
-        String substring = randomString.substring(randomString.length() / 2);
-        message.title = randomString;
-        
-        ReactionMatcher matcher = ReactionMatchers.titleContains(substring);
-        assertThat(matcher, notNullValue());
-        assertThat(matcher.matches(message), is(true));
-    }
-    
-
-    @Test
-    public void testTitleIs()
-    {
-        message.title = randomString;
-        
-        ReactionMatcher matcher = ReactionMatchers.titleIs(randomString);
-        assertThat(matcher, notNullValue());
-        assertThat(matcher.matches(message), is(true));
-    }
-    
-    
     @Test
     public void testTitleIsWhenMatch()
     {
@@ -318,66 +286,75 @@ public class ReactionMatchersTest
             .isInstanceOf(IllegalArgumentException.class);
     }
 
-
     @Test
     public void testTitleIsNotWhenMatch()
     {
         message.title = randomString;
         String anotherRandomString = one(hexadecimalString(10));
-        
+
         ReactionMatcher matcher = ReactionMatchers.titleIsNot(anotherRandomString);
-        assertThat(matcher, notNullValue());
-        assertThat(matcher.matches(message), is(true));
-        
+        assertMatchIs(matcher, true);
     }
-    
+
     @Test
     public void testTitleIsNotWhenNoMatch()
     {
         message.title = randomString;
         ReactionMatcher matcher = ReactionMatchers.titleIsNot(randomString);
-        assertThat(matcher.matches(message), is(false));
+        assertMatchIs(matcher, false);
     }
-    
+
     @Test
     public void testBodyDoesNotContainWhenMatch()
     {
         ReactionMatcher matcher = ReactionMatchers.bodyDoesNotContain(randomString);
-        assertThat(matcher, notNullValue());
-        assertThat(matcher.matches(message), is(true));
+        assertMatchIs(matcher, true);
     }
-    
+
     @Test
     public void testBodyDoesNotContainWhenNoMatch()
     {
-        String substring = message.body.substring(message.body.length() / 2);
-        
+        String substring = halfOf(message.body);
+
         ReactionMatcher matcher = ReactionMatchers.bodyDoesNotContain(substring);
-        assertThat(matcher, notNullValue());
-        assertThat(matcher.matches(message), is(false));
+        assertMatchIs(matcher, false);
     }
-    
+
     @Test
     public void testHostnameContainsWhenMatch()
     {
-        String substring = message.hostname.substring(message.hostname.length() / 2);
-        
+        String substring = halfOf(message.hostname);
+
         ReactionMatcher matcher = ReactionMatchers.hostnameContains(substring);
-        assertThat(matcher, notNullValue());
-        assertThat(matcher.matches(message), is(true));
+        assertMatchIs(matcher, true);
     }
-    
+
     @Test
     public void testHostnameContainsWhenNoMatch()
     {
         ReactionMatcher matcher = ReactionMatchers.hostnameContains(randomString);
-        assertThat(matcher, notNullValue());
-        assertThat(matcher.matches(message), is(false));
+        assertMatchIs(matcher, false);
     }
 
     @Test
-    public void testHostnameDoesNotContain()
+    public void testHostnameContainsWithBadArgs()
     {
+        assertThrows(() -> ReactionMatchers.hostnameContains(""));
+    }
+
+    @Test
+    public void testHostnameDoesNotContainWhenMatch()
+    {
+        ReactionMatcher matcher = ReactionMatchers.hostnameDoesNotContain(randomString);
+        assertMatchIs(matcher, true);
+    }
+
+    @Test
+    public void testHostnameDoesNotContainWhenNoMatch()
+    {
+        String substring = halfOf(message.hostname);
+        ReactionMatcher matcher = ReactionMatchers.hostnameDoesNotContain(substring);
+        assertMatchIs(matcher, false);
     }
 
     @Test
@@ -388,6 +365,29 @@ public class ReactionMatchersTest
     @Test
     public void testUrgencyIsOneOf()
     {
+    }
+
+    private void assertMatchIs(ReactionMatcher matcher, boolean expectedValue)
+    {
+        assertThat(matcher, notNullValue());
+        assertThat(matcher.matches(message), is(expectedValue));
+    }
+
+    private void assertMatchersDoesNotMatchNullOrEmpty(ReactionMatcher matcher)
+    {
+        assertThat(matcher.matches(emptyMessage), is(false));
+        assertThat(matcher.matches(null), is(false));
+    }
+
+    private void assertMatchersMatchesNullOrEmpty(ReactionMatcher matcher)
+    {
+        assertThat(matcher.matches(emptyMessage), is(true));
+        assertThat(matcher.matches(null), is(true));
+    }
+
+    private String halfOf(String string)
+    {
+        return string.substring(string.length() / 2);
     }
 
 }
