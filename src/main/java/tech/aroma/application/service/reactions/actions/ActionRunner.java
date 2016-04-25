@@ -44,5 +44,15 @@ public interface ActionRunner
      * @return The total number of actions executed.
      */
     int runThroughActions(@Required Message message, @Required List<Action> actions);
+    
+    static ActionRunner newSynchronousRunner()
+    {
+        return new ActionRunnerSynchronous();
+    }
+    
+    static ActionRunner newAsynchronousRunner()
+    {
+        return new ActionRunnerAsynchronous();
+    }
 
 }
