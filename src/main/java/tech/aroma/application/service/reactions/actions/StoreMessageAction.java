@@ -64,4 +64,10 @@ final class StoreMessageAction implements Action
         return Lists.emptyList();
     }
 
+    @Override
+    public String toString()
+    {
+        return "StoreMessageAction{" + "messageRepo=" + messageRepo + '}';
+    }
+
 }

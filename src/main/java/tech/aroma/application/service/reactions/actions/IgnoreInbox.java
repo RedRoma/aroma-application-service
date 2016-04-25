@@ -48,4 +48,10 @@ final class IgnoreInbox implements Action
         return Lists.emptyList();
     }
 
+    @Override
+    public String toString()
+    {
+        return "IgnoreInbox{" + '}';
+    }
+
 }

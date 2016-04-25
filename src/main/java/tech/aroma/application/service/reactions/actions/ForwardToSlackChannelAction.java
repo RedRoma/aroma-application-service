@@ -41,25 +41,31 @@ final class ForwardToSlackChannelAction implements Action
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(ForwardToSlackChannelAction.class);
-    
+
     private final ActionForwardToSlackChannel slack;
     private final AlchemyHttp http;
-    
+
     ForwardToSlackChannelAction(ActionForwardToSlackChannel slack, AlchemyHttp http)
     {
         checkThat(slack, http)
             .are(notNull());
-        
+
         this.slack = slack;
         this.http = http;
     }
-    
+
     @Override
     public List<Action> actOnMessage(Message message) throws TException
     {
         Action.checkMessage(message);
-        
+
         return Lists.emptyList();
     }
-    
+
+    @Override
+    public String toString()
+    {
+        return "ForwardToSlackChannelAction{" + "slack=" + slack + ", http=" + http + '}';
+    }
+
 }

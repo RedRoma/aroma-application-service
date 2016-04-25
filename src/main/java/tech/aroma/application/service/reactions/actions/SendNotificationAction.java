@@ -102,4 +102,10 @@ final class SendNotificationAction implements Action
         }
     }
 
+    @Override
+    public String toString()
+    {
+        return "SendNotificationAction{" + "notificationService=" + notificationService + '}';
+    }
+
 }

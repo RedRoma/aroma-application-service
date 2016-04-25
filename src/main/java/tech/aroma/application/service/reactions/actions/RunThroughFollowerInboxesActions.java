@@ -72,4 +72,10 @@ final class RunThroughFollowerInboxesActions implements Action
             .collect(toList());
     }
 
+    @Override
+    public String toString()
+    {
+        return "RunThroughFollowerInboxesActions{" + "factory=" + factory + ", followerRepo=" + followerRepo + '}';
+    }
+
 }

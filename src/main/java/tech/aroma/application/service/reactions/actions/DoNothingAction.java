@@ -45,4 +45,12 @@ final class DoNothingAction implements Action
         return Lists.emptyList();
     }
 
+    @Override
+    public String toString()
+    {
+        return "DoNothingAction{" + '}';
+    }
+
+    
+    
 }

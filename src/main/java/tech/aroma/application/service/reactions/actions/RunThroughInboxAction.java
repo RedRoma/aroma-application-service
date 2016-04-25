@@ -103,4 +103,10 @@ class RunThroughInboxAction implements Action
         return newActions;
     }
 
+    @Override
+    public String toString()
+    {
+        return "RunThroughInboxAction{" + "actionFactory=" + actionFactory + ", matchAlgorithm=" + matchAlgorithm + ", reactionRepo=" + reactionRepo + ", user=" + user + '}';
+    }
+
 }

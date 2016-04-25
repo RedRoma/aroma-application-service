@@ -67,4 +67,10 @@ final class StoreInInboxAction implements Action
         return Lists.emptyList();
     }
 
+    @Override
+    public String toString()
+    {
+        return "StoreInInboxAction{" + "inboxRepo=" + inboxRepo + ", user=" + user + '}';
+    }
+
 }
