@@ -18,20 +18,13 @@ package tech.aroma.application.service.reactions.matchers;
 
 import com.google.inject.ImplementedBy;
 import java.util.List;
-import java.util.Objects;
-import javax.inject.Inject;
-import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.reactions.AromaMatcher;
 import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
-import static java.util.stream.Collectors.toList;
-import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.INTERFACE;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
-import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
  * The matching algorithm decides on what criteria to judge whether a Message Matches a set
@@ -40,79 +33,33 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
  * @author SirWellington
  */
 @StrategyPattern(role = INTERFACE)
-@ImplementedBy(MatchAlgorithm.AndImpl.class)
+@ImplementedBy(AndMatchAlgorithm.class)
 public interface MatchAlgorithm
 {
     
     boolean matches(@Required Message message, @NonEmpty List<AromaMatcher> matchers);
-    
-    @StrategyPattern(role = CONCRETE_BEHAVIOR)
-    static class AndImpl implements MatchAlgorithm
+ 
+    /**
+     * Matches only when ALL of the conditions are met.
+     * 
+     * @param matcherFactory
+     * @return
+     * @throws IllegalArgumentException 
+     */
+    static MatchAlgorithm and(MatcherFactory matcherFactory) throws IllegalArgumentException
     {
-        
-        private final MatcherFactory matcherFactory;
-        
-        @Inject
-        AndImpl(MatcherFactory matcherFactory)
-        {
-            checkThat(matcherFactory)
-                .is(notNull());
-            
-            this.matcherFactory = matcherFactory;
-        }
-        
-        @Override
-        public boolean matches(Message message, List<AromaMatcher> matchers)
-        {
-            if (Lists.isEmpty(matchers))
-            {
-                return false;
-            }
-            
-            List<MessageMatcher> reactionMatchers = matchers
-                .stream()
-                .map(matcherFactory::matcherFor)
-                .filter(Objects::nonNull)
-                .collect(toList());
-            
-            long totalMatches = reactionMatchers.stream()
-                .filter(matcher -> matcher.matches(message))
-                .count();
-            
-            return totalMatches == matchers.size();
-        }
-        
+        return new AndMatchAlgorithm(matcherFactory);
     }
     
-    @StrategyPattern(role = CONCRETE_BEHAVIOR)
-    static class OrImpl implements MatchAlgorithm
+    /**
+     * Matches when only ONE of the conditions are met.
+     * 
+     * @param matcherFactory
+     * @return
+     * @throws IllegalArgumentException 
+     */
+    static MatchAlgorithm or(MatcherFactory matcherFactory) throws IllegalArgumentException
     {
-        
-        private final MatcherFactory factory;
-        
-        @Inject
-        OrImpl(MatcherFactory factory)
-        {
-            checkThat(factory).is(notNull());
-            this.factory = factory;
-        }
-        
-        @Override
-        public boolean matches(Message message, List<AromaMatcher> matchers)
-        {
-            if (Lists.isEmpty(matchers))
-            {
-                return false;
-            }
-            
-            long totalMatches = matchers.stream()
-                .map(factory::matcherFor)
-                .filter(Objects::nonNull)
-                .filter(matcher -> matcher.matches(message))
-                .count();
-            
-            return totalMatches >= 1;
-        }
+        return new OrMatchAlgorithm(matcherFactory);
     }
-    
 }
