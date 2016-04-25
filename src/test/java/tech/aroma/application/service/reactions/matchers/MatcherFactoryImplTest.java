@@ -24,6 +24,7 @@ import tech.aroma.thrift.Urgency;
 import tech.aroma.thrift.reactions.AromaMatcher;
 import tech.aroma.thrift.reactions.MatcherAll;
 import tech.aroma.thrift.reactions.MatcherBodyContains;
+import tech.aroma.thrift.reactions.MatcherBodyDoesNotContain;
 import tech.aroma.thrift.reactions.MatcherBodyIs;
 import tech.aroma.thrift.reactions.MatcherHostnameIs;
 import tech.aroma.thrift.reactions.MatcherTitleContains;
@@ -109,7 +110,7 @@ public class MatcherFactoryImplTest
     @Test
     public void testBodyContainsWhenMatches()
     {
-        String substring = message.body.substring(message.body.length() / 2);
+        String substring = halfOf(message.body);
         matcher.setBodyContains(new MatcherBodyContains(substring));
         
         MessageMatcher result = instance.matcherFor(matcher);
@@ -122,6 +123,25 @@ public class MatcherFactoryImplTest
     {
         matcher.setBodyContains(new MatcherBodyContains(randomString));
         
+        MessageMatcher result = instance.matcherFor(matcher);
+        assertThat(result, notNullValue());
+        assertThat(result.matches(message), is(false));
+    }
+    
+    @Test
+    public void testBodyDoesNotContainWhenMatches()
+    {
+        matcher.setBodyDoesNotContain(new MatcherBodyDoesNotContain(randomString));
+        MessageMatcher result = instance.matcherFor(matcher);
+        assertThat(result, notNullValue());
+        assertThat(result.matches(message), is(true));
+    }
+    
+    @Test
+    public void testBodyDoesNotContainWhenNoMatch()
+    {
+        String substring = halfOf(message.body);
+        matcher.setBodyDoesNotContain(new MatcherBodyDoesNotContain(substring));
         MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
@@ -151,7 +171,7 @@ public class MatcherFactoryImplTest
     @Test
     public void testTitleContainsWhenMatch()
     {
-        String substring = message.title.substring(message.title.length() / 2);
+        String substring = halfOf(message.title);
         matcher.setTitleContains(new MatcherTitleContains(substring));
         
         MessageMatcher result = instance.matcherFor(matcher);
@@ -237,5 +257,10 @@ public class MatcherFactoryImplTest
         MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
+    }
+    
+    private String halfOf(String string)
+    {
+        return string.substring(0, string.length() / 2);
     }
 }
