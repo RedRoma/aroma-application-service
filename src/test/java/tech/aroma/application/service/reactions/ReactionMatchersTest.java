@@ -197,6 +197,7 @@ public class ReactionMatchersTest
 
         ReactionMatcher matcher = ReactionMatchers.urgencyIs(expected);
         assertMatchIs(matcher, true);
+        assertMatchersDoesNotMatchNullOrEmpty(matcher);
     }
 
     @Test
@@ -238,7 +239,7 @@ public class ReactionMatchersTest
         ReactionMatcher result = ReactionMatchers.not(neverMatch);
 
         assertMatchIs(result, true);
-        assertThat(result.matches(emptyMessage), is(true));
+        assertMatchersMatchesNullOrEmpty(result);
     }
 
     @Test
