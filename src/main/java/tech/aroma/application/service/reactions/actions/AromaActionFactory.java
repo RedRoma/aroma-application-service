@@ -30,22 +30,22 @@ import tech.sirwellington.alchemy.annotations.arguments.Required;
  */
 public interface AromaActionFactory
 {
-    
+
     Action actionToDoNothing();
-    
+
     Action actionToSendToSlackChannel(@Required Message message, @Required ActionForwardToSlackChannel slack);
-    
+
     Action actionToSendToSlackUser(@Required Message message, @Required ActionForwardToSlackUser slack);
-    
+
     Action actionToSendNotifications(@Required Message message);
-    
+
     Action actionToRunThroughFollowerInboxes(@Required Message message, MessageReactor orchestrator);
-    
+
     Action actionToRunThroughInbox(@Required Message message, @Required User user);
-    
+
     Action actionToStoreMessage(@Required Message message);
-    
+
     Action actionToStoreInInbox(@Required Message message, @Required User user);
 
-     Action actionToSendEmail(@Required Message message, @Required ActionSendEmail sendEmail);
+    Action actionToSendEmail(@Required Message message, @Required ActionSendEmail sendEmail);
 }
