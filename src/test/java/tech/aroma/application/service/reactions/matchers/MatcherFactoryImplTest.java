@@ -19,6 +19,7 @@ package tech.aroma.application.service.reactions.matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import sir.wellington.alchemy.collections.sets.Sets;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.Urgency;
 import tech.aroma.thrift.reactions.AromaMatcher;
@@ -421,7 +422,7 @@ public class MatcherFactoryImplTest
     public void testUrgencyIsWhenMatch()
     {
         Urgency expected = message.urgency;
-        matcher.setUrgencyEquals(new MatcherUrgencyIs(expected));
+        matcher.setUrgencyEquals(new MatcherUrgencyIs(Sets.createFrom(expected)));
 
         MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
@@ -439,10 +440,18 @@ public class MatcherFactoryImplTest
             expected = one(urgencies);
         }
 
-        matcher.setUrgencyEquals(new MatcherUrgencyIs(expected));
+        matcher.setUrgencyEquals(new MatcherUrgencyIs(Sets.createFrom(expected)));
         MessageMatcher result = instance.matcherFor(matcher);
         assertThat(result, notNullValue());
         assertThat(result.matches(message), is(false));
+    }
+    
+    @DontRepeat
+    @Test
+    public void testUrgencyIsWithBadArgs()
+    {
+        matcher.setUrgencyEquals(new MatcherUrgencyIs(Sets.emptySet()));
+        assertThrows(() -> instance.matcherFor(matcher));
     }
 
     private String halfOf(String string)

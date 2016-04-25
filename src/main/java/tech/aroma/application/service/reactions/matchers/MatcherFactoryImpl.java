@@ -16,10 +16,9 @@
 
 package tech.aroma.application.service.reactions.matchers;
 
-import java.util.List;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sir.wellington.alchemy.collections.lists.Lists;
 import sir.wellington.alchemy.collections.sets.Sets;
 import tech.aroma.thrift.Urgency;
 import tech.aroma.thrift.reactions.AromaMatcher;
@@ -28,7 +27,7 @@ import tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPattern;
 import static tech.aroma.data.assertions.RequestAssertions.validApplicationId;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPattern.Role.FACTORY;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
-import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+import static tech.sirwellington.alchemy.arguments.assertions.CollectionAssertions.nonEmptySet;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
@@ -142,21 +141,15 @@ final class MatcherFactoryImpl implements MatcherFactory
 
         if (matcher.isSetUrgencyEquals())
         {
-            List<Urgency> urgencies = Lists.copy(matcher.getUrgencyEquals().getUrgencies());
-            
-            Urgency expectedUrgency = matcher.getUrgencyEquals().getUrgency();
-            if (expectedUrgency != null)
-            {
-                urgencies.add(expectedUrgency);
-            }
+            Set<Urgency> expectedUrgencies = Sets.nullToEmpty(matcher.getUrgencyEquals().getPossibleUrgencies());
 
-            checkThat(expectedUrgency)
-                .usingMessage("Expected Urgency cannot be null")
-                .is(notNull());
+            checkThat(expectedUrgencies)
+                .usingMessage("Expected Urgency cannot be empty")
+                .is(nonEmptySet());
 
-            return MessageMatchers.urgencyIsOneOf(Sets.copyOf(urgencies));
+            return MessageMatchers.urgencyIsOneOf(expectedUrgencies);
         }
-        
+
 
         if (matcher.isSetHostnameIs())
         {
