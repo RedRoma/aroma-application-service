@@ -39,13 +39,13 @@ import tech.aroma.thrift.functions.TokenFunctions;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
+import static tech.aroma.data.assertions.RequestAssertions.validApplicationId;
 import static tech.aroma.thrift.application.service.ApplicationServiceConstants.MAX_CHARACTERS_IN_BODY;
 import static tech.aroma.thrift.application.service.ApplicationServiceConstants.MAX_TITLE_LENGTH;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.Checks.Internal.isNullOrEmpty;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
-import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.stringWithLengthGreaterThanOrEqualTo;
 
 /**
  *
@@ -173,8 +173,7 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
         checkThat(applicationId)
             .throwing(OperationFailedException.class)
             .usingMessage("Could not get Application ID from Token")
-            .is(nonEmptyString())
-            .is(stringWithLengthGreaterThanOrEqualTo(10));
+            .is(validApplicationId());
     }
 
     private AlchemyAssertion<SendMessageRequest> good()
