@@ -36,9 +36,11 @@ import tech.aroma.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.thrift.exceptions.InvalidTokenException;
 import tech.aroma.thrift.exceptions.OperationFailedException;
 import tech.aroma.thrift.functions.TokenFunctions;
+import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
 import static tech.aroma.thrift.application.service.ApplicationServiceConstants.MAX_CHARACTERS_IN_BODY;
+import static tech.aroma.thrift.application.service.ApplicationServiceConstants.MAX_TITLE_LENGTH;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.Checks.Internal.isNullOrEmpty;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -74,9 +76,8 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
     public SendMessageResponse process(SendMessageRequest request) throws TException
     {
         checkThat(request)
-            .throwing(InvalidArgumentException.class)
-            .usingMessage("request missing")
-            .is(notNull());
+            .throwing(ex -> new InvalidArgumentException(ex.getMessage()))
+            .is(good());
         
         checkThat(request.applicationToken)
             .throwing(InvalidTokenException.class)
@@ -141,8 +142,12 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
     {
         UUID messageId = UUIDs.timeBased();
         
-        String body = request.body;
+        if (request.title.length() > MAX_TITLE_LENGTH)
+        {
+            request.setTitle(request.title.substring(0, MAX_TITLE_LENGTH));
+        }
         
+        String body = request.body;
         if (!isNullOrEmpty(body) && body.length() > MAX_CHARACTERS_IN_BODY)
         {
             body = body.substring(0, MAX_CHARACTERS_IN_BODY);
@@ -170,6 +175,21 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
             .usingMessage("Could not get Application ID from Token")
             .is(nonEmptyString())
             .is(stringWithLengthGreaterThanOrEqualTo(10));
+    }
+
+    private AlchemyAssertion<SendMessageRequest> good()
+    {
+        return request ->
+        {
+            checkThat(request).is(notNull());
+            checkThat(request.applicationToken)
+                .usingMessage("Missing Application Token")
+                .is(notNull());
+            
+            checkThat(request.title)
+                .usingMessage("Missing Message Title")
+                .is(nonEmptyString());
+        };
     }
     
 }
