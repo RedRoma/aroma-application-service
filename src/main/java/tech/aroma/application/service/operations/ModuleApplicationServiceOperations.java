@@ -19,11 +19,16 @@ package tech.aroma.application.service.operations;
 
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
+import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.thrift.application.service.SendMessageRequest;
 import tech.aroma.thrift.application.service.SendMessageResponse;
+import tech.aroma.thrift.authentication.ApplicationToken;
+import tech.aroma.thrift.authentication.AuthenticationToken;
+import tech.aroma.thrift.functions.TokenFunctions;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
 /**
@@ -40,5 +45,11 @@ public final class ModuleApplicationServiceOperations extends AbstractModule
         bind(new TypeLiteral<ThriftOperation<SendMessageRequest, SendMessageResponse>>() {})
             .to(SendMessageOperation.class);
     }
-    
+
+    @Provides
+    Function<AuthenticationToken, ApplicationToken> provideAuthToApplicationTokenMapper()
+    {
+        return TokenFunctions.authTokenToAppTokenFunction();
+    }
+
 }

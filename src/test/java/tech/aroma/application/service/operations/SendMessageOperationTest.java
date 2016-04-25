@@ -16,8 +16,10 @@
 
 package tech.aroma.application.service.operations;
 
+import java.util.function.Function;
 import junit.framework.AssertionFailedError;
 import org.apache.thrift.TApplicationException;
+import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,8 +51,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+import static tech.aroma.data.assertions.RequestAssertions.validApplicationId;
 import static tech.aroma.data.assertions.RequestAssertions.validMessageId;
 import static tech.aroma.thrift.application.service.ApplicationServiceConstants.MAX_CHARACTERS_IN_BODY;
+import static tech.aroma.thrift.application.service.ApplicationServiceConstants.MAX_TITLE_LENGTH;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
@@ -72,12 +76,17 @@ public class SendMessageOperationTest
     @Mock
     private MessageReactor messageReactor;
 
+    @Mock
+    private Function<AuthenticationToken, ApplicationToken> tokenMapper;
+
     @Captor
-    private ArgumentCaptor<Message> messageCaptor;
+    private ArgumentCaptor<Message> captor;
 
     private SendMessageOperation instance;
 
     private GetTokenInfoRequest expectedAuthenticationRequest;
+
+    private AuthenticationToken authToken;
 
     private ApplicationToken appToken;
 
@@ -99,7 +108,7 @@ public class SendMessageOperationTest
     @Before
     public void setUp() throws Exception
     {
-        instance = new SendMessageOperation(authenticationService, messageReactor);
+        instance = new SendMessageOperation(authenticationService, messageReactor, tokenMapper);
 
         verifyZeroInteractions(authenticationService, messageReactor);
 
@@ -111,8 +120,9 @@ public class SendMessageOperationTest
     @Test
     public void testConstructor()
     {
-        assertThrows(() -> new SendMessageOperation(null, messageReactor));
-        assertThrows(() -> new SendMessageOperation(authenticationService, null));
+        assertThrows(() -> new SendMessageOperation(null, messageReactor, tokenMapper));
+        assertThrows(() -> new SendMessageOperation(authenticationService, null, tokenMapper));
+        assertThrows(() -> new SendMessageOperation(authenticationService, messageReactor, null));
     }
 
     @Test
@@ -125,9 +135,9 @@ public class SendMessageOperationTest
             .throwing(AssertionFailedError.class)
             .is(validMessageId());
 
-        verify(messageReactor).reactToMessage(messageCaptor.capture());
+        verify(messageReactor).reactToMessage(captor.capture());
 
-        Message message = messageCaptor.getValue();
+        Message message = captor.getValue();
         assertThat(message, notNullValue());
         assertThat(message.messageId, is(result.messageId));
         assertThat(message.body, is(request.body));
@@ -145,6 +155,26 @@ public class SendMessageOperationTest
         when(authenticationService.getTokenInfo(expectedAuthenticationRequest))
             .thenThrow(new TApplicationException());
     }
+    
+    @Test
+    public void testWhenTitleExceedsLimit() throws Exception
+    {
+        String extraLongTitle = one(alphabeticString(MAX_TITLE_LENGTH * 2));
+        String truncatedTitle = extraLongTitle.substring(0, MAX_TITLE_LENGTH);
+        
+        request.setTitle(extraLongTitle);
+        
+        SendMessageResponse response = instance.process(request);
+        assertThat(response, notNullValue());
+        checkThat(response.messageId).is(validApplicationId());
+        
+        verify(messageReactor).reactToMessage(captor.capture());
+        Message savedMessage = captor.getValue();
+        
+        assertThat(savedMessage, notNullValue());
+        assertThat(savedMessage.title, is(truncatedTitle));
+        assertThat(savedMessage.messageId, is(response.messageId));
+    }
 
     @Test
     public void testWhenBodyExceedsLimit() throws Exception
@@ -161,29 +191,53 @@ public class SendMessageOperationTest
             .throwing(AssertionFailedError.class)
             .is(validMessageId());
 
-        verify(messageReactor).reactToMessage(messageCaptor.capture());
+        verify(messageReactor).reactToMessage(captor.capture());
 
-        Message savedMessage = messageCaptor.getValue();
+        Message savedMessage = captor.getValue();
 
         assertThat(savedMessage.body, is(truncatedBody));
         assertThat(savedMessage.messageId, is(result.messageId));
     }
-
-    private void setupMocks() throws Exception
+    
+    @DontRepeat
+    @Test
+    public void testWhenTokenMapperFails() throws Exception
     {
-        when(messageReactor.reactToMessage(any()))
-            .thenReturn(response);
+        when(tokenMapper.apply(authToken)).thenThrow(new RuntimeException());
         
-        setupExpectedAuthRequest();
-        setupAuthServiceResponse();
+        assertThrows(() -> instance.process(request))
+            .isInstanceOf(TException.class);
+    }
+    
+    @DontRepeat
+    @Test
+    public void testWhenTokenMapperReturnsNull() throws Exception
+    {
+        when(tokenMapper.apply(authToken)).thenReturn(null);
+        
+        assertThrows(() -> instance.process(request))
+            .isInstanceOf(TException.class);
     }
 
     private void setupData()
     {
         appToken = request.applicationToken;
         appToken.applicationId = appId;
+
+        authToken = TokenFunctions.appTokenToAuthTokenFunction().apply(appToken);
+
         app.applicationId = appId;
         response.messageId = messageId;
+    }
+
+    private void setupMocks() throws Exception
+    {
+        when(messageReactor.reactToMessage(any())).thenReturn(response);
+        when(tokenMapper.apply(authToken)).thenReturn(appToken);
+
+        setupExpectedAuthRequest();
+        setupAuthServiceResponse();
+
     }
 
     private void setupExpectedAuthRequest()
@@ -196,7 +250,6 @@ public class SendMessageOperationTest
 
     private void setupAuthServiceResponse() throws Exception
     {
-        AuthenticationToken authToken = TokenFunctions.appTokenToAuthTokenFunction().apply(appToken);
 
         GetTokenInfoResponse response = new GetTokenInfoResponse()
             .setToken(authToken);

@@ -19,6 +19,7 @@ package tech.aroma.application.service.operations;
 import com.datastax.driver.core.utils.UUIDs;
 import java.time.Instant;
 import java.util.UUID;
+import java.util.function.Function;
 import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ import tech.aroma.thrift.Message;
 import tech.aroma.thrift.application.service.SendMessageRequest;
 import tech.aroma.thrift.application.service.SendMessageResponse;
 import tech.aroma.thrift.authentication.ApplicationToken;
+import tech.aroma.thrift.authentication.AuthenticationToken;
 import tech.aroma.thrift.authentication.TokenType;
 import tech.aroma.thrift.authentication.service.AuthenticationService;
 import tech.aroma.thrift.authentication.service.GetTokenInfoRequest;
@@ -35,7 +37,6 @@ import tech.aroma.thrift.authentication.service.GetTokenInfoResponse;
 import tech.aroma.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.thrift.exceptions.InvalidTokenException;
 import tech.aroma.thrift.exceptions.OperationFailedException;
-import tech.aroma.thrift.functions.TokenFunctions;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
@@ -53,20 +54,25 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
  */
 final class SendMessageOperation implements ThriftOperation<SendMessageRequest, SendMessageResponse>
 {
-    
+
     private final static Logger LOG = LoggerFactory.getLogger(SendMessageOperation.class);
-    
+
     private final AuthenticationService.Iface authenticationService;
     private final MessageReactor messageReactor;
-    
+    private final Function<AuthenticationToken, ApplicationToken> tokenMapper;
+
     @Inject
-    SendMessageOperation(AuthenticationService.Iface authenticationService, MessageReactor messageReactor)
+    SendMessageOperation(AuthenticationService.Iface authenticationService,
+                         MessageReactor messageReactor,
+                         Function<AuthenticationToken, ApplicationToken> tokenMapper)
     {
-        checkThat(authenticationService, messageReactor)
+        checkThat(authenticationService, tokenMapper, messageReactor)
             .are(notNull());
-        
+
         this.authenticationService = authenticationService;
         this.messageReactor = messageReactor;
+        this.tokenMapper = tokenMapper;
+
     }
 
     /*
@@ -78,37 +84,30 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
         checkThat(request)
             .throwing(ex -> new InvalidArgumentException(ex.getMessage()))
             .is(good());
-        
-        checkThat(request.applicationToken)
-            .throwing(InvalidTokenException.class)
-            .usingMessage("missing Application Token")
-            .is(notNull());
-        
-        GetTokenInfoResponse tokenInfo = tryToGetTokenInfo(request.applicationToken);
-        
-        ApplicationToken appToken = TokenFunctions.authTokenToAppTokenFunction().apply(tokenInfo.token);
-        
+
+        ApplicationToken appToken = tryToGetTokenInfo(request.applicationToken);
+
         String applicationId = appToken.applicationId;
         checkAppId(applicationId);
-        
+
         Message message = createMessageFrom(request, appToken);
-        
+
         messageReactor.reactToMessage(message);
 
         SendMessageResponse response = new SendMessageResponse()
             .setMessageId(message.messageId);
-        
+
         return response;
     }
-    
-    private GetTokenInfoResponse tryToGetTokenInfo(ApplicationToken applicationToken) throws InvalidTokenException,
+
+    private ApplicationToken tryToGetTokenInfo(ApplicationToken applicationToken) throws InvalidTokenException,
                                                                                              OperationFailedException
     {
-        
+
         GetTokenInfoRequest getTokenInfoRequest = new GetTokenInfoRequest()
             .setTokenId(applicationToken.tokenId)
             .setTokenType(TokenType.APPLICATION);
-        
+
         GetTokenInfoResponse tokenInfo;
         try
         {
@@ -124,35 +123,53 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
             LOG.error("Failed to get info for Token [{}]", applicationToken, ex);
             throw new OperationFailedException("Could not get token info: " + ex.getMessage());
         }
-        
+
         checkThat(tokenInfo, tokenInfo.token)
             .throwing(OperationFailedException.class)
             .usingMessage("AuthenticationService Response is missing Token Info")
             .are(notNull());
-        
+
         checkThat(tokenInfo.token.ownerId)
             .throwing(OperationFailedException.class)
             .usingMessage("missing Token Info")
             .is(nonEmptyString());
+
         
-        return tokenInfo;
+        ApplicationToken appToken;
+        try
+        {
+            appToken = tokenMapper.apply(tokenInfo.token);
+        }
+        catch (Exception ex)
+        {
+            LOG.error("Failed to map Auth Token {} to App Token", tokenInfo.token, ex);
+            throw new OperationFailedException("Could not map Auth Token to App Token: " + ex.getMessage());
+        }
+
+        checkThat(appToken)
+            .throwing(OperationFailedException.class)
+            .usingMessage("Could not map Auth Token to App Token")
+            .is(notNull());
+        
+        return appToken;
     }
-    
+
     private Message createMessageFrom(SendMessageRequest request, ApplicationToken token)
     {
+        //Time-Based UUIDs to optimize Storage in Cassandra.
         UUID messageId = UUIDs.timeBased();
-        
+
         if (request.title.length() > MAX_TITLE_LENGTH)
         {
             request.setTitle(request.title.substring(0, MAX_TITLE_LENGTH));
         }
-        
+
         String body = request.body;
         if (!isNullOrEmpty(body) && body.length() > MAX_CHARACTERS_IN_BODY)
         {
             body = body.substring(0, MAX_CHARACTERS_IN_BODY);
         }
-        
+
         Message message = new Message()
             .setApplicationId(token.applicationId)
             .setApplicationName(token.applicationName)
@@ -164,16 +181,8 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
             .setTimeMessageReceived(Instant.now().toEpochMilli())
             .setHostname(request.hostname)
             .setMacAddress(request.macAddress);
-        
+
         return message;
-    }
-    
-    private void checkAppId(String applicationId) throws OperationFailedException
-    {
-        checkThat(applicationId)
-            .throwing(OperationFailedException.class)
-            .usingMessage("Could not get Application ID from Token")
-            .is(validApplicationId());
     }
 
     private AlchemyAssertion<SendMessageRequest> good()
@@ -190,5 +199,13 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
                 .is(nonEmptyString());
         };
     }
-    
+
+    private void checkAppId(String applicationId) throws OperationFailedException
+    {
+        checkThat(applicationId)
+            .throwing(OperationFailedException.class)
+            .usingMessage("Could not get Application ID from Token")
+            .is(validApplicationId());
+    }
+
 }
