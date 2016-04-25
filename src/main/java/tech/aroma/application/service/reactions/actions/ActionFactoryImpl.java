@@ -16,6 +16,7 @@
 
 package tech.aroma.application.service.reactions.actions;
 
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.application.service.reactions.matchers.MatchAlgorithm;
@@ -29,7 +30,12 @@ import tech.aroma.thrift.notification.service.NotificationService;
 import tech.aroma.thrift.reactions.ActionForwardToSlackChannel;
 import tech.aroma.thrift.reactions.ActionForwardToSlackUser;
 import tech.aroma.thrift.reactions.ActionSendEmail;
+import tech.aroma.thrift.reactions.AromaAction;
 import tech.sirwellington.alchemy.annotations.access.Internal;
+import tech.sirwellington.alchemy.http.AlchemyHttp;
+
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
  *
@@ -41,14 +47,60 @@ final class ActionFactoryImpl implements ActionFactory
 
     private final static Logger LOG = LoggerFactory.getLogger(ActionFactoryImpl.class);
 
-    private NotificationService.Iface notificationService;
+    private final NotificationService.Iface notificationService;
+    private final FollowerRepository followerRepo;
+    private final InboxRepository inboxRepo;
+    private final MatchAlgorithm matchAlgorithm;
+    private final MessageRepository messageRepo;
+    private final ReactionRepository reactionRepo;
+    private final AlchemyHttp http;
 
-    private ActionMapper actionMapper;
-    private FollowerRepository followerRepo;
-    private InboxRepository inboxRepo;
-    private MatchAlgorithm matchAlgorithm;
-    private MessageRepository messageRepo;
-    private ReactionRepository reactionRepo;
+    @Inject
+    ActionFactoryImpl(NotificationService.Iface notificationService,
+                      FollowerRepository followerRepo,
+                      InboxRepository inboxRepo,
+                      MatchAlgorithm matchAlgorithm,
+                      MessageRepository messageRepo,
+                      ReactionRepository reactionRepo,
+                      AlchemyHttp http)
+    {
+        checkThat(notificationService, followerRepo, inboxRepo, matchAlgorithm, messageRepo, reactionRepo, http)
+            .are(notNull());
+        
+        this.notificationService = notificationService;
+        this.followerRepo = followerRepo;
+        this.inboxRepo = inboxRepo;
+        this.matchAlgorithm = matchAlgorithm;
+        this.messageRepo = messageRepo;
+        this.reactionRepo = reactionRepo;
+        this.http = http;
+    }
+
+    @Override
+    public Action actionFor(AromaAction action)
+    {
+        if (action == null)
+        {
+            return this.actionToDoNothing();
+        }
+
+        if (action.isSetForwardToSlackChannel())
+        {
+            return this.actionToSendToSlackChannel(action.getForwardToSlackChannel());
+        }
+
+        if (action.isSetForwardToSlackUser())
+        {
+            return this.actionToSendToSlackUser(action.getForwardToSlackUser());
+        }
+
+        if (action.isSetSendEmail())
+        {
+            return this.actionToSendEmail(action.getSendEmail());
+        }
+
+        return this.actionToDoNothing();
+    }
 
     @Override
     public Action actionToDoNothing()
@@ -59,13 +111,13 @@ final class ActionFactoryImpl implements ActionFactory
     @Override
     public Action actionToSendToSlackChannel(ActionForwardToSlackChannel slack)
     {
-        return new ForwardToSlackAction(false, slack.slackChannel, slack.domainName, slack.slackToken);
+        return new ForwardToSlackChannelAction(slack, http);
     }
 
     @Override
     public Action actionToSendToSlackUser(ActionForwardToSlackUser slack)
     {
-        return new ForwardToSlackAction(true, slack.slackUsername, slack.domainName, slack.slackToken);
+        return actionToDoNothing();
     }
 
     @Override
@@ -83,7 +135,7 @@ final class ActionFactoryImpl implements ActionFactory
     @Override
     public Action actionToRunThroughInbox(User user)
     {
-        return new RunThroughInboxAction(this, actionMapper, matchAlgorithm, reactionRepo, user);
+        return new RunThroughInboxAction(this, matchAlgorithm, reactionRepo, user);
     }
 
     @Override

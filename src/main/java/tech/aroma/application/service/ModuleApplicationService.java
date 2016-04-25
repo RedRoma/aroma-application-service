@@ -30,6 +30,7 @@ import tech.aroma.thrift.application.service.ApplicationService;
 import tech.aroma.thrift.authentication.ApplicationToken;
 import tech.aroma.thrift.authentication.AuthenticationToken;
 import tech.aroma.thrift.functions.TokenFunctions;
+import tech.sirwellington.alchemy.http.AlchemyHttp;
 
 /**
  *
@@ -51,6 +52,14 @@ public final class ModuleApplicationService extends AbstractModule
     Function<AuthenticationToken, ApplicationToken> provideTokenMapper()
     {
         return TokenFunctions.authTokenToAppTokenFunction();
+    }
+    
+    @Provides
+    AlchemyHttp provideHttpClient()
+    {
+        return AlchemyHttp.newBuilder()
+            .enableAsyncCallbacks()
+            .build();
     }
     
     private static class ServiceModule extends DecoratorModule

@@ -22,45 +22,44 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.thrift.Message;
+import tech.aroma.thrift.reactions.ActionForwardToSlackChannel;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
+import tech.sirwellington.alchemy.http.AlchemyHttp;
 
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
-import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
  *
  * @author SirWellington
  */
-@StrategyPattern(role = CONCRETE_BEHAVIOR)
 @Internal
-final class ForwardToSlackAction implements Action
+@StrategyPattern(role = CONCRETE_BEHAVIOR)
+final class ForwardToSlackChannelAction implements Action
 {
 
-    private final static Logger LOG = LoggerFactory.getLogger(ForwardToSlackAction.class);
-
-    private final boolean isUser;
-    private final String channel;
-    private final String slackDomain;
-    private final String webToken;
-
-    ForwardToSlackAction(boolean isUser, String channel, String slackDomain, String webToken)
+    private final static Logger LOG = LoggerFactory.getLogger(ForwardToSlackChannelAction.class);
+    
+    private final ActionForwardToSlackChannel slack;
+    private final AlchemyHttp http;
+    
+    ForwardToSlackChannelAction(ActionForwardToSlackChannel slack, AlchemyHttp http)
     {
-        checkThat(channel, slackDomain, webToken)
-            .are(nonEmptyString());
-
-        this.isUser = isUser;
-        this.channel = channel;
-        this.slackDomain = slackDomain;
-        this.webToken = webToken;
+        checkThat(slack, http)
+            .are(notNull());
+        
+        this.slack = slack;
+        this.http = http;
     }
-
+    
     @Override
     public List<Action> actOnMessage(Message message) throws TException
     {
-
+        Action.checkMessage(message);
+        
         return Lists.emptyList();
     }
-
+    
 }

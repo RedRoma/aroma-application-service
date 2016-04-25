@@ -21,6 +21,7 @@ import tech.aroma.thrift.User;
 import tech.aroma.thrift.reactions.ActionForwardToSlackChannel;
 import tech.aroma.thrift.reactions.ActionForwardToSlackUser;
 import tech.aroma.thrift.reactions.ActionSendEmail;
+import tech.aroma.thrift.reactions.AromaAction;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 /**
@@ -30,6 +31,8 @@ import tech.sirwellington.alchemy.annotations.arguments.Required;
 public interface ActionFactory
 {
 
+    Action actionFor(AromaAction action);
+    
     Action actionToDoNothing();
 
     Action actionToSendToSlackChannel(@Required ActionForwardToSlackChannel slack);

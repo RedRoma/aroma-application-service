@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.application.service.reactions.actions.Action;
 import tech.aroma.application.service.reactions.actions.ActionFactory;
-import tech.aroma.application.service.reactions.actions.ActionMapper;
 import tech.aroma.application.service.reactions.actions.ActionRunner;
 import tech.aroma.application.service.reactions.matchers.MatchAlgorithm;
 import tech.aroma.data.ReactionRepository;
@@ -46,7 +45,6 @@ final class MessageReactorImpl implements MessageReactor
 
     private final static Logger LOG = LoggerFactory.getLogger(MessageReactorImpl.class);
     
-    private ActionMapper actionMapper;
     private ActionRunner actionRunner;
     private ActionFactory factory;
     private MatchAlgorithm matchAlgorithm;
@@ -88,7 +86,7 @@ final class MessageReactorImpl implements MessageReactor
                 continue;
             }
             
-            Action newAction = actionMapper.create(message, action);
+            Action newAction = factory.actionFor(action);
             initialActions.add(newAction);
         }
         

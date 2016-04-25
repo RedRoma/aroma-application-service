@@ -44,47 +44,44 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
 @Internal
 class RunThroughInboxAction implements Action
 {
-    
+
     private final static Logger LOG = LoggerFactory.getLogger(RunThroughInboxAction.class);
-    
+
     private final ActionFactory actionFactory;
-    private final ActionMapper actionMapper;
     private final MatchAlgorithm matchAlgorithm;
     private final ReactionRepository reactionRepo;
     private final User user;
-    
+
     RunThroughInboxAction(ActionFactory actionFactory,
-                          ActionMapper actionMapper,
                           MatchAlgorithm matchAlgorithm,
                           ReactionRepository reactionRepo,
                           User user)
     {
-        checkThat(actionFactory, actionMapper, matchAlgorithm, reactionRepo, user)
+        checkThat(actionFactory, matchAlgorithm, reactionRepo, user)
             .are(notNull());
-        
+
         this.actionFactory = actionFactory;
-        this.actionMapper = actionMapper;
         this.matchAlgorithm = matchAlgorithm;
         this.reactionRepo = reactionRepo;
         this.user = user;
     }
-    
+
     @Override
     public List<Action> actOnMessage(Message message) throws TException
     {
         Action.checkMessage(message);
-        
+
         List<Action> newActions = Lists.create();
         List<Reaction> reactions = reactionRepo.getReactionsForUser(user.userId);
-        
+
         boolean shouldStoreInInbox = true;
-        
+
         List<AromaAction> matchingActions = reactions.stream()
             .filter(r -> matchAlgorithm.matches(message, r.matchers))
             .flatMap(r -> r.getActions().stream())
             .distinct()
             .collect(toList());
-        
+
         for (AromaAction action : matchingActions)
         {
             if (action.isSetSkipInbox() || action.isSetDontStoreMessage())
@@ -92,18 +89,18 @@ class RunThroughInboxAction implements Action
                 shouldStoreInInbox = false;
                 continue;
             }
-            
-            Action newAction = actionMapper.create(message, action);
+
+            Action newAction = actionFactory.actionFor(action);
             newActions.add(newAction);
         }
-        
+
         if (shouldStoreInInbox)
         {
             Action actionToSaveInInbox = actionFactory.actionToStoreInInbox(user);
             newActions.add(actionToSaveInInbox);
         }
-        
+
         return newActions;
     }
-    
+
 }

@@ -34,6 +34,7 @@ import tech.aroma.thrift.authentication.AuthenticationToken;
 import tech.aroma.thrift.authentication.service.AuthenticationService;
 import tech.aroma.thrift.notification.service.NotificationService;
 import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
+import tech.sirwellington.alchemy.http.AlchemyHttp;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
 import static org.hamcrest.Matchers.notNullValue;
@@ -93,6 +94,13 @@ public class ModuleApplicationServiceTest
     {
         Function<AuthenticationToken, ApplicationToken> mapper = instance.provideTokenMapper();
         assertThat(mapper, notNullValue());
+    }
+
+    @Test
+    public void testProvideHttpClient()
+    {
+        AlchemyHttp client = instance.provideHttpClient();
+        assertThat(client, notNullValue());
     }
 
 }
