@@ -111,7 +111,7 @@ public interface MatchAlgorithm
                 .filter(matcher -> matcher.matches(message))
                 .count();
             
-            return totalMatches > 0;
+            return totalMatches >= 1;
         }
     }
     
