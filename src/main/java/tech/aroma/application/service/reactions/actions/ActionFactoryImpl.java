@@ -132,7 +132,7 @@ final class ActionFactoryImpl implements ActionFactory
     @Override
     public Action actionToRunThroughFollowerInboxes(Message message)
     {
-        return new RunThroughFollowerInboxesActions(this, followerRepo);
+        return new RunThroughFollowerInboxesAction(this, followerRepo);
     }
 
     @Override

@@ -38,15 +38,15 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
  */
 @Internal
 @StrategyPattern(role = CONCRETE_BEHAVIOR)
-final class RunThroughFollowerInboxesActions implements Action
+final class RunThroughFollowerInboxesAction implements Action
 {
 
-    private final static Logger LOG = LoggerFactory.getLogger(RunThroughFollowerInboxesActions.class);
+    private final static Logger LOG = LoggerFactory.getLogger(RunThroughFollowerInboxesAction.class);
 
     private final ActionFactory factory;
     private final FollowerRepository followerRepo;
 
-    RunThroughFollowerInboxesActions(ActionFactory factory, FollowerRepository followerRepo)
+    RunThroughFollowerInboxesAction(ActionFactory factory, FollowerRepository followerRepo)
     {
         checkThat(factory, followerRepo)
             .are(notNull());
