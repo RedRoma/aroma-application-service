@@ -30,12 +30,12 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static tech.aroma.thrift.generators.MessageGenerators.messages;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
-import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
 
 /**
  *
@@ -76,7 +76,7 @@ public class ActionRunnerTest
 
     private static void testWithOnlyOneRoundOfAction(ActionRunner runner) throws Exception
     {
-        Message message = one(pojos(Message.class));
+        Message message = one(messages());
         List<Action> actions = listOf(() -> mock(Action.class), 20);
 
         runner.runThroughActions(message, actions);
@@ -90,7 +90,7 @@ public class ActionRunnerTest
     
     static void testWithMultipleRounds(ActionRunner runner) throws Exception
     {
-        Message message = one(pojos(Message.class));
+        Message message = one(messages());
         
         int rounds = one(integers(2, 5));
 
