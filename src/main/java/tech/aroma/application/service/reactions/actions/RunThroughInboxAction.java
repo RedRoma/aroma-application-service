@@ -17,6 +17,7 @@
 package tech.aroma.application.service.reactions.actions;
 
 import java.util.List;
+import java.util.Objects;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,8 +113,10 @@ class RunThroughInboxAction implements Action
         reactions = Lists.nullToEmpty(reactions);
 
         return reactions.stream()
-            .filter(r -> matchAlgorithm.matches(message, r.matchers))
-            .flatMap(r -> r.getActions().stream())
+            .filter(reaction -> matchAlgorithm.matches(message, reaction.matchers))
+            .map(reaction -> reaction.getActions())
+            .filter(Objects::nonNull)
+            .flatMap(List::stream)
             .distinct()
             .collect(toList());
     }
