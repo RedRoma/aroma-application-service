@@ -21,12 +21,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.aroma.thrift.Message;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
-import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
+import static tech.aroma.thrift.generators.MessageGenerators.messages;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 
 /**
  *
@@ -37,7 +38,6 @@ import static org.junit.Assert.assertThat;
 public class DoNothingActionTest 
 {
     
-    @GeneratePojo
     private Message message;
 
     private DoNothingAction instance;
@@ -45,6 +45,7 @@ public class DoNothingActionTest
     @Before
     public void setUp() throws Exception
     {
+        message = one(messages());
         
         instance = new DoNothingAction();
     }
