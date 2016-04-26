@@ -16,6 +16,7 @@
 
 package tech.aroma.application.service.reactions.actions;
 
+import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,57 +34,63 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
-
 /**
  *
  * @author SirWellington
  */
 @Repeat(50)
 @RunWith(AlchemyTestRunner.class)
-public class ForwardToSlackChannelActionTest 
+public class ForwardToSlackChannelActionTest
 {
 
     @Mock
     private AlchemyHttp http;
-    
+
     @GeneratePojo
     private ActionForwardToSlackChannel slack;
-    
+
     private ForwardToSlackChannelAction instance;
-    
+
     @Before
     public void setUp() throws Exception
     {
-        
+
         setupData();
         setupMocks();
-        
+
         instance = new ForwardToSlackChannelAction(slack, http);
         verifyZeroInteractions(http);
     }
 
-
     private void setupData() throws Exception
     {
-        
+
     }
 
     private void setupMocks() throws Exception
     {
-        
+
     }
 
     @DontRepeat
     @Test
-    public void testConstructor() 
+    public void testConstructor()
     {
         assertThrows(() -> new ForwardToSlackChannelAction(null, http));
         assertThrows(() -> new ForwardToSlackChannelAction(slack, null));
     }
-    
+
     @Test
     public void testActOnMessage() throws Exception
     {
+    }
+
+    @DontRepeat
+    @Test
+    public void testWithBadArgs()
+    {
+        assertThrows(() -> instance.actOnMessage(null))
+            .isInstanceOf(TException.class);
     }
 
     @Test
