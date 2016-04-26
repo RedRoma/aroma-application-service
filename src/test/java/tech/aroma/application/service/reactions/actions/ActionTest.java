@@ -26,20 +26,20 @@ import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
+import static tech.aroma.thrift.generators.MessageGenerators.messages;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.ALPHABETIC;
-import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.UUID;
 
 /**
  *
  * @author SirWellington
  */
-@Repeat(10)
+@Repeat(50)
 @RunWith(AlchemyTestRunner.class)
 public class ActionTest 
 {
 
-    @GeneratePojo
     private Message goodMessage;
     
     @GeneratePojo
@@ -48,8 +48,6 @@ public class ActionTest
     @GenerateString(ALPHABETIC)
     private String badId;
     
-    @GenerateString(UUID)
-    private String goodId;
     
     @Before
     public void setUp() throws Exception
@@ -60,8 +58,7 @@ public class ActionTest
 
     private void setupData() throws Exception
     {
-        goodMessage.messageId = goodId;
-        goodMessage.applicationId = goodId;
+        goodMessage = one(messages());
         
         badMessage.messageId = badId;
     }
