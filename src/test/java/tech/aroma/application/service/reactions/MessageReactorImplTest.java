@@ -38,8 +38,6 @@ import tech.aroma.thrift.reactions.AromaAction;
 import tech.aroma.thrift.reactions.Reaction;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
-import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
-import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static java.util.stream.Collectors.toList;
@@ -56,10 +54,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+import static tech.aroma.thrift.generators.MessageGenerators.messages;
 import static tech.aroma.thrift.generators.ReactionGenerators.reactions;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
-import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.UUID;
 
 /**
  *
@@ -95,13 +93,8 @@ public class MessageReactorImplTest
     private Reaction reactionThatSkipsInbox;
     private Reaction reactionThatSkipsStorage;
 
-    @GeneratePojo
     private Message message;
-    
-    @GenerateString(UUID)
     private String appId;
-    
-    @GenerateString(UUID)
     private String messageId;
     
     private MessageReactorImpl instance;
@@ -122,8 +115,9 @@ public class MessageReactorImplTest
     
     private void setupData() throws Exception
     {
-        message.messageId = messageId;
-        message.applicationId = appId;
+        message = one(messages());
+        messageId = message.messageId;
+        appId = message.applicationId;
         
         reaction = one(reactions());
         reaction.actions = reaction.actions
