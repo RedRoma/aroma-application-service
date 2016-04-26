@@ -22,15 +22,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.aroma.thrift.Message;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
-import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
-import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
+import static tech.aroma.thrift.generators.MessageGenerators.messages;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
-import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.UUID;
 
 /**
  *
@@ -41,22 +40,14 @@ import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.
 public class IgnoreInboxTest
 {
 
-    @GeneratePojo
     private Message message;
-    
-    @GenerateString(UUID)
-    private String messageId;
-    
-    @GenerateString(UUID)
-    private String appId;
     
     private IgnoreInbox instance;
 
     @Before
     public void setUp() throws Exception
     {
-        message.applicationId = appId;
-        message.messageId = messageId;
+        message = one(messages());
         
         instance = new IgnoreInbox();
     }
