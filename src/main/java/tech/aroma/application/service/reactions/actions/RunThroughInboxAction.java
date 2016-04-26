@@ -32,6 +32,7 @@ import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
 import static java.util.stream.Collectors.toList;
+import static tech.aroma.data.assertions.RequestAssertions.validUser;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -60,6 +61,8 @@ class RunThroughInboxAction implements Action
     {
         checkThat(actionFactory, matchAlgorithm, reactionRepo, user)
             .are(notNull());
+        
+        checkThat(user).is(validUser());
 
         this.actionFactory = actionFactory;
         this.matchAlgorithm = matchAlgorithm;
