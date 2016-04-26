@@ -59,6 +59,7 @@ final class ActionRunnerAsynchronous implements ActionRunner
                 .flatMap(List::stream)
                 .collect(toList());
             
+            queue.clear();
             LOG.debug("Pass {} complete with {} additional actions to run through.", totalRuns, additionalActions.size());
 
             queue.addAll(additionalActions);
