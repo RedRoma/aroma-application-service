@@ -18,49 +18,35 @@ package tech.aroma.application.service.operations;
 
 import com.datastax.driver.core.utils.UUIDs;
 import java.time.Instant;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sir.wellington.alchemy.collections.sets.Sets;
-import tech.aroma.data.ApplicationRepository;
-import tech.aroma.data.FollowerRepository;
-import tech.aroma.data.InboxRepository;
-import tech.aroma.data.MessageRepository;
-import tech.aroma.data.UserRepository;
-import tech.aroma.thrift.Application;
-import tech.aroma.thrift.LengthOfTime;
+import tech.aroma.application.service.reactions.MessageReactor;
 import tech.aroma.thrift.Message;
-import tech.aroma.thrift.User;
 import tech.aroma.thrift.application.service.SendMessageRequest;
 import tech.aroma.thrift.application.service.SendMessageResponse;
 import tech.aroma.thrift.authentication.ApplicationToken;
+import tech.aroma.thrift.authentication.AuthenticationToken;
 import tech.aroma.thrift.authentication.TokenType;
 import tech.aroma.thrift.authentication.service.AuthenticationService;
 import tech.aroma.thrift.authentication.service.GetTokenInfoRequest;
 import tech.aroma.thrift.authentication.service.GetTokenInfoResponse;
-import tech.aroma.thrift.events.ApplicationSentMessage;
-import tech.aroma.thrift.events.Event;
-import tech.aroma.thrift.events.EventType;
 import tech.aroma.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.thrift.exceptions.InvalidTokenException;
 import tech.aroma.thrift.exceptions.OperationFailedException;
-import tech.aroma.thrift.functions.TokenFunctions;
-import tech.aroma.thrift.message.service.MessageServiceConstants;
-import tech.aroma.thrift.notification.service.NotificationService;
-import tech.aroma.thrift.notification.service.SendNotificationRequest;
-import tech.aroma.thrift.service.AromaServiceConstants;
+import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
+import static tech.aroma.data.assertions.RequestAssertions.validApplicationId;
 import static tech.aroma.thrift.application.service.ApplicationServiceConstants.MAX_CHARACTERS_IN_BODY;
+import static tech.aroma.thrift.application.service.ApplicationServiceConstants.MAX_TITLE_LENGTH;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.Checks.Internal.isNullOrEmpty;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
-import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.stringWithLengthGreaterThanOrEqualTo;
 
 /**
  *
@@ -72,32 +58,21 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
     private final static Logger LOG = LoggerFactory.getLogger(SendMessageOperation.class);
 
     private final AuthenticationService.Iface authenticationService;
-    private final ApplicationRepository appRepo;
-    private final InboxRepository inboxRepo;
-    private final MessageRepository messageRepo;
-    private final FollowerRepository followerRepo;
-    private final UserRepository userRepo;
-    private final NotificationService.Iface notificationService;
+    private final MessageReactor messageReactor;
+    private final Function<AuthenticationToken, ApplicationToken> tokenMapper;
 
     @Inject
     SendMessageOperation(AuthenticationService.Iface authenticationService,
-                         ApplicationRepository appRepo,
-                         FollowerRepository followerRepo,
-                         InboxRepository inboxRepo,
-                         MessageRepository messageRepo,
-                         UserRepository userRepo,
-                         NotificationService.Iface notificationService)
+                         MessageReactor messageReactor,
+                         Function<AuthenticationToken, ApplicationToken> tokenMapper)
     {
-        checkThat(authenticationService, appRepo, followerRepo, inboxRepo, messageRepo, userRepo, notificationService)
+        checkThat(authenticationService, tokenMapper, messageReactor)
             .are(notNull());
 
         this.authenticationService = authenticationService;
-        this.appRepo = appRepo;
-        this.messageRepo = messageRepo;
-        this.followerRepo = followerRepo;
-        this.inboxRepo = inboxRepo;
-        this.userRepo = userRepo;
-        this.notificationService = notificationService;
+        this.messageReactor = messageReactor;
+        this.tokenMapper = tokenMapper;
+
     }
 
     /*
@@ -107,31 +82,17 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
     public SendMessageResponse process(SendMessageRequest request) throws TException
     {
         checkThat(request)
-            .throwing(InvalidArgumentException.class)
-            .usingMessage("request missing")
-            .is(notNull());
+            .throwing(ex -> new InvalidArgumentException(ex.getMessage()))
+            .is(good());
 
-        checkThat(request.applicationToken)
-            .throwing(InvalidTokenException.class)
-            .usingMessage("missing Application Token")
-            .is(notNull());
-
-        GetTokenInfoResponse tokenInfo = tryToGetTokenInfo(request.applicationToken);
-
-        ApplicationToken appToken = TokenFunctions.authTokenToAppTokenFunction().apply(tokenInfo.token);
+        ApplicationToken appToken = tryToGetTokenInfo(request.applicationToken);
 
         String applicationId = appToken.applicationId;
         checkAppId(applicationId);
 
         Message message = createMessageFrom(request, appToken);
 
-        messageRepo.saveMessage(message, MessageServiceConstants.DEFAULT_MESSAGE_LIFETIME);
-        LOG.debug("Message successfully stored in repository");
-
-        storeInFollowerInboxes(message);
-        SendNotificationRequest sendNotificationRequest = createNotificationRequestFor(message);
-
-        tryToSendNotification(sendNotificationRequest);
+        messageReactor.reactToMessage(message);
 
         SendMessageResponse response = new SendMessageResponse()
             .setMessageId(message.messageId);
@@ -139,7 +100,7 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
         return response;
     }
 
-    private GetTokenInfoResponse tryToGetTokenInfo(ApplicationToken applicationToken) throws InvalidTokenException,
+    private ApplicationToken tryToGetTokenInfo(ApplicationToken applicationToken) throws InvalidTokenException,
                                                                                              OperationFailedException
     {
 
@@ -173,15 +134,37 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
             .usingMessage("missing Token Info")
             .is(nonEmptyString());
 
-        return tokenInfo;
+        
+        ApplicationToken appToken;
+        try
+        {
+            appToken = tokenMapper.apply(tokenInfo.token);
+        }
+        catch (Exception ex)
+        {
+            LOG.error("Failed to map Auth Token {} to App Token", tokenInfo.token, ex);
+            throw new OperationFailedException("Could not map Auth Token to App Token: " + ex.getMessage());
+        }
+
+        checkThat(appToken)
+            .throwing(OperationFailedException.class)
+            .usingMessage("Could not map Auth Token to App Token")
+            .is(notNull());
+        
+        return appToken;
     }
 
     private Message createMessageFrom(SendMessageRequest request, ApplicationToken token)
     {
+        //Time-Based UUIDs to optimize Storage in Cassandra.
         UUID messageId = UUIDs.timeBased();
 
-        String body = request.body;
+        if (request.title.length() > MAX_TITLE_LENGTH)
+        {
+            request.setTitle(request.title.substring(0, MAX_TITLE_LENGTH));
+        }
 
+        String body = request.body;
         if (!isNullOrEmpty(body) && body.length() > MAX_CHARACTERS_IN_BODY)
         {
             body = body.substring(0, MAX_CHARACTERS_IN_BODY);
@@ -202,38 +185,19 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
         return message;
     }
 
-    private SendNotificationRequest createNotificationRequestFor(Message message)
+    private AlchemyAssertion<SendMessageRequest> good()
     {
-        ApplicationSentMessage applicationSentMessage = new ApplicationSentMessage()
-            .setMessage(message.messageId)
-            .setMessage(message.body);
-
-        EventType eventType = new EventType();
-        eventType.setApplicationSentMessage(applicationSentMessage);
-
-        String appId = message.applicationId;
-        Application app = new Application().setApplicationId(appId);
-        
-        Event event = new Event()
-            .setApplication(app)
-            .setApplicationId(appId)
-            .setTimestamp(Instant.now().toEpochMilli())
-            .setEventId("")
-            .setEventType(eventType);
-
-        return new SendNotificationRequest().setEvent(event);
-    }
-
-    private void tryToSendNotification(SendNotificationRequest sendNotificationRequest)
-    {
-        try
+        return request ->
         {
-            notificationService.sendNotification(sendNotificationRequest);
-        }
-        catch (TException ex)
-        {
-            LOG.warn("Failed to send Notification request: {}", sendNotificationRequest, ex);
-        }
+            checkThat(request).is(notNull());
+            checkThat(request.applicationToken)
+                .usingMessage("Missing Application Token")
+                .is(notNull());
+            
+            checkThat(request.title)
+                .usingMessage("Missing Message Title")
+                .is(nonEmptyString());
+        };
     }
 
     private void checkAppId(String applicationId) throws OperationFailedException
@@ -241,57 +205,7 @@ final class SendMessageOperation implements ThriftOperation<SendMessageRequest, 
         checkThat(applicationId)
             .throwing(OperationFailedException.class)
             .usingMessage("Could not get Application ID from Token")
-            .is(nonEmptyString())
-            .is(stringWithLengthGreaterThanOrEqualTo(10));
-    }
-
-    private void storeInFollowerInboxes(Message message) throws TException
-    {
-        String appId = message.applicationId;
-
-        Set<User> followers = Sets.toSet(followerRepo.getApplicationFollowers(appId));
-
-        followers.parallelStream()
-            .forEach(user -> this.tryToSaveInInbox(message, user));
-
-        LOG.debug("Store Message in the Inboxes of {} users", followers.size());
-    }
-
-    private Set<User> getOwnerForApp(String appId) throws TException
-    {
-        Application app = appRepo.getById(appId);
-
-        return app.owners
-            .stream()
-            .map(this::toUser)
-            .collect(Collectors.toSet());
-    }
-
-    private void tryToSaveInInbox(Message message, User user)
-    {
-        LengthOfTime lifetime = AromaServiceConstants.DEFAULT_INBOX_LIFETIME;
-        
-        try
-        {
-            inboxRepo.saveMessageForUser(user, message, lifetime);
-        }
-        catch (TException ex)
-        {
-            LOG.error("Failed to save message {} in Inbox of User {}", message, user, ex);
-        }
-    }
-
-    private User toUser(String userId)
-    {
-        try
-        {
-            return userRepo.getUser(userId);
-        }
-        catch (TException ex)
-        {
-            LOG.warn("Could not find user With ID [{}]", userId, ex);
-            return new User().setUserId(userId);
-        }
+            .is(validApplicationId());
     }
 
 }

@@ -14,25 +14,35 @@
  * limitations under the License.
  */
 
+package tech.aroma.application.service.reactions.actions;
 
-package tech.aroma.application.service.reactions;
-
-import com.google.inject.ImplementedBy;
-import tech.aroma.thrift.reactions.AromaMatcher;
-import tech.sirwellington.alchemy.annotations.arguments.Required;
-
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
+import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 /**
  *
  * @author SirWellington
  */
-@ImplementedBy(AromaMatcherFactoryImpl.class)
-public interface AromaMatcherFactory 
+@Repeat(50)
+@RunWith(AlchemyTestRunner.class)
+public class ActionRunnerAsynchronousTest
 {
-    ReactionMatcher matcherFor(@Required AromaMatcher matcher);
+
+    private ActionRunnerAsynchronous instance;
     
-    static AromaMatcherFactory newInstance()
+    @Before
+    public void setUp() throws Exception
     {
-        return new AromaMatcherFactoryImpl();
+        instance = new ActionRunnerAsynchronous();
     }
+
+    @Test
+    public void testRunThroughActions() throws Exception
+    {
+        ActionRunnerTest.testActionRunner(instance);
+    }
+    
 }

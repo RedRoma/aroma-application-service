@@ -77,11 +77,12 @@ final class ApplicationServiceBase implements ApplicationService.Iface
                                                                               InvalidCredentialsException,
                                                                               TException
     {
-        LOG.debug("Received request to send message: {}", request);
-        
         checkThat(request)
             .throwing(withMessage("request is missing"))
             .is(notNull());
+        
+        SendMessageRequest requestWithoutBody = new SendMessageRequest(request).setBody(null);
+        LOG.debug("Received request to send message: {}", requestWithoutBody);
         
         return sendMessageOperation.process(request);
     }

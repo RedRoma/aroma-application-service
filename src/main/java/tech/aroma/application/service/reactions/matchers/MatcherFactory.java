@@ -15,23 +15,24 @@
  */
 
 
-package tech.aroma.application.service.reactions;
+package tech.aroma.application.service.reactions.matchers;
 
-import tech.aroma.thrift.Message;
-import tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPattern;
-import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
-
-import static tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPattern.Role.PRODUCT;
-import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.INTERFACE;
+import com.google.inject.ImplementedBy;
+import tech.aroma.thrift.reactions.AromaMatcher;
+import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 
 /**
  *
  * @author SirWellington
  */
-@FactoryPattern(role = PRODUCT)
-@StrategyPattern(role = INTERFACE)
-public interface ReactionMatcher
+@ImplementedBy(MatcherFactoryImpl.class)
+public interface MatcherFactory 
 {
-    boolean matches(Message message);
+    MessageMatcher matcherFor(@Required AromaMatcher matcher);
+    
+    static MatcherFactory newInstance()
+    {
+        return new MatcherFactoryImpl();
+    }
 }

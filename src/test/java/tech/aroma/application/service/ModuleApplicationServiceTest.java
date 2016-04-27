@@ -21,7 +21,6 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Provides;
-import java.util.function.Function;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,11 +28,10 @@ import org.mockito.Mockito;
 import tech.aroma.application.service.operations.ModuleApplicationServiceOperations;
 import tech.aroma.data.memory.ModuleMemoryDataRepositories;
 import tech.aroma.thrift.application.service.ApplicationService;
-import tech.aroma.thrift.authentication.ApplicationToken;
-import tech.aroma.thrift.authentication.AuthenticationToken;
 import tech.aroma.thrift.authentication.service.AuthenticationService;
 import tech.aroma.thrift.notification.service.NotificationService;
 import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
+import tech.sirwellington.alchemy.http.AlchemyHttp;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
 import static org.hamcrest.Matchers.notNullValue;
@@ -89,10 +87,10 @@ public class ModuleApplicationServiceTest
     }
 
     @Test
-    public void testProvideTokenMapper()
+    public void testProvideHttpClient()
     {
-        Function<AuthenticationToken, ApplicationToken> mapper = instance.provideTokenMapper();
-        assertThat(mapper, notNullValue());
+        AlchemyHttp client = instance.provideHttpClient();
+        assertThat(client, notNullValue());
     }
 
 }

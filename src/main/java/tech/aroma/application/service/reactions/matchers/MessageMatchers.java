@@ -15,9 +15,10 @@
  */
 
  
-package tech.aroma.application.service.reactions;
+package tech.aroma.application.service.reactions.matchers;
 
 
+import java.util.Objects;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 import static tech.aroma.data.assertions.RequestAssertions.isNullOrEmpty;
+import static tech.aroma.data.assertions.RequestAssertions.validApplicationId;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
@@ -37,22 +39,43 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
  * @author SirWellington
  */
 @NonInstantiable
-final class ReactionMatchers 
+final class MessageMatchers 
 {
-    private final static Logger LOG = LoggerFactory.getLogger(ReactionMatchers.class);
+    private final static Logger LOG = LoggerFactory.getLogger(MessageMatchers.class);
     
     
-    static ReactionMatcher matchesAll()
+    static MessageMatcher matchesAll()
     {
         return message -> true;
     }
     
-    static ReactionMatcher matchesNone()
+    static MessageMatcher matchesNone()
     {
         return message -> false;
     }
     
-    static ReactionMatcher not(@Required ReactionMatcher matcher)
+    static MessageMatcher applicationIs(@NonEmpty String appId)
+    {
+        checkThat(appId)
+            .is(validApplicationId());
+        
+        return message ->
+        {
+            if(message == null)
+            {
+                return false;
+            }
+            
+            return Objects.equals(message.applicationId, appId);
+        };
+    }
+    
+    static MessageMatcher applicationIsNot(@NonEmpty String appId)
+    {
+        return not(applicationIs(appId));
+    }
+    
+    static MessageMatcher not(@Required MessageMatcher matcher)
     {
         checkThat(matcher).is(notNull());
         
@@ -62,7 +85,7 @@ final class ReactionMatchers
         };
     }
     
-    static ReactionMatcher titleContains(@NonEmpty String substring)
+    static MessageMatcher titleContains(@NonEmpty String substring)
     {
         checkThat(substring)
             .is(nonEmptyString());
@@ -84,7 +107,7 @@ final class ReactionMatchers
         
     }
     
-    static ReactionMatcher titleIs(@NonEmpty String title)
+    static MessageMatcher titleIs(@NonEmpty String title)
     {
         checkThat(title)
             .is(nonEmptyString());
@@ -105,12 +128,12 @@ final class ReactionMatchers
         };
     } 
     
-    static ReactionMatcher titleIsNot(@NonEmpty String title)
+    static MessageMatcher titleIsNot(@NonEmpty String title)
     {
         return not(titleIs(title));
     }
     
-    static ReactionMatcher bodyContains(@NonEmpty String substring)
+    static MessageMatcher bodyContains(@NonEmpty String substring)
     {
         checkThat(substring)
             .is(nonEmptyString());
@@ -131,12 +154,12 @@ final class ReactionMatchers
         };
     }
     
-    static ReactionMatcher bodyDoesNotContain(@NonEmpty String substring)
+    static MessageMatcher bodyDoesNotContain(@NonEmpty String substring)
     {
         return not(bodyContains(substring));
     }
     
-    static ReactionMatcher bodyIs(@NonEmpty String expectedBody)
+    static MessageMatcher bodyIs(@NonEmpty String expectedBody)
     {
         checkThat(expectedBody)
             .usingMessage("Expected Body cannot be empty")
@@ -158,7 +181,7 @@ final class ReactionMatchers
         };
     }
     
-    static ReactionMatcher hostnameIs(@NonEmpty String expectedHostname)
+    static MessageMatcher hostnameIs(@NonEmpty String expectedHostname)
     {
         checkThat(expectedHostname)
             .usingMessage("Expected Hostname cannot be empty")
@@ -180,7 +203,7 @@ final class ReactionMatchers
         };
     }
  
-    static ReactionMatcher hostnameContains(@NonEmpty final String substring)
+    static MessageMatcher hostnameContains(@NonEmpty final String substring)
     {
         checkThat(substring)
             .usingMessage("Hostname string cannot be empty")
@@ -202,12 +225,12 @@ final class ReactionMatchers
         };
     }
     
-    static ReactionMatcher hostnameDoesNotContain(@NonEmpty final String substring)
+    static MessageMatcher hostnameDoesNotContain(@NonEmpty final String substring)
     {
         return not(hostnameContains(substring));
     }
 
-    static ReactionMatcher urgencyIs(@Required Urgency urgency)
+    static MessageMatcher urgencyIs(@Required Urgency urgency)
     {
         checkThat(urgency)
             .usingMessage("Urgency cannot be null")
@@ -229,7 +252,7 @@ final class ReactionMatchers
         };
     }
     
-    static ReactionMatcher urgencyIsOneOf(@Required Set<Urgency> urgencies)
+    static MessageMatcher urgencyIsOneOf(@Required Set<Urgency> urgencies)
     {
         checkThat(urgencies).is(notNull());
         

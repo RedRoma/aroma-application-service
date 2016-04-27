@@ -14,54 +14,49 @@
  * limitations under the License.
  */
 
-package tech.aroma.application.service.reactions;
+package tech.aroma.application.service.reactions.matchers;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
+import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
+
 
 /**
  *
  * @author SirWellington
  */
+@Repeat(10)
 @RunWith(AlchemyTestRunner.class)
-public class AromaMatcherFactoryTest
+public class MatchAlgorithmTest 
 {
 
+    @Mock
+    private MatcherFactory matcherFactory;
+    
     @Before
     public void setUp() throws Exception
     {
-
-        setupData();
-        setupMocks();
-    }
-
-    private void setupData() throws Exception
-    {
-
-    }
-
-    private void setupMocks() throws Exception
-    {
-
     }
 
     @Test
-    public void testMatcherFor()
+    public void testAnd()
     {
+        MatchAlgorithm matcher = MatchAlgorithm.and(matcherFactory);
+        assertThat(matcher, notNullValue());
     }
 
     @Test
-    public void testNewInstance()
+    public void testOr()
     {
-        AromaMatcherFactory instance = AromaMatcherFactory.newInstance();
-        assertThat(instance, notNullValue());
+        MatchAlgorithm matcher = MatchAlgorithm.or(matcherFactory);
+        assertThat(matcher, notNullValue());
     }
+
 
 }

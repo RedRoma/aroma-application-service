@@ -23,13 +23,10 @@ import com.google.inject.Provides;
 import decorice.DecoratorModule;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.thrift.application.service.ApplicationService;
-import tech.aroma.thrift.authentication.ApplicationToken;
-import tech.aroma.thrift.authentication.AuthenticationToken;
-import tech.aroma.thrift.functions.TokenFunctions;
+import tech.sirwellington.alchemy.http.AlchemyHttp;
 
 /**
  *
@@ -48,9 +45,11 @@ public final class ModuleApplicationService extends AbstractModule
     }
     
     @Provides
-    Function<AuthenticationToken, ApplicationToken> provideTokenMapper()
+    AlchemyHttp provideHttpClient()
     {
-        return TokenFunctions.authTokenToAppTokenFunction();
+        return AlchemyHttp.newBuilder()
+            .enableAsyncCallbacks()
+            .build();
     }
     
     private static class ServiceModule extends DecoratorModule

@@ -16,25 +16,19 @@
 
 package tech.aroma.application.service.operations;
 
-import java.util.List;
+import java.util.function.Function;
 import junit.framework.AssertionFailedError;
 import org.apache.thrift.TApplicationException;
+import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import tech.aroma.data.ApplicationRepository;
-import tech.aroma.data.FollowerRepository;
-import tech.aroma.data.InboxRepository;
-import tech.aroma.data.MessageRepository;
-import tech.aroma.data.UserRepository;
+import tech.aroma.application.service.reactions.MessageReactor;
 import tech.aroma.thrift.Application;
-import tech.aroma.thrift.LengthOfTime;
 import tech.aroma.thrift.Message;
-import tech.aroma.thrift.User;
 import tech.aroma.thrift.application.service.SendMessageRequest;
 import tech.aroma.thrift.application.service.SendMessageResponse;
 import tech.aroma.thrift.authentication.ApplicationToken;
@@ -44,10 +38,8 @@ import tech.aroma.thrift.authentication.service.AuthenticationService;
 import tech.aroma.thrift.authentication.service.GetTokenInfoRequest;
 import tech.aroma.thrift.authentication.service.GetTokenInfoResponse;
 import tech.aroma.thrift.functions.TokenFunctions;
-import tech.aroma.thrift.notification.service.NotificationService;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
-import tech.sirwellington.alchemy.test.junit.runners.GenerateList;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
@@ -56,13 +48,13 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+import static tech.aroma.data.assertions.RequestAssertions.validApplicationId;
 import static tech.aroma.data.assertions.RequestAssertions.validMessageId;
 import static tech.aroma.thrift.application.service.ApplicationServiceConstants.MAX_CHARACTERS_IN_BODY;
+import static tech.aroma.thrift.application.service.ApplicationServiceConstants.MAX_TITLE_LENGTH;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
@@ -82,66 +74,45 @@ public class SendMessageOperationTest
     private AuthenticationService.Iface authenticationService;
 
     @Mock
-    private ApplicationRepository appRepo;
-    
-    @Mock
-    private InboxRepository inboxRepo;
-    
-    @Mock
-    private MessageRepository messageRepo;
-    
-    @Mock
-    private FollowerRepository followerRepo;
-    
-    @Mock
-    private UserRepository userRepo;
+    private MessageReactor messageReactor;
 
     @Mock
-    private NotificationService.Iface notificationService;
+    private Function<AuthenticationToken, ApplicationToken> tokenMapper;
 
     @Captor
-    private ArgumentCaptor<Message> messageCaptor;
+    private ArgumentCaptor<Message> captor;
 
     private SendMessageOperation instance;
 
     private GetTokenInfoRequest expectedAuthenticationRequest;
 
+    private AuthenticationToken authToken;
+
     private ApplicationToken appToken;
-    
+
     @GeneratePojo
     private Application app;
-    
+
     @GenerateString(UUID)
     private String appId;
-    
-    @GenerateList(User.class)
-    private List<User> followers;
+
+    @GenerateString(UUID)
+    private String messageId;
 
     @GeneratePojo
     private SendMessageRequest request;
 
+    @GeneratePojo
+    private SendMessageResponse response;
+
     @Before
     public void setUp() throws Exception
     {
-        instance = new SendMessageOperation(authenticationService,
-                                            appRepo,
-                                            followerRepo,
-                                            inboxRepo,
-                                            messageRepo,
-                                            userRepo,
-                                            notificationService);
+        instance = new SendMessageOperation(authenticationService, messageReactor, tokenMapper);
 
-        verifyZeroInteractions(authenticationService,
-                               appRepo,
-                               followerRepo,
-                               inboxRepo,
-                               messageRepo,
-                               userRepo,
-                               notificationService);
+        verifyZeroInteractions(authenticationService, messageReactor);
 
         setupData();
-        setupExpectedAuthRequest();
-        setupAuthServiceResponse();
         setupMocks();
     }
 
@@ -149,52 +120,32 @@ public class SendMessageOperationTest
     @Test
     public void testConstructor()
     {
-        assertThrows(() -> new SendMessageOperation(null, appRepo, followerRepo, inboxRepo, messageRepo, userRepo, notificationService))
-            .isInstanceOf(IllegalArgumentException.class);
-        
-        assertThrows(() -> new SendMessageOperation(authenticationService, null, followerRepo, inboxRepo, messageRepo, userRepo, notificationService))
-            .isInstanceOf(IllegalArgumentException.class);
-        
-        assertThrows(() -> new SendMessageOperation(authenticationService, appRepo, null, inboxRepo, messageRepo, userRepo, notificationService))
-            .isInstanceOf(IllegalArgumentException.class);
-        
-        assertThrows(() -> new SendMessageOperation(authenticationService, appRepo, followerRepo, null, messageRepo, userRepo, notificationService))
-            .isInstanceOf(IllegalArgumentException.class);
-        
-        assertThrows(() -> new SendMessageOperation(authenticationService, appRepo, followerRepo, inboxRepo, null, userRepo, notificationService))
-            .isInstanceOf(IllegalArgumentException.class);
-        
-        assertThrows(() -> new SendMessageOperation(authenticationService, appRepo, followerRepo, inboxRepo, messageRepo, null, notificationService))
-            .isInstanceOf(IllegalArgumentException.class);
-        
-        assertThrows(() -> new SendMessageOperation(authenticationService, appRepo, followerRepo, inboxRepo, messageRepo, userRepo, null))
-            .isInstanceOf(IllegalArgumentException.class);
-        
+        assertThrows(() -> new SendMessageOperation(null, messageReactor, tokenMapper));
+        assertThrows(() -> new SendMessageOperation(authenticationService, null, tokenMapper));
+        assertThrows(() -> new SendMessageOperation(authenticationService, messageReactor, null));
     }
 
     @Test
     public void testProcess() throws Exception
     {
-        SendMessageResponse response = instance.process(request);
-        assertThat(response, notNullValue());
+        SendMessageResponse result = instance.process(request);
+        assertThat(result, notNullValue());
 
-        checkThat(response.messageId)
+        checkThat(result.messageId)
             .throwing(AssertionFailedError.class)
             .is(validMessageId());
 
-        verify(messageRepo).saveMessage(messageCaptor.capture(), Mockito.any());
+        verify(messageReactor).reactToMessage(captor.capture());
 
-        Message message = messageCaptor.getValue();
+        Message message = captor.getValue();
         assertThat(message, notNullValue());
-        assertThat(message.messageId, is(response.messageId));
+        assertThat(message.messageId, is(result.messageId));
         assertThat(message.body, is(request.body));
         assertThat(message.title, is(request.title));
         assertThat(message.urgency, is(request.urgency));
         assertThat(message.macAddress, is(request.macAddress));
         assertThat(message.hostname, is(request.hostname));
         assertThat(message.timeOfCreation, is(request.timeOfMessage));
-
-        verify(inboxRepo, atLeastOnce()).saveMessageForUser(Mockito.any(), eq(message), Mockito.any());
 
     }
 
@@ -205,7 +156,26 @@ public class SendMessageOperationTest
             .thenThrow(new TApplicationException());
     }
     
-    
+    @Test
+    public void testWhenTitleExceedsLimit() throws Exception
+    {
+        String extraLongTitle = one(alphabeticString(MAX_TITLE_LENGTH * 2));
+        String truncatedTitle = extraLongTitle.substring(0, MAX_TITLE_LENGTH);
+        
+        request.setTitle(extraLongTitle);
+        
+        SendMessageResponse response = instance.process(request);
+        assertThat(response, notNullValue());
+        checkThat(response.messageId).is(validApplicationId());
+        
+        verify(messageReactor).reactToMessage(captor.capture());
+        Message savedMessage = captor.getValue();
+        
+        assertThat(savedMessage, notNullValue());
+        assertThat(savedMessage.title, is(truncatedTitle));
+        assertThat(savedMessage.messageId, is(response.messageId));
+    }
+
     @Test
     public void testWhenBodyExceedsLimit() throws Exception
     {
@@ -213,22 +183,61 @@ public class SendMessageOperationTest
         String truncatedBody = extraLongBody.substring(0, MAX_CHARACTERS_IN_BODY);
 
         request.setBody(extraLongBody);
-        
-        SendMessageResponse response = instance.process(request);
-        
-        checkThat(response.messageId)
+
+        SendMessageResponse result = instance.process(request);
+        assertThat(result, notNullValue());
+
+        checkThat(result.messageId)
             .throwing(AssertionFailedError.class)
             .is(validMessageId());
-        
-        verify(messageRepo).saveMessage(messageCaptor.capture(), any(LengthOfTime.class));
-        
-        Message savedMessage = messageCaptor.getValue();
-        
+
+        verify(messageReactor).reactToMessage(captor.capture());
+
+        Message savedMessage = captor.getValue();
+
         assertThat(savedMessage.body, is(truncatedBody));
-        assertThat(savedMessage.messageId, is(response.messageId));
+        assertThat(savedMessage.messageId, is(result.messageId));
+    }
+    
+    @DontRepeat
+    @Test
+    public void testWhenTokenMapperFails() throws Exception
+    {
+        when(tokenMapper.apply(authToken)).thenThrow(new RuntimeException());
         
-        verify(inboxRepo, atLeastOnce())
-            .saveMessageForUser(any(User.class), eq(savedMessage), any(LengthOfTime.class));
+        assertThrows(() -> instance.process(request))
+            .isInstanceOf(TException.class);
+    }
+    
+    @DontRepeat
+    @Test
+    public void testWhenTokenMapperReturnsNull() throws Exception
+    {
+        when(tokenMapper.apply(authToken)).thenReturn(null);
+        
+        assertThrows(() -> instance.process(request))
+            .isInstanceOf(TException.class);
+    }
+
+    private void setupData()
+    {
+        appToken = request.applicationToken;
+        appToken.applicationId = appId;
+
+        authToken = TokenFunctions.appTokenToAuthTokenFunction().apply(appToken);
+
+        app.applicationId = appId;
+        response.messageId = messageId;
+    }
+
+    private void setupMocks() throws Exception
+    {
+        when(messageReactor.reactToMessage(any())).thenReturn(response);
+        when(tokenMapper.apply(authToken)).thenReturn(appToken);
+
+        setupExpectedAuthRequest();
+        setupAuthServiceResponse();
+
     }
 
     private void setupExpectedAuthRequest()
@@ -241,30 +250,12 @@ public class SendMessageOperationTest
 
     private void setupAuthServiceResponse() throws Exception
     {
-        AuthenticationToken authToken = TokenFunctions.appTokenToAuthTokenFunction().apply(appToken);
 
         GetTokenInfoResponse response = new GetTokenInfoResponse()
             .setToken(authToken);
 
         when(authenticationService.getTokenInfo(expectedAuthenticationRequest))
             .thenReturn(response);
-    }
-
-    private void setupMocks() throws Exception
-    {
-        when(appRepo.getById(appId))
-            .thenReturn(app);
-        
-        when(followerRepo.getApplicationFollowers(appId))
-            .thenReturn(followers);
-        
-    }
-
-    private void setupData()
-    {
-        appToken = request.applicationToken;
-        appToken.applicationId = appId;
-        app.applicationId = appId;
     }
 
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tech.aroma.application.service.reactions;
+package tech.aroma.application.service.reactions.matchers;
 
 import java.util.Set;
 import org.junit.Before;
@@ -40,8 +40,10 @@ import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.BooleanGenerators.booleans;
 import static tech.sirwellington.alchemy.generator.EnumGenerators.enumValueOf;
 import static tech.sirwellington.alchemy.generator.StringGenerators.hexadecimalString;
+import static tech.sirwellington.alchemy.generator.StringGenerators.uuids;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.HEXADECIMAL;
+import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.UUID;
 
 /**
  *
@@ -49,9 +51,12 @@ import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.
  */
 @Repeat(100)
 @RunWith(AlchemyTestRunner.class)
-public class ReactionMatchersTest
+public class MessageMatchersTest
 {
 
+    @GenerateString(UUID)
+    private String appId;
+        
     @GeneratePojo
     private Message message;
 
@@ -70,12 +75,14 @@ public class ReactionMatchersTest
     {
         emptyMessage = new Message();
         emptyMessage.unsetUrgency();
+        
+        message.applicationId = appId;
     }
 
     @Test
     public void testMatchesAll()
     {
-        ReactionMatcher matcher = ReactionMatchers.matchesAll();
+        MessageMatcher matcher = MessageMatchers.matchesAll();
         assertThat(matcher, notNullValue());
 
         assertMatchIs(matcher, true);
@@ -85,7 +92,7 @@ public class ReactionMatchersTest
     @Test
     public void testMatchesNone()
     {
-        ReactionMatcher matcher = ReactionMatchers.matchesNone();
+        MessageMatcher matcher = MessageMatchers.matchesNone();
 
         assertMatchIs(matcher, false);
         assertMatchersDoesNotMatchNullOrEmpty(matcher);
@@ -96,7 +103,7 @@ public class ReactionMatchersTest
     {
         String substring = halfOf(message.title);
 
-        ReactionMatcher matcher = ReactionMatchers.titleContains(substring);
+        MessageMatcher matcher = MessageMatchers.titleContains(substring);
         assertMatchIs(matcher, true);
         assertMatchersDoesNotMatchNullOrEmpty(matcher);
     }
@@ -104,7 +111,7 @@ public class ReactionMatchersTest
     @Test
     public void testTitleContainsWhenNoMatch()
     {
-        ReactionMatcher matcher = ReactionMatchers.titleContains(randomString);
+        MessageMatcher matcher = MessageMatchers.titleContains(randomString);
         assertMatchIs(matcher, false);
     }
 
@@ -112,7 +119,7 @@ public class ReactionMatchersTest
     @Test
     public void testTitleContainsWithBadArgs()
     {
-        assertThrows(() -> ReactionMatchers.titleContains(""))
+        assertThrows(() -> MessageMatchers.titleContains(""))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -121,7 +128,7 @@ public class ReactionMatchersTest
     {
         String substring = halfOf(message.body);
 
-        ReactionMatcher matcher = ReactionMatchers.bodyContains(substring);
+        MessageMatcher matcher = MessageMatchers.bodyContains(substring);
         assertMatchIs(matcher, true);
         assertMatchersDoesNotMatchNullOrEmpty(matcher);
     }
@@ -129,7 +136,7 @@ public class ReactionMatchersTest
     @Test
     public void testBodyContainsWhenNoMatch()
     {
-        ReactionMatcher matcher = ReactionMatchers.bodyContains(randomString);
+        MessageMatcher matcher = MessageMatchers.bodyContains(randomString);
         assertMatchIs(matcher, false);
     }
 
@@ -137,7 +144,7 @@ public class ReactionMatchersTest
     @Test
     public void testBodyContainsWithBadArgs()
     {
-        assertThrows(() -> ReactionMatchers.bodyContains(""))
+        assertThrows(() -> MessageMatchers.bodyContains(""))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -146,7 +153,7 @@ public class ReactionMatchersTest
     {
         String expected = message.body;
 
-        ReactionMatcher matcher = ReactionMatchers.bodyIs(expected);
+        MessageMatcher matcher = MessageMatchers.bodyIs(expected);
         assertMatchIs(matcher, true);
         assertMatchersDoesNotMatchNullOrEmpty(matcher);
     }
@@ -154,7 +161,7 @@ public class ReactionMatchersTest
     @Test
     public void testBodyIsWhenNoMatch()
     {
-        ReactionMatcher matcher = ReactionMatchers.bodyIs(randomString);
+        MessageMatcher matcher = MessageMatchers.bodyIs(randomString);
 
         assertMatchIs(matcher, false);
     }
@@ -163,7 +170,7 @@ public class ReactionMatchersTest
     @Test
     public void testBodyIsWithBadArgs()
     {
-        assertThrows(() -> ReactionMatchers.bodyIs(""))
+        assertThrows(() -> MessageMatchers.bodyIs(""))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -172,7 +179,7 @@ public class ReactionMatchersTest
     {
         String expected = message.hostname;
 
-        ReactionMatcher matcher = ReactionMatchers.hostnameIs(expected);
+        MessageMatcher matcher = MessageMatchers.hostnameIs(expected);
         assertMatchIs(matcher, true);
         assertMatchersDoesNotMatchNullOrEmpty(matcher);
     }
@@ -180,7 +187,7 @@ public class ReactionMatchersTest
     @Test
     public void testHostnameIsWhenNoMatch()
     {
-        ReactionMatcher matcher = ReactionMatchers.hostnameIs(randomString);
+        MessageMatcher matcher = MessageMatchers.hostnameIs(randomString);
         assertMatchIs(matcher, false);
     }
 
@@ -188,7 +195,7 @@ public class ReactionMatchersTest
     @Test
     public void testHostnameIsWithBadArgs()
     {
-        assertThrows(() -> ReactionMatchers.hostnameIs(""))
+        assertThrows(() -> MessageMatchers.hostnameIs(""))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -197,7 +204,7 @@ public class ReactionMatchersTest
     {
         Urgency expected = message.urgency;
 
-        ReactionMatcher matcher = ReactionMatchers.urgencyIs(expected);
+        MessageMatcher matcher = MessageMatchers.urgencyIs(expected);
         assertMatchIs(matcher, true);
         assertMatchersDoesNotMatchNullOrEmpty(matcher);
     }
@@ -214,7 +221,7 @@ public class ReactionMatchersTest
             urgency = one(urgencies);
         }
 
-        ReactionMatcher matcher = ReactionMatchers.urgencyIs(urgency);
+        MessageMatcher matcher = MessageMatchers.urgencyIs(urgency);
         assertMatchIs(matcher, false);
     }
 
@@ -222,7 +229,7 @@ public class ReactionMatchersTest
     @Test
     public void testUrgencyIsWithBadArgs()
     {
-        assertThrows(() -> ReactionMatchers.urgencyIs(null))
+        assertThrows(() -> MessageMatchers.urgencyIs(null))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -230,15 +237,15 @@ public class ReactionMatchersTest
     @Test
     public void testNotWithBadArgs()
     {
-        assertThrows(() -> ReactionMatchers.not(null))
+        assertThrows(() -> MessageMatchers.not(null))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     public void testNotWhenMatch()
     {
-        ReactionMatcher neverMatch = ReactionMatchers.matchesNone();
-        ReactionMatcher result = ReactionMatchers.not(neverMatch);
+        MessageMatcher neverMatch = MessageMatchers.matchesNone();
+        MessageMatcher result = MessageMatchers.not(neverMatch);
 
         assertMatchIs(result, true);
         assertMatchersMatchesNullOrEmpty(result);
@@ -247,20 +254,20 @@ public class ReactionMatchersTest
     @Test
     public void testNotWhenNoMatch()
     {
-        ReactionMatcher alwaysMatch = ReactionMatchers.matchesAll();
-        ReactionMatcher result = ReactionMatchers.not(alwaysMatch);
+        MessageMatcher alwaysMatch = MessageMatchers.matchesAll();
+        MessageMatcher result = MessageMatchers.not(alwaysMatch);
         assertMatchIs(result, false);
     }
 
     @Test
     public void testNot()
     {
-        ReactionMatcher fakeMatcher = mock(ReactionMatcher.class);
+        MessageMatcher fakeMatcher = mock(MessageMatcher.class);
 
         boolean value = one(booleans());
         when(fakeMatcher.matches(message)).thenReturn(value);
 
-        ReactionMatcher matcher = ReactionMatchers.not(fakeMatcher);
+        MessageMatcher matcher = MessageMatchers.not(fakeMatcher);
         assertThat(matcher, notNullValue());
 
         assertThat(matcher.matches(message), is(!value));
@@ -272,7 +279,7 @@ public class ReactionMatchersTest
     {
         String expected = message.title;
 
-        ReactionMatcher matcher = ReactionMatchers.titleIs(expected);
+        MessageMatcher matcher = MessageMatchers.titleIs(expected);
         assertMatchIs(matcher, true);
         assertMatchersDoesNotMatchNullOrEmpty(matcher);
     }
@@ -280,7 +287,7 @@ public class ReactionMatchersTest
     @Test
     public void testTitleIsWhenNoMatch()
     {
-        ReactionMatcher matcher = ReactionMatchers.titleIs(randomString);
+        MessageMatcher matcher = MessageMatchers.titleIs(randomString);
         assertMatchIs(matcher, false);
     }
 
@@ -288,7 +295,7 @@ public class ReactionMatchersTest
     @Test
     public void testTitleIsWithBadArgs()
     {
-        assertThrows(() -> ReactionMatchers.titleIs(""))
+        assertThrows(() -> MessageMatchers.titleIs(""))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -298,7 +305,7 @@ public class ReactionMatchersTest
         message.title = randomString;
         String anotherRandomString = one(hexadecimalString(10));
 
-        ReactionMatcher matcher = ReactionMatchers.titleIsNot(anotherRandomString);
+        MessageMatcher matcher = MessageMatchers.titleIsNot(anotherRandomString);
         assertMatchIs(matcher, true);
         assertMatchersMatchesNullOrEmpty(matcher);
     }
@@ -307,7 +314,7 @@ public class ReactionMatchersTest
     public void testTitleIsNotWhenNoMatch()
     {
         message.title = randomString;
-        ReactionMatcher matcher = ReactionMatchers.titleIsNot(randomString);
+        MessageMatcher matcher = MessageMatchers.titleIsNot(randomString);
         assertMatchIs(matcher, false);
     }
 
@@ -315,13 +322,13 @@ public class ReactionMatchersTest
     @Test
     public void testTitleIsNotWithBadArgs()
     {
-        assertThrows(() -> ReactionMatchers.titleIsNot(""));
+        assertThrows(() -> MessageMatchers.titleIsNot(""));
     }
 
     @Test
     public void testBodyDoesNotContainWhenMatch()
     {
-        ReactionMatcher matcher = ReactionMatchers.bodyDoesNotContain(randomString);
+        MessageMatcher matcher = MessageMatchers.bodyDoesNotContain(randomString);
         assertMatchIs(matcher, true);
     }
 
@@ -330,7 +337,7 @@ public class ReactionMatchersTest
     {
         String substring = halfOf(message.body);
 
-        ReactionMatcher matcher = ReactionMatchers.bodyDoesNotContain(substring);
+        MessageMatcher matcher = MessageMatchers.bodyDoesNotContain(substring);
         assertMatchIs(matcher, false);
     }
 
@@ -339,14 +346,14 @@ public class ReactionMatchersTest
     {
         String substring = halfOf(message.hostname);
 
-        ReactionMatcher matcher = ReactionMatchers.hostnameContains(substring);
+        MessageMatcher matcher = MessageMatchers.hostnameContains(substring);
         assertMatchIs(matcher, true);
     }
 
     @Test
     public void testHostnameContainsWhenNoMatch()
     {
-        ReactionMatcher matcher = ReactionMatchers.hostnameContains(randomString);
+        MessageMatcher matcher = MessageMatchers.hostnameContains(randomString);
         assertMatchIs(matcher, false);
     }
     
@@ -354,13 +361,13 @@ public class ReactionMatchersTest
     @Test
     public void testHostnameContainsWithBadArgs()
     {
-        assertThrows(() -> ReactionMatchers.hostnameContains(""));
+        assertThrows(() -> MessageMatchers.hostnameContains(""));
     }
 
     @Test
     public void testHostnameDoesNotContainWhenMatch()
     {
-        ReactionMatcher matcher = ReactionMatchers.hostnameDoesNotContain(randomString);
+        MessageMatcher matcher = MessageMatchers.hostnameDoesNotContain(randomString);
         assertMatchIs(matcher, true);
     }
 
@@ -368,7 +375,7 @@ public class ReactionMatchersTest
     public void testHostnameDoesNotContainWhenNoMatch()
     {
         String substring = halfOf(message.hostname);
-        ReactionMatcher matcher = ReactionMatchers.hostnameDoesNotContain(substring);
+        MessageMatcher matcher = MessageMatchers.hostnameDoesNotContain(substring);
         assertMatchIs(matcher, false);
     }
 
@@ -380,7 +387,7 @@ public class ReactionMatchersTest
         Set<Urgency> urgencies = Sets.createFrom(generator.get(), generator.get());
         message.urgency = Sets.oneOf(urgencies);
         
-        ReactionMatcher matcher = ReactionMatchers.urgencyIsOneOf(urgencies);
+        MessageMatcher matcher = MessageMatchers.urgencyIsOneOf(urgencies);
         assertMatchIs(matcher, true);
         assertMatchersDoesNotMatchNullOrEmpty(matcher);
     }
@@ -395,7 +402,7 @@ public class ReactionMatchersTest
             message.urgency = generator.get();
         }
         
-        ReactionMatcher matcher = ReactionMatchers.urgencyIsOneOf(urgencies);
+        MessageMatcher matcher = MessageMatchers.urgencyIsOneOf(urgencies);
         assertMatchIs(matcher, false);
         assertMatchersDoesNotMatchNullOrEmpty(matcher);
     }
@@ -404,22 +411,22 @@ public class ReactionMatchersTest
     @Test
     public void testUrgencyIsOneOfWithBadArgs()
     {
-        assertThrows(() -> ReactionMatchers.urgencyIsOneOf(null));
+        assertThrows(() -> MessageMatchers.urgencyIsOneOf(null));
     }
 
-    private void assertMatchIs(ReactionMatcher matcher, boolean expectedValue)
+    private void assertMatchIs(MessageMatcher matcher, boolean expectedValue)
     {
         assertThat(matcher, notNullValue());
         assertThat(matcher.matches(message), is(expectedValue));
     }
 
-    private void assertMatchersDoesNotMatchNullOrEmpty(ReactionMatcher matcher)
+    private void assertMatchersDoesNotMatchNullOrEmpty(MessageMatcher matcher)
     {
         assertThat(matcher.matches(emptyMessage), is(false));
         assertThat(matcher.matches(null), is(false));
     }
 
-    private void assertMatchersMatchesNullOrEmpty(ReactionMatcher matcher)
+    private void assertMatchersMatchesNullOrEmpty(MessageMatcher matcher)
     {
         assertThat(matcher.matches(emptyMessage), is(true));
         assertThat(matcher.matches(null), is(true));
@@ -430,4 +437,52 @@ public class ReactionMatchersTest
         return string.substring(string.length() / 2);
     }
 
+    @Test
+    public void testApplicationIsWhenMatch()
+    {
+        MessageMatcher matcher = MessageMatchers.applicationIs(appId);
+        assertMatchIs(matcher, true);
+        assertMatchersDoesNotMatchNullOrEmpty(matcher);
+    }
+
+    @Test
+    public void testApplicationIsWhenNoMatch()
+    {
+        String otherId = one(uuids);
+        MessageMatcher matcher = MessageMatchers.applicationIs(otherId);
+        assertMatchIs(matcher, false);
+        assertMatchersDoesNotMatchNullOrEmpty(matcher);
+    }
+
+    @Test
+    public void testApplicationIsWithBadArgs()
+    {
+        assertThrows(() -> MessageMatchers.applicationIs(null));
+        assertThrows(() -> MessageMatchers.applicationIs(""));
+        assertThrows(() -> MessageMatchers.applicationIs(randomString));
+    }
+
+    @Test
+    public void testApplicationIsNotWhenMatch()
+    {
+        String otherId = one(uuids);
+        
+        MessageMatcher matcher = MessageMatchers.applicationIsNot(otherId);
+        assertMatchIs(matcher, true);
+    }
+
+    @Test
+    public void testApplicationIsNotWhenNoMatch()
+    {
+        MessageMatcher matcher = MessageMatchers.applicationIsNot(appId);
+        assertMatchIs(matcher, false);
+    }
+
+    @Test
+    public void testApplicationIsNotWithBadArgs()
+    {
+        assertThrows(() -> MessageMatchers.applicationIs(null));
+        assertThrows(() -> MessageMatchers.applicationIs(""));
+        assertThrows(() -> MessageMatchers.applicationIs(randomString));
+    }
 }
