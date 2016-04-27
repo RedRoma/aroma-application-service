@@ -40,15 +40,9 @@ public class ActionRunnerAsynchronousTest
     }
 
     @Test
-    public void testRunThroughActionsWithOneRound() throws Exception
+    public void testRunThroughActions() throws Exception
     {
         ActionRunnerTest.testActionRunner(instance);
     }
     
-    @Test
-    public void testRunThroughActionsWithMultipleRound() throws Exception
-    {
-        ActionRunnerTest.testWithMultipleRounds(instance);
-    }
-
 }

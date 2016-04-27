@@ -46,10 +46,4 @@ public class ActionRunnerSynchronousTest
         ActionRunnerTest.testActionRunner(instance);
     }
     
-    @Test
-    public void testRunThroughActionsWithMultipleLevels() throws Exception
-    {
-        ActionRunnerTest.testWithMultipleRounds(instance);
-    }
-
 }

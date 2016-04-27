@@ -72,6 +72,8 @@ public class ActionRunnerTest
     {
         checkThat(runner).is(notNull());
         testWithOnlyOneRoundOfAction(runner);
+        testWithMultipleRounds(runner);
+        testWhenAnActionFails(runner);
     }
 
     private static void testWithOnlyOneRoundOfAction(ActionRunner runner) throws Exception
@@ -88,7 +90,7 @@ public class ActionRunnerTest
 
     }
     
-    static void testWithMultipleRounds(ActionRunner runner) throws Exception
+    private static void testWithMultipleRounds(ActionRunner runner) throws Exception
     {
         Message message = one(messages());
         
@@ -110,6 +112,23 @@ public class ActionRunnerTest
             
             currentRoundOfActions = Lists.copy(nextRoundOfActions);
             nextRoundOfActions.clear();
+        }
+    }
+    
+    private static void testWhenAnActionFails(ActionRunner runner) throws Exception
+    {
+        Message message = one(messages());
+        
+        List<Action> actions = listOf(() -> mock(Action.class), 20);
+        Action failingAction = Lists.oneOf(actions);
+        when(failingAction.actOnMessage(message))
+            .thenThrow(new RuntimeException());
+        
+        runner.runThroughActions(message, actions);
+        
+        for (Action action : actions)
+        {
+            verify(action).actOnMessage(message);
         }
     }
 

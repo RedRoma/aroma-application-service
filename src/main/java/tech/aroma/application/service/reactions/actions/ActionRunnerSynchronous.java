@@ -19,7 +19,6 @@ package tech.aroma.application.service.reactions.actions;
 import com.google.common.collect.Queues;
 import java.util.List;
 import java.util.Queue;
-import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
@@ -74,7 +73,7 @@ final class ActionRunnerSynchronous implements ActionRunner
         {
             return action.actOnMessage(message);
         }
-        catch (TException ex)
+        catch (Exception ex)
         {
             LOG.error("Failed to run Action {} on Message {}", action, message, ex);
             return Lists.emptyList();
