@@ -76,8 +76,6 @@ final class ForwardToSlackChannelAction implements Action
 
         Payload payload = createPayloadFor(message);
 
-        LOG.debug("Sending Payload {} for Message {}", payload, message);
-
         URL webhookUrl;
 
         try
@@ -89,6 +87,8 @@ final class ForwardToSlackChannelAction implements Action
             LOG.error("Failed to convert Slack Webhook URL: {}", slack.webhookUrl, ex);
             throw new OperationFailedException("Could not convert URL: " + ex.getMessage());
         }
+     
+        LOG.debug("Sending Payload {} to {} for Message {}", payload, webhookUrl, message.title);
 
         http.go()
             .post()
