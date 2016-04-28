@@ -88,22 +88,27 @@ final class ActionFactoryImpl implements ActionFactory
         {
             return this.actionToDoNothing();
         }
-
+        
         if (action.isSetForwardToSlackChannel())
         {
             return this.actionToSendToSlackChannel(action.getForwardToSlackChannel());
         }
-
+        
         if (action.isSetForwardToSlackUser())
         {
             return this.actionToSendToSlackUser(action.getForwardToSlackUser());
         }
-
+        
+        if (action.isSetForwardToGitter())
+        {
+            return this.actionToSendToGitter(action.getForwardToGitter());
+        }
+        
         if (action.isSetSendEmail())
         {
             return this.actionToSendEmail(action.getSendEmail());
         }
-
+        
         return this.actionToDoNothing();
     }
 
