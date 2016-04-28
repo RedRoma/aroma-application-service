@@ -16,22 +16,33 @@
 
 package tech.aroma.application.service.reactions.actions;
 
+import java.net.URL;
+import java.util.List;
 import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import tech.aroma.thrift.Message;
 import tech.aroma.thrift.reactions.ActionForwardToSlackChannel;
 import tech.sirwellington.alchemy.http.AlchemyHttp;
+import tech.sirwellington.alchemy.http.HttpResponse;
+import tech.sirwellington.alchemy.http.exceptions.AlchemyHttpException;
+import tech.sirwellington.alchemy.http.mock.AlchemyHttpMock;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
+import tech.sirwellington.alchemy.test.junit.runners.GenerateURL;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static tech.aroma.thrift.generators.MessageGenerators.messages;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
@@ -48,8 +59,16 @@ public class ForwardToSlackChannelActionTest
 
     @GeneratePojo
     private ActionForwardToSlackChannel slack;
+    
+    @GenerateURL
+    private URL webhookUrl;
+    
+    private Message message;
 
     private ForwardToSlackChannelAction instance;
+    
+    @Mock
+    private HttpResponse response;
 
     @Before
     public void setUp() throws Exception
@@ -59,17 +78,22 @@ public class ForwardToSlackChannelActionTest
         setupMocks();
 
         instance = new ForwardToSlackChannelAction(slack, http);
-        verifyZeroInteractions(http);
     }
 
     private void setupData() throws Exception
     {
-
+        slack.webhookUrl = webhookUrl.toString();
+        message = one(messages());
     }
 
     private void setupMocks() throws Exception
     {
-
+        http = AlchemyHttpMock.begin()
+            .whenPost()
+            .anyBody()
+            .at(webhookUrl)
+            .thenReturnResponse(response)
+            .build();
     }
 
     @DontRepeat
@@ -83,6 +107,28 @@ public class ForwardToSlackChannelActionTest
     @Test
     public void testActOnMessage() throws Exception
     {
+        List<Action> actions = instance.actOnMessage(message);
+        assertThat(actions, notNullValue());
+        assertThat(actions, is(empty()));
+        
+        AlchemyHttpMock.verifyAllRequestsMade(http);
+    }
+    
+    @Test
+    public void testWhenHttpCallFails() throws Exception
+    {
+        http = AlchemyHttpMock.begin()
+            .whenPost()
+            .anyBody()
+            .at(webhookUrl)
+            .thenThrow(new AlchemyHttpException())
+            .build();
+        
+        instance = new ForwardToSlackChannelAction(slack, http);
+        
+        List<Action> actions = instance.actOnMessage(message);
+        assertThat(actions, notNullValue());
+        assertThat(actions, is(empty()));
     }
 
     @DontRepeat
