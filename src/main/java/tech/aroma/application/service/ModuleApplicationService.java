@@ -23,6 +23,7 @@ import com.google.inject.Provides;
 import decorice.DecoratorModule;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.thrift.application.service.ApplicationService;
@@ -41,14 +42,16 @@ public final class ModuleApplicationService extends AbstractModule
     {
         install(new ServiceModule());
         
-        bind(ExecutorService.class).toInstance(Executors.newWorkStealingPool(10));
+        bind(ExecutorService.class).toInstance(Executors.newWorkStealingPool(8));
     }
     
+    @Singleton
     @Provides
-    AlchemyHttp provideHttpClient()
+    AlchemyHttp provideHttpClient(ExecutorService executor)
     {
         return AlchemyHttp.newBuilder()
             .enableAsyncCallbacks()
+            .usingExecutorService(executor)
             .build();
     }
     

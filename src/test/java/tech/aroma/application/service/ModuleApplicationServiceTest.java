@@ -16,6 +16,7 @@
 
 package tech.aroma.application.service;
 
+import com.google.common.util.concurrent.MoreExecutors;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -89,7 +90,7 @@ public class ModuleApplicationServiceTest
     @Test
     public void testProvideHttpClient()
     {
-        AlchemyHttp client = instance.provideHttpClient();
+        AlchemyHttp client = instance.provideHttpClient(MoreExecutors.newDirectExecutorService());
         assertThat(client, notNullValue());
     }
 
