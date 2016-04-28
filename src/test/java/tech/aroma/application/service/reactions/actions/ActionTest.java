@@ -28,6 +28,7 @@ import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static tech.aroma.thrift.generators.MessageGenerators.messages;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.ALPHABETIC;
 
@@ -76,6 +77,11 @@ public class ActionTest
             .isInstanceOf(InvalidArgumentException.class);
         
         assertThrows(() -> Action.checkMessage(badMessage))
+            .isInstanceOf(InvalidArgumentException.class);
+        
+        Message messageWithBadId = new Message(goodMessage)
+            .setMessageId(one(alphabeticString()));
+        assertThrows(() -> Action.checkMessage(messageWithBadId))
             .isInstanceOf(InvalidArgumentException.class);
     }
 

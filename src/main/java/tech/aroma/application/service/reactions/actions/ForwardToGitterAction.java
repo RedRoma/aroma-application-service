@@ -18,20 +18,30 @@
 package tech.aroma.application.service.reactions.actions;
 
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.thrift.Message;
+import tech.aroma.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.thrift.reactions.ActionForwardToGitter;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
+import tech.sirwellington.alchemy.annotations.objects.Pojo;
 import tech.sirwellington.alchemy.http.AlchemyHttp;
+import tech.sirwellington.alchemy.http.HttpResponse;
+import tech.sirwellington.alchemy.http.exceptions.AlchemyHttpException;
 
+import static tech.aroma.thrift.Urgency.HIGH;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+import static tech.sirwellington.alchemy.arguments.assertions.NetworkAssertions.validURL;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
  *
@@ -51,6 +61,10 @@ final class ForwardToGitterAction implements Action
         checkThat(http, gitter)
             .are(notNull());
         
+        checkThat(gitter.gitterWebhookUrl)
+            .is(nonEmptyString())
+            .is(validURL());
+        
         this.http = http;
         this.gitter = gitter;
     }
@@ -60,8 +74,112 @@ final class ForwardToGitterAction implements Action
     {
         Action.checkMessage(message);
         
+        URL url;
+        
+        try
+        {
+            url = new URL(gitter.gitterWebhookUrl);
+        }
+        catch (MalformedURLException ex)
+        {
+            LOG.warn("Failed to conver Gitter Webhook to URL", ex);
+            throw new InvalidArgumentException("Gitter URL Invalid: " + gitter.gitterWebhookUrl);
+        }
+        
+        GitterMessage gitterMessage = new GitterMessage();
+        
+        if (message.urgency == HIGH)
+        {
+            gitterMessage.level = GitterMessage.GITTER_LEVEL_ERROR;
+        }
+        
+        gitterMessage.message = String.format("**Aroma** - New Message From *%s*\n**%s**", message.applicationName, message.title);
+        
+        if (gitter.includeBody)
+        {
+            gitterMessage.message += String.format("\n\n%s", message.body);
+        }
+        
+        http.go()
+            .post()
+            .body(gitterMessage)
+            .onSuccess(this::onSuccess)
+            .onFailure(this::onFailure)
+            .at(url);
         
         return Lists.emptyList();
     }
 
+    
+    private void onSuccess(HttpResponse response)
+    {
+        LOG.debug("Successfully posted message to Gitter Webhook");
+    }
+    
+    private void onFailure(AlchemyHttpException ex)
+    {
+        LOG.error("Failed to post to Gitter", ex);
+    }
+
+    @Override
+    public String toString()
+    {
+        return "ForwardToGitterAction{" + "http=" + http + ", gitter=" + gitter + '}';
+    }
+    
+    @Pojo
+    @Internal
+    static class GitterMessage
+    {
+        
+        static final String GITTER_LEVEL_INFO = "info";
+        static final String GITTER_LEVEL_ERROR = "error";
+        
+        private String message;
+        private String level = GITTER_LEVEL_INFO;
+
+        @Override
+        public int hashCode()
+        {
+            int hash = 7;
+            hash = 29 * hash + Objects.hashCode(this.message);
+            hash = 29 * hash + Objects.hashCode(this.level);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj)
+        {
+            if (this == obj)
+            {
+                return true;
+            }
+            if (obj == null)
+            {
+                return false;
+            }
+            if (getClass() != obj.getClass())
+            {
+                return false;
+            }
+            final GitterMessage other = (GitterMessage) obj;
+            if (!Objects.equals(this.message, other.message))
+            {
+                return false;
+            }
+            if (!Objects.equals(this.level, other.level))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public String toString()
+        {
+            return "GitterMessage{" + "message=" + message + ", level=" + level + '}';
+        }
+
+    }
+    
 }

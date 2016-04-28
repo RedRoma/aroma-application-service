@@ -27,6 +27,7 @@ import tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPattern;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
 import static tech.aroma.data.assertions.RequestAssertions.validApplicationId;
+import static tech.aroma.data.assertions.RequestAssertions.validMessageId;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPattern.Role.PRODUCT;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.INTERFACE;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
@@ -62,6 +63,11 @@ public interface Action
             .throwing(InvalidArgumentException.class)
             .usingMessage("missing message")
             .is(notNull());
+        
+        checkThat(message.messageId)
+            .throwing(InvalidArgumentException.class)
+            .usingMessage("message ID is invalid")
+            .is(validMessageId());
         
         checkThat(message.applicationId)
             .throwing(InvalidArgumentException.class)
