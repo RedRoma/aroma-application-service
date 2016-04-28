@@ -19,6 +19,7 @@ package tech.aroma.application.service.reactions.actions;
 import com.google.inject.ImplementedBy;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.User;
+import tech.aroma.thrift.reactions.ActionForwardToGitter;
 import tech.aroma.thrift.reactions.ActionForwardToSlackChannel;
 import tech.aroma.thrift.reactions.ActionForwardToSlackUser;
 import tech.aroma.thrift.reactions.ActionSendEmail;
@@ -39,6 +40,8 @@ public interface ActionFactory
     
     Action actionToDoNothing();
 
+    Action actionToSendToGitter(@Required ActionForwardToGitter gitter);
+    
     Action actionToSendToSlackChannel(@Required ActionForwardToSlackChannel slack);
 
     Action actionToSendToSlackUser(@Required ActionForwardToSlackUser slack);
