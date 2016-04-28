@@ -17,7 +17,6 @@
 package tech.aroma.application.service.reactions;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
@@ -36,6 +35,7 @@ import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 import tech.sirwellington.alchemy.annotations.concurrency.ThreadSafe;
 
+import static java.util.stream.Collectors.toList;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
@@ -133,10 +133,11 @@ final class MessageReactorImpl implements MessageReactor
 
         return Lists.nullToEmpty(reactions)
             .stream()
-            .filter((reaction) -> matchAlgorithm.matches(message, reaction.matchers))
-            .flatMap(reaction -> Lists.nullToEmpty(reaction.actions).stream())
+            .filter(reaction -> matchAlgorithm.matches(message, reaction.matchers))
+            .filter(reaction -> !Lists.isEmpty(reaction.actions))
+            .flatMap(reaction -> reaction.actions.stream())
             .distinct()
-            .collect(Collectors.toList());
+            .collect(toList());
     }
 
 }
