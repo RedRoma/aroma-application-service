@@ -28,6 +28,7 @@ import tech.aroma.data.ReactionRepository;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.User;
 import tech.aroma.thrift.notification.service.NotificationService;
+import tech.aroma.thrift.reactions.ActionForwardToGitter;
 import tech.aroma.thrift.reactions.ActionForwardToSlackChannel;
 import tech.aroma.thrift.reactions.ActionForwardToSlackUser;
 import tech.aroma.thrift.reactions.ActionSendEmail;
@@ -44,6 +45,7 @@ import static tech.aroma.thrift.generators.MessageGenerators.messages;
 import static tech.aroma.thrift.generators.ReactionGenerators.actions;
 import static tech.aroma.thrift.generators.UserGenerators.users;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.NetworkGenerators.httpUrls;
 import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
@@ -136,6 +138,25 @@ public class ActionFactoryImplTest
     }
 
     @Test
+    public void testActionToSendToGitter()
+    {
+        String webhook = one(httpUrls()).toString();
+        ActionForwardToGitter gitter = new ActionForwardToGitter(webhook);
+        
+        Action result = instance.actionToSendToGitter(gitter);
+        checkAction(result);
+    }
+
+    @Test
+    public void testActionToSendToGitterWithBadArgs()
+    {
+        assertThrows(() -> instance.actionToSendToGitter(null));
+        
+        ActionForwardToGitter gitterWithoutUrl = new ActionForwardToGitter();
+        assertThrows(() -> instance.actionToSendToGitter(gitterWithoutUrl));
+    }
+    
+    @Test
     public void testActionToSendToSlackChannel()
     {
         ActionForwardToSlackChannel slack = one(pojos(ActionForwardToSlackChannel.class));
@@ -198,5 +219,6 @@ public class ActionFactoryImplTest
     {
         assertThat(result, notNullValue());
     }
+
 
 }

@@ -27,6 +27,7 @@ import tech.aroma.data.ReactionRepository;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.User;
 import tech.aroma.thrift.notification.service.NotificationService;
+import tech.aroma.thrift.reactions.ActionForwardToGitter;
 import tech.aroma.thrift.reactions.ActionForwardToSlackChannel;
 import tech.aroma.thrift.reactions.ActionForwardToSlackUser;
 import tech.aroma.thrift.reactions.ActionSendEmail;
@@ -38,6 +39,7 @@ import tech.sirwellington.alchemy.http.AlchemyHttp;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPattern.Role.FACTORY;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+import static tech.sirwellington.alchemy.arguments.assertions.NetworkAssertions.validURL;
 
 /**
  *
@@ -109,6 +111,17 @@ final class ActionFactoryImpl implements ActionFactory
     public Action actionToDoNothing()
     {
         return new DoNothingAction();
+    }
+
+    @Override
+    public Action actionToSendToGitter(ActionForwardToGitter gitter)
+    {
+        checkThat(gitter).is(notNull());
+        checkThat(gitter.gitterWebhookUrl)
+            .usingMessage("Gitter Webhook not a valid URL: " + gitter.gitterWebhookUrl)
+            .is(validURL());
+
+        return new ForwardToGitterAction(http, gitter);
     }
 
     @Override
