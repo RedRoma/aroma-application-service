@@ -88,7 +88,7 @@ final class ForwardToSlackChannelAction implements Action
             throw new OperationFailedException("Could not convert URL: " + ex.getMessage());
         }
      
-        LOG.debug("Sending Payload {} to {} for Message {}", payload, webhookUrl, message.title);
+        LOG.debug("Sending Message Payload to {} for Message {}", webhookUrl, message.title);
 
         http.go()
             .post()
@@ -103,7 +103,7 @@ final class ForwardToSlackChannelAction implements Action
 
     private void onSuccess(HttpResponse response)
     {
-        LOG.debug("Successfully sent Slack Message: {}", response);
+        LOG.debug("Successfully sent Slack Message | {}", response);
     }
 
     private void onFailure(AlchemyHttpException ex)
