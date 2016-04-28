@@ -23,6 +23,7 @@ import com.google.inject.Provides;
 import decorice.DecoratorModule;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,7 @@ public final class ModuleApplicationService extends AbstractModule
         return AlchemyHttp.newBuilder()
             .enableAsyncCallbacks()
             .usingExecutorService(executor)
+            .usingTimeout(45, TimeUnit.SECONDS)
             .build();
     }
     
