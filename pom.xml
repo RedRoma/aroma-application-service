@@ -100,6 +100,7 @@
         <dependency>
             <groupId>tech.sirwellington.alchemy</groupId>
             <artifactId>alchemy-http</artifactId>
+            <version>1.2-SNAPSHOT</version>
         </dependency>
 
         <dependency>
