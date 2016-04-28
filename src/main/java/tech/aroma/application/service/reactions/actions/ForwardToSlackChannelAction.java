@@ -93,7 +93,7 @@ final class ForwardToSlackChannelAction implements Action
         http.go()
             .post()
             .body(payload)
-            .accept("application/json", "text/plain", "text/html")
+            .accept("application/json", "text/plain", "text/javascript")
             .onSuccess(this::onSuccess)
             .onFailure(this::onFailure)
             .at(webhookUrl);
@@ -235,7 +235,6 @@ final class ForwardToSlackChannelAction implements Action
         private String pretext;
         private String color;
         private List<Field> fields = Lists.create();
-        private boolean mrkdwn = true;
 
 
         @Override
