@@ -93,7 +93,7 @@ final class ForwardToGitterAction implements Action
             gitterMessage.level = GitterMessage.GITTER_LEVEL_ERROR;
         }
 
-        gitterMessage.message = String.format("**%s** - *via Aroma*\n**%s**\n\nFrom Device %s", message.applicationName, 
+        gitterMessage.message = String.format("**%s** - *via Aroma*\n**%s**\n\nFrom Device: %s", message.applicationName, 
                                                                                                 message.title,
                                                                                                 message.hostname);
         
