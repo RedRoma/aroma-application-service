@@ -211,6 +211,7 @@ final class MessageMatchers
         
         return message ->
         {
+            
             if (message == null)
             {
                 return false;
