@@ -47,21 +47,21 @@ final class MatcherFactoryImpl implements MatcherFactory
         {
             return MessageMatchers.matchesAll();
         }
-        
+
         if (matcher.isSetApplicationIs())
         {
             String appId = matcher.getApplicationIs().getAppId();
             checkThat(appId)
                 .is(validApplicationId());
-            
+
             return MessageMatchers.applicationIs(appId);
         }
-        
+
         if (matcher.isSetApplicationIsNot())
         {
             String appId = matcher.getApplicationIsNot().getAppId();
             checkThat(appId).is(validApplicationId());
-            
+
             return MessageMatchers.applicationIsNot(appId);
         }
 
@@ -114,7 +114,7 @@ final class MatcherFactoryImpl implements MatcherFactory
             checkThat(substring)
                 .usingMessage("Matcher substring cannot be empty")
                 .is(nonEmptyString());
-            
+
             return MessageMatchers.not(MessageMatchers.titleContains(substring));
         }
 
@@ -128,14 +128,14 @@ final class MatcherFactoryImpl implements MatcherFactory
 
             return MessageMatchers.titleIs(expectedTitle);
         }
-        
+
         if (matcher.isSetTitleIsNot())
         {
             String title = matcher.getTitleIsNot().getTitle();
             checkThat(title)
                 .usingMessage("Message Title cannot be empty")
                 .is(nonEmptyString());
-            
+
             return MessageMatchers.titleIsNot(title);
         }
 
@@ -150,7 +150,6 @@ final class MatcherFactoryImpl implements MatcherFactory
             return MessageMatchers.urgencyIsOneOf(expectedUrgencies);
         }
 
-
         if (matcher.isSetHostnameIs())
         {
             String expectedHostname = matcher.getHostnameIs().getExpectedHostname();
@@ -161,27 +160,27 @@ final class MatcherFactoryImpl implements MatcherFactory
 
             return MessageMatchers.hostnameIs(expectedHostname);
         }
-        
+
         if (matcher.isSetHostnameContains())
         {
             String substring = matcher.getHostnameContains().getSubstring();
             checkThat(substring)
                 .usingMessage("Hostname substring cannot be empty")
                 .is(nonEmptyString());
-            
+
             return MessageMatchers.hostnameContains(substring);
         }
-        
-        if(matcher.isSetHostnameDoesNotContain())
+
+        if (matcher.isSetHostnameDoesNotContain())
         {
             String substring = matcher.getHostnameDoesNotContain().getSubstring();
             checkThat(substring)
                 .usingMessage("Hostname substring cannot be empty")
                 .is(nonEmptyString());
-            
+
             return MessageMatchers.hostnameDoesNotContain(substring);
         }
-        
+
         return MessageMatchers.matchesNone();
     }
 
