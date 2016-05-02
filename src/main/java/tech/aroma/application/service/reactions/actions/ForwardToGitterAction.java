@@ -82,7 +82,7 @@ final class ForwardToGitterAction implements Action
         }
         catch (MalformedURLException ex)
         {
-            LOG.warn("Failed to conver Gitter Webhook to URL", ex);
+            LOG.warn("Failed to convert Gitter Webhook to URL", ex);
             throw new InvalidArgumentException("Gitter URL Invalid: " + gitter.gitterWebhookUrl);
         }
         
