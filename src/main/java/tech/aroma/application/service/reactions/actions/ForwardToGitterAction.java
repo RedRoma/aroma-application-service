@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
- 
 package tech.aroma.application.service.reactions.actions;
-
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -51,8 +49,9 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
 @StrategyPattern(role = CONCRETE_BEHAVIOR)
 final class ForwardToGitterAction implements Action
 {
+
     private final static Logger LOG = LoggerFactory.getLogger(ForwardToGitterAction.class);
-    
+
     private final AlchemyHttp http;
     private final ActionForwardToGitter gitter;
 
@@ -60,11 +59,11 @@ final class ForwardToGitterAction implements Action
     {
         checkThat(http, gitter)
             .are(notNull());
-        
+
         checkThat(gitter.gitterWebhookUrl)
             .is(nonEmptyString())
             .is(validURL());
-        
+
         this.http = http;
         this.gitter = gitter;
     }
@@ -73,9 +72,9 @@ final class ForwardToGitterAction implements Action
     public List<Action> actOnMessage(Message message) throws TException
     {
         Action.checkMessage(message);
-        
+
         URL url;
-        
+
         try
         {
             url = new URL(gitter.gitterWebhookUrl);
@@ -85,25 +84,24 @@ final class ForwardToGitterAction implements Action
             LOG.warn("Failed to convert Gitter Webhook to URL", ex);
             throw new InvalidArgumentException("Gitter URL Invalid: " + gitter.gitterWebhookUrl);
         }
-        
+
         GitterMessage gitterMessage = GitterMessage.createFrom(message, gitter);
-        
+
         http.go()
             .post()
             .body(gitterMessage)
             .onSuccess(this::onSuccess)
             .onFailure(this::onFailure)
             .at(url);
-        
+
         return Lists.emptyList();
     }
 
-    
     private void onSuccess(HttpResponse response)
     {
         LOG.debug("Successfully posted message to Gitter Webhook");
     }
-    
+
     private void onFailure(AlchemyHttpException ex)
     {
         LOG.error("Failed to post to Gitter", ex);
@@ -114,15 +112,15 @@ final class ForwardToGitterAction implements Action
     {
         return "ForwardToGitterAction{" + "http=" + http + ", gitter=" + gitter + '}';
     }
-    
+
     @Pojo
     @Internal
     static class GitterMessage
     {
-        
+
         static final String GITTER_LEVEL_INFO = "info";
         static final String GITTER_LEVEL_ERROR = "error";
-        
+
         private String message;
         private String level = GITTER_LEVEL_INFO;
 
@@ -150,7 +148,6 @@ final class ForwardToGitterAction implements Action
 
             return gitterMessage;
         }
-        
 
         @Override
         public int hashCode()
@@ -195,5 +192,5 @@ final class ForwardToGitterAction implements Action
         }
 
     }
-    
+
 }
