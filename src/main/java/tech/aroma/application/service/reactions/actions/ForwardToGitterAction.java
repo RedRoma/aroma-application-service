@@ -86,21 +86,7 @@ final class ForwardToGitterAction implements Action
             throw new InvalidArgumentException("Gitter URL Invalid: " + gitter.gitterWebhookUrl);
         }
         
-        GitterMessage gitterMessage = new GitterMessage();
-        
-        if (message.urgency == HIGH)
-        {
-            gitterMessage.level = GitterMessage.GITTER_LEVEL_ERROR;
-        }
-
-        gitterMessage.message = String.format("**%s** - *via Aroma*\n**%s**\n\nFrom Device: %s", message.applicationName, 
-                                                                                                message.title,
-                                                                                                message.hostname);
-        
-        if (gitter.includeBody)
-        {
-            gitterMessage.message += String.format("\n\n%s", message.body);
-        }
+        GitterMessage gitterMessage = GitterMessage.createFrom(message, gitter);
         
         http.go()
             .post()
@@ -139,6 +125,32 @@ final class ForwardToGitterAction implements Action
         
         private String message;
         private String level = GITTER_LEVEL_INFO;
+
+        private GitterMessage()
+        {
+        }
+
+        private static GitterMessage createFrom(Message message, ActionForwardToGitter gitter)
+        {
+            GitterMessage gitterMessage = new GitterMessage();
+
+            if (message.urgency == HIGH)
+            {
+                gitterMessage.level = GitterMessage.GITTER_LEVEL_ERROR;
+            }
+
+            gitterMessage.message = String.format("**%s** - *via Aroma*\n**%s**\n\nFrom Device: %s", message.applicationName,
+                                                  message.title,
+                                                  message.hostname);
+
+            if (gitter.includeBody)
+            {
+                gitterMessage.message += String.format("\n\n%s", message.body);
+            }
+
+            return gitterMessage;
+        }
+        
 
         @Override
         public int hashCode()
