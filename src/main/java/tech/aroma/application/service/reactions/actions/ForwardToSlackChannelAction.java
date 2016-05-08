@@ -87,7 +87,7 @@ final class ForwardToSlackChannelAction implements Action
             LOG.error("Failed to convert Slack Webhook URL: {}", slack.webhookUrl, ex);
             throw new OperationFailedException("Could not convert URL: " + ex.getMessage());
         }
-     
+
         LOG.debug("Sending Message Payload to {} for Message {}", webhookUrl, message.title);
 
         http.go()
@@ -117,7 +117,7 @@ final class ForwardToSlackChannelAction implements Action
         Field titleField = new Field();
         titleField.title = message.title;
         titleField.value = message.body;
-        
+
         Field deviceField = new Field();
         deviceField.title = "From Device";
         deviceField.value = message.hostname;
@@ -137,8 +137,6 @@ final class ForwardToSlackChannelAction implements Action
                 break;
         }
 
-//        attachment.pretext = String.format("*%s*", message.applicationName);
-//        attachment.fallback = attachment.pretext;
         attachment.fields = Lists.createFrom(titleField, deviceField);
 
         Payload payload = new Payload();
@@ -149,7 +147,7 @@ final class ForwardToSlackChannelAction implements Action
         {
             payload.channel = slack.slackChannel;
         }
-        
+
         return payload;
     }
 
@@ -239,7 +237,6 @@ final class ForwardToSlackChannelAction implements Action
         private String pretext;
         private String color;
         private List<Field> fields = Lists.create();
-
 
         @Override
         public int hashCode()
