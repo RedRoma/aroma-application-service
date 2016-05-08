@@ -114,9 +114,13 @@ final class ForwardToSlackChannelAction implements Action
     private Payload createPayloadFor(Message message)
     {
 
-        Field field = new Field();
-        field.title = message.title;
-        field.value = message.body;
+        Field titleField = new Field();
+        titleField.title = message.title;
+        titleField.value = message.body;
+        
+        Field deviceField = new Field();
+        deviceField.title = "From Device";
+        deviceField.value = message.hostname;
 
         Attachment attachment = new Attachment();
 
@@ -135,7 +139,7 @@ final class ForwardToSlackChannelAction implements Action
 
 //        attachment.pretext = String.format("*%s*", message.applicationName);
 //        attachment.fallback = attachment.pretext;
-        attachment.fields = Lists.createFrom(field);
+        attachment.fields = Lists.createFrom(titleField, deviceField);
 
         Payload payload = new Payload();
         payload.attachments.add(attachment);
