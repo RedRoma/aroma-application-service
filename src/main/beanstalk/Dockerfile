@@ -1,6 +1,6 @@
 FROM williamyeh/docker-java8
 
-ADD aroma-application-service-1.1.jar aroma-application-service.jar
+ADD aroma-application-service-1.2-SNAPSHOT.jar aroma-application-service.jar
 ADD lib lib
 
 RUN apt-get update -y
