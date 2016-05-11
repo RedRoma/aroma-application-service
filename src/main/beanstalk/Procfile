@@ -1,0 +1,1 @@
+service: java -jar aroma-application-service-1.1.jar -Xmms:512m --port 5000

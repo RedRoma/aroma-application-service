@@ -1,5 +1,5 @@
 <configuration>
-    <contextName>Banana</contextName>
+    <contextName>Aroma</contextName>
     <jmxConfigurator />
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -10,8 +10,8 @@
 
     <appender name="rollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/var/log/aroma/banana_application_service/banana_application_service-%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>14</maxHistory>
+            <fileNamePattern>/var/log/aroma/aroma_application_service/aroma_application_service-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
             <maxFileSize>100MB</maxFileSize>
         </rollingPolicy>
         <encoder>
@@ -30,7 +30,7 @@
     <root level="info">
         <appender-ref ref="STDOUT"/>
     </root>
-    
-    <logger name="tech.aroma.banana.application.service" level="debug" />
+
+    <logger name="tech.aroma.application.service" level="debug" />
 
 </configuration>

@@ -1,0 +1,10 @@
+{
+  "AWSEBDockerrunVersion": "1",
+  "Volumes": [
+    {
+      "ContainerDirectory": "/var/log",
+      "HostDirectory": "/var/log"
+    }
+  ],
+  "Logging": "/var/log/aroma/"
+}
