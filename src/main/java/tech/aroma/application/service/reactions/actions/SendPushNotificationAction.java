@@ -28,6 +28,7 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
+import tech.aroma.data.UserPreferencesRepository;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.channels.IOSDevice;
 import tech.aroma.thrift.channels.MobileDevice;
@@ -42,11 +43,6 @@ import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPa
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
-import tech.aroma.data.UserPreferencesRepository;
-
-import static java.lang.String.format;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
-
 /**
  *
  * @author SirWellington
@@ -58,18 +54,19 @@ final class SendPushNotificationAction implements Action
     private final static Logger LOG = LoggerFactory.getLogger(SendPushNotificationAction.class);
 
     private final ApnsService apns;
-    private final UserPreferencesRepository deviceRepo;
+    private final UserPreferencesRepository userPreferencesRepo;
     private final String userId;
 
     @Inject
-    SendPushNotificationAction(ApnsService apns, UserPreferencesRepository deviceRepo, String userId)
+    SendPushNotificationAction(ApnsService apns, UserPreferencesRepository userPreferencesRepo, String userId)
     {
-        checkThat(apns, deviceRepo)
+        checkThat(apns, userPreferencesRepo)
             .are(notNull());
+        
         checkThat(userId).is(validUserId());
         
         this.apns = apns;
-        this.deviceRepo = deviceRepo;
+        this.userPreferencesRepo = userPreferencesRepo;
         this.userId = userId;
     }
 
@@ -77,7 +74,7 @@ final class SendPushNotificationAction implements Action
     public List<Action> actOnMessage(Message message) throws TException
     {
         
-       deviceRepo.getMobileDevices(userId)
+       userPreferencesRepo.getMobileDevices(userId)
             .stream()
             .filter(MobileDevice::isSetIosDevice)
             .map(MobileDevice::getIosDevice)
@@ -121,7 +118,6 @@ final class SendPushNotificationAction implements Action
             .customField("message", serializedMessage);
 
         if (!builder.isTooLong())
-        
         {
             LOG.debug("Apple PNS Payload too long. Shortening: {}", builder.toString());
             return builder.build();

@@ -20,6 +20,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
+import com.notnoop.apns.ApnsService;
 import java.util.function.Function;
 import org.junit.Before;
 import org.junit.Test;
@@ -98,6 +99,12 @@ public class ModuleApplicationServiceOperationsTest
         AlchemyHttp provideAlchemyHttp()
         {
             return mock(AlchemyHttp.class);
+        }
+        
+        @Provides
+        ApnsService provideApnsService()
+        {
+            return mock(ApnsService.class);
         }
     }
 
