@@ -68,26 +68,26 @@ public class SendPushNotificationActionTest
 
     @Mock
     private ApnsService apns;
-    
+
     @Mock
     private UserPreferencesRepository userPreferencesRepo;
-    
+
     @GenerateString(UUID)
     private String userId;
 
     private SendPushNotificationAction instance;
-    
+
     private Set<MobileDevice> devices;
     private Set<IOSDevice> iosDevices;
-    
+
     private Message message;
-    
+
     @Captor
     private ArgumentCaptor<String> payloadCaptor;
-    
+
     @Captor
     private ArgumentCaptor<String> deviceTokenCaptor;
-    
+
     @Before
     public void setUp() throws Exception
     {
