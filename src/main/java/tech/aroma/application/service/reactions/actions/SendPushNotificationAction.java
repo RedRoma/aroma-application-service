@@ -32,12 +32,14 @@ import tech.aroma.data.UserPreferencesRepository;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.channels.IOSDevice;
 import tech.aroma.thrift.channels.MobileDevice;
+import tech.aroma.thrift.exceptions.InvalidArgumentException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 import tech.sirwellington.alchemy.thrift.ThriftObjects;
 
 import static java.lang.String.format;
 import static tech.aroma.data.assertions.RequestAssertions.isNullOrEmpty;
+import static tech.aroma.data.assertions.RequestAssertions.validMessage;
 import static tech.aroma.data.assertions.RequestAssertions.validUserId;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
@@ -73,6 +75,9 @@ final class SendPushNotificationAction implements Action
     @Override
     public List<Action> actOnMessage(Message message) throws TException
     {
+        checkThat(message)
+            .throwing(InvalidArgumentException.class)
+            .is(validMessage());
         
        userPreferencesRepo.getMobileDevices(userId)
             .stream()
