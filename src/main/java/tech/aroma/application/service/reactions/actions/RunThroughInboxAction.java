@@ -84,15 +84,22 @@ class RunThroughInboxAction implements Action
         
         //This Action is assumed true unless otherwise excluded.
         boolean shouldStoreInInbox = true;
+        boolean shouldSendPushNotification = true;
 
         List<Action> newActions = Lists.create();
 
         for (AromaAction action : applicableActions)
         {
-            //We will take any one of these to signify that the message should not be stored in the Inbox
-            if (action.isSetSkipInbox() || action.isSetDontStoreMessage())
+            if (action.isSetDontStoreMessage())
             {
                 shouldStoreInInbox = false;
+                continue;
+            }
+
+            if (action.isSetSkipInbox())
+            {
+                shouldStoreInInbox = false;
+                shouldSendPushNotification = false;
                 continue;
             }
 
@@ -104,6 +111,12 @@ class RunThroughInboxAction implements Action
         {
             Action actionToSaveInInbox = actionFactory.actionToStoreInInbox(user);
             newActions.add(actionToSaveInInbox);
+        }
+        
+        if (shouldSendPushNotification)
+        {
+            Action actionToSendPushNotification = actionFactory.actionToSendPushNotification(user.userId);
+            newActions.add(actionToSendPushNotification);
         }
 
         return newActions;

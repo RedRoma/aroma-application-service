@@ -24,6 +24,7 @@ import tech.aroma.thrift.reactions.ActionForwardToSlackChannel;
 import tech.aroma.thrift.reactions.ActionForwardToSlackUser;
 import tech.aroma.thrift.reactions.ActionSendEmail;
 import tech.aroma.thrift.reactions.AromaAction;
+import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 import tech.sirwellington.alchemy.annotations.concurrency.ThreadSafe;
 
@@ -37,11 +38,11 @@ public interface ActionFactory
 {
 
     Action actionFor(AromaAction action);
-    
+
     Action actionToDoNothing();
 
     Action actionToSendToGitter(@Required ActionForwardToGitter gitter);
-    
+
     Action actionToSendToSlackChannel(@Required ActionForwardToSlackChannel slack);
 
     Action actionToSendToSlackUser(@Required ActionForwardToSlackUser slack);
@@ -55,6 +56,8 @@ public interface ActionFactory
     Action actionToStoreMessage(@Required Message message);
 
     Action actionToStoreInInbox(@Required User user);
+
+    Action actionToSendPushNotification(@NonEmpty String userId);
 
     Action actionToSendEmail(@Required ActionSendEmail sendEmail);
 }

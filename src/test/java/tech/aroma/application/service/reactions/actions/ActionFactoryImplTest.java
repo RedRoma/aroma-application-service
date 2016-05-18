@@ -16,6 +16,7 @@
 
 package tech.aroma.application.service.reactions.actions;
 
+import com.notnoop.apns.ApnsService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +26,7 @@ import tech.aroma.data.FollowerRepository;
 import tech.aroma.data.InboxRepository;
 import tech.aroma.data.MessageRepository;
 import tech.aroma.data.ReactionRepository;
+import tech.aroma.data.UserPreferencesRepository;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.User;
 import tech.aroma.thrift.notification.service.NotificationService;
@@ -59,30 +61,36 @@ public class ActionFactoryImplTest
 {
 
     @Mock
-    private NotificationService.Iface notificationService;
+    private AlchemyHttp http;
+    
+    @Mock
+    private ApnsService apns;
     
     @Mock
     private FollowerRepository followerRepo;
     
     @Mock
     private InboxRepository inboxRepo;
-   
+    
     @Mock
     private MatchAlgorithm matchAlgorithm;
-  
+    
     @Mock
     private MessageRepository messageRepo;
-   
+    
     @Mock
     private ReactionRepository reactionRepo;
-   
+    
     @Mock
-    private AlchemyHttp http;
+    private UserPreferencesRepository userPreferencesRepo;
 
-    private AromaAction action;
+    @Mock
+    private NotificationService.Iface notificationService;
+
 
     private ActionFactoryImpl instance;
-    
+ 
+    private AromaAction action;
     private Message message;
     private User user;
 
@@ -93,8 +101,8 @@ public class ActionFactoryImplTest
         setupData();
         setupMocks();
         
-        instance = new ActionFactoryImpl(notificationService, followerRepo, inboxRepo, matchAlgorithm, messageRepo, reactionRepo, http);
-        verifyZeroInteractions(notificationService, followerRepo, inboxRepo, matchAlgorithm, messageRepo, reactionRepo, http);
+        instance = new ActionFactoryImpl(http, apns, followerRepo, inboxRepo, matchAlgorithm, messageRepo, reactionRepo, userPreferencesRepo, notificationService);
+        verifyZeroInteractions(http, apns, followerRepo, inboxRepo, matchAlgorithm, messageRepo, reactionRepo, userPreferencesRepo, notificationService);
     }
 
     private void setupData() throws Exception
@@ -114,13 +122,15 @@ public class ActionFactoryImplTest
     @Test
     public void testConstructor() 
     {
-        assertThrows(() -> new ActionFactoryImpl(null, followerRepo, inboxRepo, matchAlgorithm, messageRepo, reactionRepo, http));
-        assertThrows(() -> new ActionFactoryImpl(notificationService, null, inboxRepo, matchAlgorithm, messageRepo, reactionRepo, http));
-        assertThrows(() -> new ActionFactoryImpl(notificationService, followerRepo, null, matchAlgorithm, messageRepo, reactionRepo, http));
-        assertThrows(() -> new ActionFactoryImpl(notificationService, followerRepo, inboxRepo, null, messageRepo, reactionRepo, http));
-        assertThrows(() -> new ActionFactoryImpl(notificationService, followerRepo, inboxRepo, matchAlgorithm, null, reactionRepo, http));
-        assertThrows(() -> new ActionFactoryImpl(notificationService, followerRepo, inboxRepo, matchAlgorithm, messageRepo, null, http));
-        assertThrows(() -> new ActionFactoryImpl(notificationService, followerRepo, inboxRepo, matchAlgorithm, messageRepo, reactionRepo, null));
+        assertThrows(() -> new ActionFactoryImpl(null, apns, followerRepo, inboxRepo, matchAlgorithm, messageRepo, reactionRepo, userPreferencesRepo, notificationService));
+        assertThrows(() -> new ActionFactoryImpl(http, null, followerRepo, inboxRepo, matchAlgorithm, messageRepo, reactionRepo, userPreferencesRepo, notificationService));
+        assertThrows(() -> new ActionFactoryImpl(http, apns, null, inboxRepo, matchAlgorithm, messageRepo, reactionRepo, userPreferencesRepo, notificationService));
+        assertThrows(() -> new ActionFactoryImpl(http, apns, followerRepo, null, matchAlgorithm, messageRepo, reactionRepo, userPreferencesRepo, notificationService));
+        assertThrows(() -> new ActionFactoryImpl(http, apns, followerRepo, inboxRepo, null, messageRepo, reactionRepo, userPreferencesRepo, notificationService));
+        assertThrows(() -> new ActionFactoryImpl(http, apns, followerRepo, inboxRepo, matchAlgorithm, null, reactionRepo, userPreferencesRepo, notificationService));
+        assertThrows(() -> new ActionFactoryImpl(http, apns, followerRepo, inboxRepo, matchAlgorithm, messageRepo, null, userPreferencesRepo, notificationService));
+        assertThrows(() -> new ActionFactoryImpl(http, apns, followerRepo, inboxRepo, matchAlgorithm, messageRepo, reactionRepo, null, notificationService));
+        assertThrows(() -> new ActionFactoryImpl(http, apns, followerRepo, inboxRepo, matchAlgorithm, messageRepo, reactionRepo, userPreferencesRepo, null));
     }
 
     @Test
@@ -214,11 +224,19 @@ public class ActionFactoryImplTest
         Action result = instance.actionToSendEmail(sendEmail);
         checkAction(result);
     }
+    
+    @Test
+    public void testActionToSendPushNotification()
+    {
+        Action actionToSendPushNotification = instance.actionToSendPushNotification(user.userId);
+        checkAction(actionToSendPushNotification);
+    }
 
     private void checkAction(Action result)
     {
         assertThat(result, notNullValue());
     }
+
 
 
 }
