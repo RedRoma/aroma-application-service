@@ -108,6 +108,7 @@ final class SendPushNotificationAction implements Action
         {
             payload = createNotificationFromMessage(message);
             apns.push(deviceTokenHex, payload);
+            LOG.debug("Successfully sent Notification to Device {}", device);
         }
         catch (Exception ex)
         {
@@ -118,7 +119,7 @@ final class SendPushNotificationAction implements Action
     
     private String createNotificationFromMessage(Message message) throws TException
     {
-        String title = format("%s - %s", message.applicationName, message.title);
+        String alertTitle = format("%s - %s", message.applicationName, message.title);
         
         PushNotificationPayload payload = new PushNotificationPayload()
             .setMessageId(message.messageId)
@@ -127,7 +128,7 @@ final class SendPushNotificationAction implements Action
         byte[] serializedPayload = ThriftObjects.toBinary(payload);
 
         PayloadBuilder builder = APNS.newPayload()
-            .alertTitle(title)
+            .alertTitle(alertTitle)
             .customField(ChannelsConstants.PUSH_NOTIFICATION_KEY_FOR_PAYLOAD, serializedPayload);
 
         if (!builder.isTooLong())
@@ -138,7 +139,7 @@ final class SendPushNotificationAction implements Action
         else
         {
             return APNS.newPayload()
-                .alertTitle(title)
+                .alertTitle(alertTitle)
                 .build();
         }
     }
