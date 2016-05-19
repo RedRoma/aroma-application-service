@@ -24,6 +24,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.google.inject.ProvisionException;
+import com.notnoop.apns.ApnsService;
 import java.net.SocketException;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -111,6 +112,12 @@ public final class TcpServer
         {
             return new NoOpNotificationService();
         }
-        
+
+        @Provides
+        ApnsService provideApnsService()
+        {
+            return new DoNothingApnsService();
+        }
+   
     }
 }

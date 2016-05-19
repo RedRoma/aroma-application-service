@@ -22,6 +22,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Provides;
+import com.notnoop.apns.ApnsService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,6 +37,7 @@ import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 
 /**
  *
@@ -65,6 +67,12 @@ public class ModuleApplicationServiceTest
         NotificationService.Iface provideNotificationService()
         {
             return Mockito.mock(NotificationService.Iface.class);
+        }
+        
+        @Provides
+        ApnsService provideApnsService()
+        {
+            return mock(ApnsService.class);
         }
         
     };
