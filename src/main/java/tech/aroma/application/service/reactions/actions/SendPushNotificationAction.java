@@ -40,7 +40,6 @@ import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 import tech.sirwellington.alchemy.thrift.ThriftObjects;
 
-import static java.lang.String.format;
 import static tech.aroma.data.assertions.RequestAssertions.isNullOrEmpty;
 import static tech.aroma.data.assertions.RequestAssertions.validMessage;
 import static tech.aroma.data.assertions.RequestAssertions.validUserId;
@@ -119,7 +118,8 @@ final class SendPushNotificationAction implements Action
     
     private String createNotificationFromMessage(Message message) throws TException
     {
-        String alertTitle = format("%s - %s", message.applicationName, message.title);
+        String alertTitle = message.applicationName; //format("%s - %s", message.applicationName, message.title);
+        String alertBody = message.title;
         
         PushNotificationPayload payload = new PushNotificationPayload()
             .setMessageId(message.messageId)
@@ -129,7 +129,7 @@ final class SendPushNotificationAction implements Action
 
         PayloadBuilder builder = APNS.newPayload()
             .alertTitle(alertTitle)
-            .alertBody(alertTitle)
+            .alertBody(alertBody)
             .customField(ChannelsConstants.PUSH_NOTIFICATION_KEY_FOR_PAYLOAD, serializedPayload);
 
         if (!builder.isTooLong())
@@ -141,7 +141,7 @@ final class SendPushNotificationAction implements Action
         {
             return APNS.newPayload()
                 .alertTitle(alertTitle)
-                .alertBody(alertTitle)
+                .alertBody(alertBody)
                 .build();
         }
     }
