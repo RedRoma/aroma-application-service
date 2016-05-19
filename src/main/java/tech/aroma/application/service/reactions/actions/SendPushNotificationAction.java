@@ -24,6 +24,7 @@ import com.notnoop.apns.PayloadBuilder;
 import java.util.List;
 import java.util.Objects;
 import javax.inject.Inject;
+import javax.xml.bind.DatatypeConverter;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,19 +92,20 @@ final class SendPushNotificationAction implements Action
 
     private void sendNotification(Message message, IOSDevice device)
     {
-        String deviceToken = device.deviceToken;
-
-        if (isNullOrEmpty(deviceToken))
+        if (isNullOrEmpty(device.deviceToken))
         {
             //Ignore it
             return;
         }
+        
+        byte[] deviceTokenBinary = DatatypeConverter.parseBase64Binary(device.deviceToken);
+        String deviceTokenHex = DatatypeConverter.printHexBinary(deviceTokenBinary);
 
         String payload = "";
         try
         {
             payload = createNotificationFromMessage(message);
-            apns.push(deviceToken, payload);
+            apns.push(deviceTokenHex, payload);
         }
         catch (Exception ex)
         {

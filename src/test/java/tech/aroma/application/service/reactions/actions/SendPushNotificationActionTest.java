@@ -21,6 +21,7 @@ import com.notnoop.exceptions.NetworkIOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import javax.xml.bind.DatatypeConverter;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -136,7 +137,7 @@ public class SendPushNotificationActionTest
         
         for (IOSDevice device : iosDevices)
         {
-            verify(apns).push(eq(device.deviceToken), payloadCaptor.capture());
+            verify(apns).push(eq(convertToHex(device.deviceToken)), payloadCaptor.capture());
             
             String payload = payloadCaptor.getValue();
             assertThat(payload, not(isEmptyOrNullString()));
@@ -156,7 +157,7 @@ public class SendPushNotificationActionTest
         
         IOSDevice failingDevice = Sets.oneOf(iosDevices);
         
-        when(apns.push(eq(failingDevice.deviceToken), anyString()))
+        when(apns.push(eq(convertToHex(failingDevice.deviceToken)), anyString()))
             .thenThrow(new NetworkIOException());
         
         instance.actOnMessage(message);
@@ -168,7 +169,7 @@ public class SendPushNotificationActionTest
                 continue;
             }
             
-            verify(apns).push(eq(device.deviceToken), Mockito.contains(message.title));
+            verify(apns).push(eq(convertToHex(device.deviceToken)), Mockito.contains(message.title));
         }
     }
     
@@ -198,6 +199,10 @@ public class SendPushNotificationActionTest
         
     }
     
-    
+    private String convertToHex(String base64)
+    {
+        byte[] binary = DatatypeConverter.parseBase64Binary(base64);
+        return DatatypeConverter.printHexBinary(binary);
+    }
 
 }
