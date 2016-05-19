@@ -26,7 +26,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import tech.aroma.application.service.operations.ModuleApplicationServiceOperations;
 import tech.aroma.data.memory.ModuleMemoryDataRepositories;
 import tech.aroma.thrift.application.service.ApplicationService;
 import tech.aroma.thrift.authentication.service.AuthenticationService;
@@ -48,7 +47,7 @@ public class ModuleApplicationServiceTest
 {
     private ModuleMemoryDataRepositories dataModule;
     private ModuleApplicationService instance;
-    private ModuleApplicationServiceOperations operationsModule;
+    
     private Module mockModule = new AbstractModule()
     {
         @Override
@@ -74,14 +73,13 @@ public class ModuleApplicationServiceTest
     public void setUp()
     {
         dataModule = new ModuleMemoryDataRepositories();
-        operationsModule = new ModuleApplicationServiceOperations();
         instance = new ModuleApplicationService();
     }
 
     @Test
     public void testConfigure()
     {
-        Injector injector = Guice.createInjector(dataModule, mockModule, operationsModule, instance);
+        Injector injector = Guice.createInjector(dataModule, mockModule, instance);
         
         ApplicationService.Iface service = injector.getInstance(ApplicationService.Iface.class);
         assertThat(service, notNullValue());

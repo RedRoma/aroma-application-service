@@ -16,6 +16,7 @@
 
 package tech.aroma.application.service.reactions.actions;
 
+import com.notnoop.apns.ApnsService;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import tech.aroma.data.FollowerRepository;
 import tech.aroma.data.InboxRepository;
 import tech.aroma.data.MessageRepository;
 import tech.aroma.data.ReactionRepository;
+import tech.aroma.data.UserPreferencesRepository;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.User;
 import tech.aroma.thrift.notification.service.NotificationService;
@@ -51,35 +53,44 @@ final class ActionFactoryImpl implements ActionFactory
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(ActionFactoryImpl.class);
-
-    private final NotificationService.Iface notificationService;
+    
+    private final AlchemyHttp http;
+    private final ApnsService apns;
+    
     private final FollowerRepository followerRepo;
     private final InboxRepository inboxRepo;
     private final MatchAlgorithm matchAlgorithm;
     private final MessageRepository messageRepo;
     private final ReactionRepository reactionRepo;
-    private final AlchemyHttp http;
+    private final UserPreferencesRepository userPreferencesRepo;
+    
+    private final NotificationService.Iface notificationService;
 
     @Inject
-    ActionFactoryImpl(NotificationService.Iface notificationService,
+    ActionFactoryImpl(AlchemyHttp http,
+                      ApnsService apns,
                       FollowerRepository followerRepo,
                       InboxRepository inboxRepo,
                       MatchAlgorithm matchAlgorithm,
                       MessageRepository messageRepo,
                       ReactionRepository reactionRepo,
-                      AlchemyHttp http)
+                      UserPreferencesRepository userPreferencesRepo,
+                      NotificationService.Iface notificationService)
     {
-        checkThat(notificationService, followerRepo, inboxRepo, matchAlgorithm, messageRepo, reactionRepo, http)
+        checkThat(http, apns, followerRepo, inboxRepo, matchAlgorithm, messageRepo, reactionRepo, userPreferencesRepo, notificationService)
             .are(notNull());
         
-        this.notificationService = notificationService;
+        this.http = http;
+        this.apns = apns;
         this.followerRepo = followerRepo;
         this.inboxRepo = inboxRepo;
         this.matchAlgorithm = matchAlgorithm;
         this.messageRepo = messageRepo;
         this.reactionRepo = reactionRepo;
-        this.http = http;
+        this.userPreferencesRepo = userPreferencesRepo;
+        this.notificationService = notificationService;
     }
+   
 
     @Override
     public Action actionFor(AromaAction action)
@@ -175,6 +186,12 @@ final class ActionFactoryImpl implements ActionFactory
     public Action actionToSendEmail(ActionSendEmail sendEmail)
     {
         return new DoNothingAction();
+    }
+
+    @Override
+    public Action actionToSendPushNotification(String userId)
+    {
+        return new SendPushNotificationAction(apns, userPreferencesRepo, userId);
     }
 
 }
