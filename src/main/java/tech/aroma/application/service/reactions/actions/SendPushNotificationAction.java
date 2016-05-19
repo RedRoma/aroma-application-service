@@ -124,7 +124,7 @@ final class SendPushNotificationAction implements Action
             .setMessageId(message.messageId)
             .setApplicationId(message.applicationId);
         
-        String serializedPayload = ThriftObjects.toJson(payload);
+        byte[] serializedPayload = ThriftObjects.toBinary(payload);
 
         PayloadBuilder builder = APNS.newPayload()
             .alertTitle(title)
