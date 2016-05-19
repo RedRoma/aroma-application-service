@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.maps.Maps;
 import sir.wellington.alchemy.collections.sets.Sets;
+import tech.aroma.application.service.operations.ModuleApplicationServiceOperations;
 import tech.aroma.thrift.application.service.ApplicationService;
 import tech.sirwellington.alchemy.http.AlchemyHttp;
 
@@ -50,6 +51,7 @@ public final class ModuleApplicationService extends AbstractModule
     @Override
     protected void configure()
     {
+        install(new ModuleApplicationServiceOperations());
         install(new ServiceModule());
         
         bind(ExecutorService.class).toInstance(Executors.newWorkStealingPool(8));
