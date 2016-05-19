@@ -19,6 +19,7 @@ package tech.aroma.application.service.reactions.actions;
 
 
 import com.notnoop.apns.APNS;
+import com.notnoop.apns.ApnsNotification;
 import com.notnoop.apns.ApnsService;
 import com.notnoop.apns.PayloadBuilder;
 import java.util.List;
@@ -103,8 +104,8 @@ final class SendPushNotificationAction implements Action
         try
         {
             payload = createNotificationFromMessage(message);
-            apns.push(deviceToken, payload);
-            LOG.debug("Successfully sent Notification to Device {}", device);
+            ApnsNotification response = apns.push(deviceToken, payload);
+            LOG.debug("Successfully sent Notification [{}] to Device: {}", response, device);
         }
         catch (Exception ex)
         {
