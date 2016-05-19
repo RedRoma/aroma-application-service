@@ -151,6 +151,10 @@ final class SendPushNotificationAction implements Action
     public static class ApnsListener implements ApnsDelegate
     {
 
+        public ApnsListener()
+        {
+        }
+        
         @Override
         public void messageSent(ApnsNotification message, boolean resent)
         {
