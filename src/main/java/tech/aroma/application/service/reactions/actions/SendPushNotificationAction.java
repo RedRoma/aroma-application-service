@@ -19,10 +19,8 @@ package tech.aroma.application.service.reactions.actions;
 
 
 import com.notnoop.apns.APNS;
-import com.notnoop.apns.ApnsDelegate;
 import com.notnoop.apns.ApnsNotification;
 import com.notnoop.apns.ApnsService;
-import com.notnoop.apns.DeliveryError;
 import com.notnoop.apns.PayloadBuilder;
 import java.util.List;
 import java.util.Objects;
@@ -145,42 +143,6 @@ final class SendPushNotificationAction implements Action
                 .alertBody(alertBody)
                 .buildBytes();
         }
-    }
-
-    @Internal
-    public static class ApnsListener implements ApnsDelegate
-    {
-
-        public ApnsListener()
-        {
-        }
-        
-        @Override
-        public void messageSent(ApnsNotification message, boolean resent)
-        {
-        }
-
-        @Override
-        public void messageSendFailed(ApnsNotification message, Throwable ex)
-        {
-            LOG.warn("Failed to send push notification message {}", message, ex);
-        }
-
-        @Override
-        public void connectionClosed(DeliveryError e, int messageIdentifier)
-        {
-        }
-
-        @Override
-        public void cacheLengthExceeded(int newCacheLength)
-        {
-        }
-
-        @Override
-        public void notificationsResent(int resendCount)
-        {
-        }
-        
     }
     
 }
