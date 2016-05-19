@@ -131,13 +131,13 @@ final class SendPushNotificationAction implements Action
             .alertBody(alertBody)
             .customField(ChannelsConstants.PUSH_NOTIFICATION_KEY_FOR_PAYLOAD, serializedPayload);
 
-        if (!builder.isTooLong())
+        if (builder.isTooLong())
         {
-            LOG.debug("Apple PNS Payload too long. Shortening: {}", builder.toString());
             return builder.buildBytes();
         }
         else
         {
+            LOG.debug("Apple PNS Payload too long. Shortening: {}", builder.toString());
             return APNS.newPayload()
                 .alertTitle(alertTitle)
                 .alertBody(alertBody)
