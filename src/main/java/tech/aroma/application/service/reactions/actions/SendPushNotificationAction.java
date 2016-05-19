@@ -105,7 +105,7 @@ final class SendPushNotificationAction implements Action
         {
             payload = createNotificationFromMessage(message);
             ApnsNotification response = apns.push(deviceToken, payload);
-            LOG.debug("Successfully sent Notification [{}] to Device: {}", response, device);
+            LOG.debug("Successfully sent Notification to Device: {}", device);
         }
         catch (Exception ex)
         {
