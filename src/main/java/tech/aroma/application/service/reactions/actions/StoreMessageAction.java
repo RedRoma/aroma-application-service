@@ -59,7 +59,7 @@ final class StoreMessageAction implements Action
         Action.checkMessage(message);
 
         messageRepo.saveMessage(message, new LengthOfTime(TimeUnit.HOURS, 18));
-        LOG.debug("Saved message in Message Repo: {}", message);
+        LOG.debug("Saved message in Message Repo: {}/{}", message.applicationId, message.messageId);
 
         return Lists.emptyList();
     }
