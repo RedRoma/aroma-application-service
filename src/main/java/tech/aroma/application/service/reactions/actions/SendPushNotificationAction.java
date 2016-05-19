@@ -129,6 +129,7 @@ final class SendPushNotificationAction implements Action
 
         PayloadBuilder builder = APNS.newPayload()
             .alertTitle(alertTitle)
+            .alertBody(alertTitle)
             .customField(ChannelsConstants.PUSH_NOTIFICATION_KEY_FOR_PAYLOAD, serializedPayload);
 
         if (!builder.isTooLong())
@@ -140,6 +141,7 @@ final class SendPushNotificationAction implements Action
         {
             return APNS.newPayload()
                 .alertTitle(alertTitle)
+                .alertBody(alertTitle)
                 .build();
         }
     }
