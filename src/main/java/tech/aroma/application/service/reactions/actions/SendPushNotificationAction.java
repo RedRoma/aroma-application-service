@@ -24,7 +24,6 @@ import com.notnoop.apns.PayloadBuilder;
 import java.util.List;
 import java.util.Objects;
 import javax.inject.Inject;
-import javax.xml.bind.DatatypeConverter;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +39,6 @@ import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 import tech.sirwellington.alchemy.thrift.ThriftObjects;
 
-import static tech.aroma.data.assertions.RequestAssertions.isNullOrEmpty;
 import static tech.aroma.data.assertions.RequestAssertions.validMessage;
 import static tech.aroma.data.assertions.RequestAssertions.validUserId;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;
@@ -93,30 +91,29 @@ final class SendPushNotificationAction implements Action
 
     private void sendNotification(Message message, IOSDevice device)
     {
-        if (isNullOrEmpty(device.deviceToken))
+        byte[] deviceToken = device.getDeviceToken();
+
+        if (deviceToken == null || deviceToken.length == 0)
         {
             //Ignore it
             return;
         }
-        
-        byte[] deviceTokenBinary = DatatypeConverter.parseBase64Binary(device.deviceToken);
-        String deviceTokenHex = DatatypeConverter.printHexBinary(deviceTokenBinary);
 
-        String payload = "";
+        byte[] payload = null;
         try
         {
             payload = createNotificationFromMessage(message);
-            apns.push(deviceTokenHex, payload);
+            apns.push(deviceToken, payload);
             LOG.debug("Successfully sent Notification to Device {}", device);
         }
         catch (Exception ex)
         {
-            LOG.warn("Failed to send Push Notification: {}", payload, ex);
+            LOG.warn("Failed to send Push Notification for: {}", message.messageId, ex);
         }
 
     }
     
-    private String createNotificationFromMessage(Message message) throws TException
+    private byte[] createNotificationFromMessage(Message message) throws TException
     {
         String alertTitle = message.applicationName; //format("%s - %s", message.applicationName, message.title);
         String alertBody = message.title;
@@ -128,6 +125,7 @@ final class SendPushNotificationAction implements Action
         byte[] serializedPayload = ThriftObjects.toBinary(payload);
 
         PayloadBuilder builder = APNS.newPayload()
+            .instantDeliveryOrSilentNotification()
             .alertTitle(alertTitle)
             .alertBody(alertBody)
             .customField(ChannelsConstants.PUSH_NOTIFICATION_KEY_FOR_PAYLOAD, serializedPayload);
@@ -135,14 +133,14 @@ final class SendPushNotificationAction implements Action
         if (!builder.isTooLong())
         {
             LOG.debug("Apple PNS Payload too long. Shortening: {}", builder.toString());
-            return builder.build();
+            return builder.buildBytes();
         }
         else
         {
             return APNS.newPayload()
                 .alertTitle(alertTitle)
                 .alertBody(alertBody)
-                .build();
+                .buildBytes();
         }
     }
 
