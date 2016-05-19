@@ -21,14 +21,12 @@ import com.notnoop.exceptions.NetworkIOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import javax.xml.bind.DatatypeConverter;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import sir.wellington.alchemy.collections.sets.Sets;
 import tech.aroma.data.UserPreferencesRepository;
 import tech.aroma.thrift.Message;
@@ -45,7 +43,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -84,7 +82,7 @@ public class SendPushNotificationActionTest
     private Message message;
 
     @Captor
-    private ArgumentCaptor<String> payloadCaptor;
+    private ArgumentCaptor<byte[]> payloadCaptor;
 
     @Captor
     private ArgumentCaptor<String> deviceTokenCaptor;
@@ -137,9 +135,9 @@ public class SendPushNotificationActionTest
         
         for (IOSDevice device : iosDevices)
         {
-            verify(apns).push(eq(convertToHex(device.deviceToken)), payloadCaptor.capture());
+            verify(apns).push(eq(device.getDeviceToken()), payloadCaptor.capture());
             
-            String payload = payloadCaptor.getValue();
+            String payload = new String(payloadCaptor.getValue());
             assertThat(payload, not(isEmptyOrNullString()));
             assertThat(payload, containsString(message.title));
             assertThat(payload, containsString(message.applicationName));
@@ -157,7 +155,7 @@ public class SendPushNotificationActionTest
         
         IOSDevice failingDevice = Sets.oneOf(iosDevices);
         
-        when(apns.push(eq(convertToHex(failingDevice.deviceToken)), anyString()))
+        when(apns.push(eq(failingDevice.getDeviceToken()), any()))
             .thenThrow(new NetworkIOException());
         
         instance.actOnMessage(message);
@@ -169,7 +167,13 @@ public class SendPushNotificationActionTest
                 continue;
             }
             
-            verify(apns).push(eq(convertToHex(device.deviceToken)), Mockito.contains(message.title));
+            verify(apns).push(eq(device.getDeviceToken()), payloadCaptor.capture());
+            
+            byte[] payloadBinary = payloadCaptor.getValue();
+            String payload = new String(payloadBinary);
+            
+            assertThat(payload, containsString(message.applicationName));
+            assertThat(payload, containsString(message.title));
         }
     }
     
@@ -197,12 +201,6 @@ public class SendPushNotificationActionTest
         Message messageWithoutId = new Message();
         assertThrows(() -> instance.actOnMessage(messageWithoutId)).isInstanceOf(InvalidArgumentException.class);
         
-    }
-    
-    private String convertToHex(String base64)
-    {
-        byte[] binary = DatatypeConverter.parseBase64Binary(base64);
-        return DatatypeConverter.printHexBinary(binary);
     }
 
 }
