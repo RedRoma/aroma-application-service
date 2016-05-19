@@ -31,8 +31,10 @@ import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.data.UserPreferencesRepository;
 import tech.aroma.thrift.Message;
+import tech.aroma.thrift.channels.ChannelsConstants;
 import tech.aroma.thrift.channels.IOSDevice;
 import tech.aroma.thrift.channels.MobileDevice;
+import tech.aroma.thrift.channels.PushNotificationPayload;
 import tech.aroma.thrift.exceptions.InvalidArgumentException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
@@ -117,12 +119,16 @@ final class SendPushNotificationAction implements Action
     private String createNotificationFromMessage(Message message) throws TException
     {
         String title = format("%s - %s", message.applicationName, message.title);
-
-        String serializedMessage = ThriftObjects.toJson(message);
+        
+        PushNotificationPayload payload = new PushNotificationPayload()
+            .setMessageId(message.messageId)
+            .setApplicationId(message.applicationId);
+        
+        String serializedPayload = ThriftObjects.toJson(payload);
 
         PayloadBuilder builder = APNS.newPayload()
             .alertTitle(title)
-            .customField("message", serializedMessage);
+            .customField(ChannelsConstants.PUSH_NOTIFICATION_KEY_FOR_PAYLOAD, serializedPayload);
 
         if (!builder.isTooLong())
         {
