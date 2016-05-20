@@ -40,6 +40,7 @@ import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 import tech.sirwellington.alchemy.thrift.ThriftObjects;
 
+import static java.lang.String.format;
 import static tech.aroma.data.assertions.RequestAssertions.validMessage;
 import static tech.aroma.data.assertions.RequestAssertions.validUserId;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;
@@ -116,8 +117,8 @@ final class SendPushNotificationAction implements Action
     
     private byte[] createNotificationFromMessage(Message message) throws TException
     {
-        String alertTitle = message.applicationName; //format("%s - %s", message.applicationName, message.title);
-        String alertBody = message.title;
+        String alertTitle = message.applicationName;
+        String alertBody = format("%s - %s", message.applicationName, message.title);
         
         PushNotificationPayload payload = new PushNotificationPayload()
             .setMessageId(message.messageId)
