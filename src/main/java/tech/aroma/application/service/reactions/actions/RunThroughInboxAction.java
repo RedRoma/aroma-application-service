@@ -44,7 +44,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
  */
 @StrategyPattern(role = CONCRETE_BEHAVIOR)
 @Internal
-class RunThroughInboxAction implements Action
+final class RunThroughInboxAction implements Action
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(RunThroughInboxAction.class);
@@ -100,6 +100,17 @@ class RunThroughInboxAction implements Action
             {
                 shouldStoreInInbox = false;
                 shouldSendPushNotification = false;
+                continue;
+            }
+            
+            if (action.isSetDontSendPushNotification())
+            {
+                shouldSendPushNotification = false;
+            }
+            
+            if (action.isSetSendPushNotification())
+            {
+                shouldSendPushNotification = true;
                 continue;
             }
 
