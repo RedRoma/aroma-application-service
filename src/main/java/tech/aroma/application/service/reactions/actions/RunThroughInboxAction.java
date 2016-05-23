@@ -88,8 +88,6 @@ final class RunThroughInboxAction implements Action
 
         List<Action> newActions = Lists.create();
         
-        LOG.debug("Running through actions: {}", applicableActions);
-        
         for (AromaAction action : applicableActions)
         {
             if (action.isSetDontStoreMessage())
@@ -103,7 +101,6 @@ final class RunThroughInboxAction implements Action
             }
             else if (action.isSetDontSendPushNotification())
             {
-                LOG.debug("[Skip Push Notification] Action found.");
                 shouldSendPushNotification = false;
             }
             else if (action.isSetSendPushNotification())
@@ -127,7 +124,7 @@ final class RunThroughInboxAction implements Action
         {
             Action actionToSendPushNotification = actionFactory.actionToSendPushNotification(user.userId);
             newActions.add(actionToSendPushNotification);
-            LOG.debug("Sending Push Notifications for {}", user);
+            LOG.debug("Sending Push Notifications to {}", user);
         }
         else
         {
