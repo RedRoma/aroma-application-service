@@ -106,6 +106,7 @@ final class RunThroughInboxAction implements Action
             if (action.isSetDontSendPushNotification())
             {
                 shouldSendPushNotification = false;
+                continue;
             }
             
             if (action.isSetSendPushNotification())
