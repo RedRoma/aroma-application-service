@@ -93,30 +93,25 @@ final class RunThroughInboxAction implements Action
             if (action.isSetDontStoreMessage())
             {
                 shouldStoreInInbox = false;
-                continue;
             }
-
-            if (action.isSetSkipInbox())
+            else if (action.isSetSkipInbox())
             {
                 shouldStoreInInbox = false;
                 shouldSendPushNotification = false;
-                continue;
             }
-            
-            if (action.isSetDontSendPushNotification())
+            else if (action.isSetDontSendPushNotification())
             {
                 shouldSendPushNotification = false;
-                continue;
             }
-            
-            if (action.isSetSendPushNotification())
+            else if (action.isSetSendPushNotification())
             {
                 shouldSendPushNotification = true;
-                continue;
             }
-
-            Action newAction = actionFactory.actionFor(action);
-            newActions.add(newAction);
+            else
+            {
+                Action newAction = actionFactory.actionFor(action);
+                newActions.add(newAction);
+            }
         }
 
         if (shouldStoreInInbox)

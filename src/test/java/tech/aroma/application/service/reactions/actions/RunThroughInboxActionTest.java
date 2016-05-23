@@ -27,10 +27,12 @@ import tech.aroma.application.service.reactions.matchers.MatchAlgorithm;
 import tech.aroma.data.ReactionRepository;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.User;
+import tech.aroma.thrift.reactions.ActionDontSendPushNotification;
 import tech.aroma.thrift.reactions.ActionDontStoreMessage;
 import tech.aroma.thrift.reactions.ActionSkipInbox;
 import tech.aroma.thrift.reactions.AromaAction;
 import tech.aroma.thrift.reactions.Reaction;
+import tech.sirwellington.alchemy.generator.AlchemyGenerator;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
@@ -42,6 +44,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -71,13 +74,18 @@ public class RunThroughInboxActionTest
     
     @Mock
     private Action genericAction;
+    
     @Mock
     private Action actionToStoreInInbox;
+    
+    @Mock
+    private Action actionToSendPushNotification;
     
     private Message message;
     private User user;
     private Reaction reaction;
     private Reaction reactionThatSkipInbox;
+    private Reaction reactionThatSkipPush;
     private Reaction reactionThatDontStoreMessage;
     
     private RunThroughInboxAction instance;
@@ -97,14 +105,19 @@ public class RunThroughInboxActionTest
     {
         message = one(messages());
         user = one(users());
-        reaction = one(reactions());
-        reactionThatSkipInbox = one(reactions());
-        reactionThatDontStoreMessage = one(reactions());
+        
+        AlchemyGenerator<Reaction> reactions = reactions();
+        reaction = one(reactions);
+        reactionThatSkipInbox = one(reactions);
+        reactionThatDontStoreMessage = one(reactions);
+        reactionThatSkipPush = one(reactions);
         
         reaction.actions = reaction.actions
             .stream()
             .filter(action -> !action.isSetSkipInbox())
             .filter(action -> !action.isSetDontStoreMessage())
+            .filter(action -> !action.isSetDontSendPushNotification())
+            .filter(action -> !action.isSetSendPushNotification())
             .collect(toList());
         
         reactionThatDontStoreMessage.actions = Lists.copy(reaction.actions);
@@ -116,6 +129,11 @@ public class RunThroughInboxActionTest
         AromaAction actionToSkipInbox = new AromaAction();
         actionToSkipInbox.setSkipInbox(new ActionSkipInbox());
         reactionThatSkipInbox.actions.add(actionToSkipInbox);
+        
+        reactionThatSkipPush.actions = Lists.copy(reaction.actions);
+        AromaAction actionToSkipPush = new AromaAction();
+        actionToSkipPush.setDontSendPushNotification(new ActionDontSendPushNotification());
+        reactionThatSkipPush.addToActions(actionToSkipPush);
     }
     
     private void setupMocks() throws Exception
@@ -131,6 +149,9 @@ public class RunThroughInboxActionTest
         
         when(actionFactory.actionToStoreInInbox(user))
             .thenReturn(actionToStoreInInbox);
+        
+        when(actionFactory.actionToSendPushNotification(user.userId))
+            .thenReturn(actionToSendPushNotification);
     }
     
     @Test
@@ -166,6 +187,19 @@ public class RunThroughInboxActionTest
         List<Action> actions = instance.actOnMessage(message);
         assertThat(actions, hasItem(genericAction));
         assertThat(actions, not(hasItem(actionToStoreInInbox)));
+    }
+    
+    @Test
+    public void testWhenSkipPushNotificationIncluded() throws Exception
+    {
+        when(reactionRepo.getReactionsForUser(user.userId))
+            .thenReturn(Lists.createFrom(reactionThatSkipPush));
+        
+        List<Action> actions = instance.actOnMessage(message);
+        assertThat(actions, hasItem(genericAction));
+        assertThat(actions, not(hasItem(actionToSendPushNotification)));
+        
+        verify(actionFactory, never()).actionToSendPushNotification(anyString());
     }
     
     @Test
