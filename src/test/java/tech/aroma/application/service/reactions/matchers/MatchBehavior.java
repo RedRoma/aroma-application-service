@@ -20,6 +20,7 @@ package tech.aroma.application.service.reactions.matchers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.maps.Maps;
@@ -28,10 +29,9 @@ import tech.aroma.thrift.reactions.AromaMatcher;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.generator.AlchemyGenerator;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static tech.aroma.thrift.generators.ReactionGenerators.matchers;
-import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.Get.one;
 import static tech.sirwellington.alchemy.generator.BooleanGenerators.alternatingBooleans;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 

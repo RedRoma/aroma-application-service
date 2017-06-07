@@ -17,6 +17,7 @@
 package tech.aroma.application.service.reactions.matchers;
 
 import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,24 +25,18 @@ import sir.wellington.alchemy.collections.sets.Sets;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.Urgency;
 import tech.sirwellington.alchemy.generator.AlchemyGenerator;
-import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
-import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
-import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
-import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
-import tech.sirwellington.alchemy.test.junit.runners.Repeat;
+import tech.sirwellington.alchemy.test.junit.runners.*;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static org.mockito.Mockito.*;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.Get.one;
 import static tech.sirwellington.alchemy.generator.BooleanGenerators.booleans;
 import static tech.sirwellington.alchemy.generator.EnumGenerators.enumValueOf;
 import static tech.sirwellington.alchemy.generator.StringGenerators.hexadecimalString;
 import static tech.sirwellington.alchemy.generator.StringGenerators.uuids;
-import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.HEXADECIMAL;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.UUID;
 

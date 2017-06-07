@@ -22,34 +22,24 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import tech.aroma.application.service.reactions.matchers.MatchAlgorithm;
-import tech.aroma.data.FollowerRepository;
-import tech.aroma.data.InboxRepository;
-import tech.aroma.data.MessageRepository;
-import tech.aroma.data.ReactionRepository;
-import tech.aroma.data.UserPreferencesRepository;
+import tech.aroma.data.*;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.User;
 import tech.aroma.thrift.notification.service.NotificationService;
-import tech.aroma.thrift.reactions.ActionForwardToGitter;
-import tech.aroma.thrift.reactions.ActionForwardToSlackChannel;
-import tech.aroma.thrift.reactions.ActionForwardToSlackUser;
-import tech.aroma.thrift.reactions.ActionSendEmail;
-import tech.aroma.thrift.reactions.AromaAction;
+import tech.aroma.thrift.reactions.*;
 import tech.sirwellington.alchemy.http.AlchemyHttp;
-import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
-import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
-import tech.sirwellington.alchemy.test.junit.runners.Repeat;
+import tech.sirwellington.alchemy.test.junit.runners.*;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.*;
 import static tech.aroma.thrift.generators.MessageGenerators.messages;
 import static tech.aroma.thrift.generators.ReactionGenerators.actions;
 import static tech.aroma.thrift.generators.UserGenerators.users;
-import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.Get.one;
 import static tech.sirwellington.alchemy.generator.NetworkGenerators.httpUrls;
 import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
-import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
  *

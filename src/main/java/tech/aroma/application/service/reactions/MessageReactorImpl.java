@@ -18,13 +18,12 @@ package tech.aroma.application.service.reactions;
 
 import java.util.List;
 import javax.inject.Inject;
+
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
-import tech.aroma.application.service.reactions.actions.Action;
-import tech.aroma.application.service.reactions.actions.ActionFactory;
-import tech.aroma.application.service.reactions.actions.ActionRunner;
+import tech.aroma.application.service.reactions.actions.*;
 import tech.aroma.application.service.reactions.matchers.MatchAlgorithm;
 import tech.aroma.data.ReactionRepository;
 import tech.aroma.thrift.Message;
@@ -36,7 +35,7 @@ import tech.sirwellington.alchemy.annotations.arguments.Required;
 import tech.sirwellington.alchemy.annotations.concurrency.ThreadSafe;
 
 import static java.util.stream.Collectors.toList;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**

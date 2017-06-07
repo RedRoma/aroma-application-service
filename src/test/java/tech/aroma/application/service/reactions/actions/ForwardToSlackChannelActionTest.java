@@ -18,6 +18,7 @@ package tech.aroma.application.service.reactions.actions;
 
 import java.net.URL;
 import java.util.List;
+
 import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,21 +30,13 @@ import tech.sirwellington.alchemy.http.AlchemyHttp;
 import tech.sirwellington.alchemy.http.HttpResponse;
 import tech.sirwellington.alchemy.http.exceptions.AlchemyHttpException;
 import tech.sirwellington.alchemy.http.mock.AlchemyHttpMock;
-import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
-import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
-import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
-import tech.sirwellington.alchemy.test.junit.runners.GenerateURL;
-import tech.sirwellington.alchemy.test.junit.runners.Repeat;
+import tech.sirwellington.alchemy.test.junit.runners.*;
 
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static tech.aroma.thrift.generators.MessageGenerators.messages;
-import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
-import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.Get.one;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
  *

@@ -21,21 +21,17 @@ package tech.aroma.application.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.thrift.authentication.ApplicationToken;
-import tech.aroma.thrift.authentication.service.AuthenticationService;
-import tech.aroma.thrift.authentication.service.VerifyTokenRequest;
-import tech.aroma.thrift.authentication.service.VerifyTokenResponse;
+import tech.aroma.thrift.authentication.service.*;
 import tech.aroma.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.thrift.exceptions.InvalidTokenException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.access.NonInstantiable;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
-import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
-import tech.sirwellington.alchemy.arguments.ExceptionMapper;
-import tech.sirwellington.alchemy.arguments.FailedAssertionException;
+import tech.sirwellington.alchemy.arguments.*;
 
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
-import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.*;
 
 /**
  *

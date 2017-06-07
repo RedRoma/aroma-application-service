@@ -18,22 +18,21 @@ package tech.aroma.application.service.reactions.actions;
 
 import java.time.Instant;
 import java.util.List;
+
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.thrift.Application;
 import tech.aroma.thrift.Message;
-import tech.aroma.thrift.events.ApplicationSentMessage;
-import tech.aroma.thrift.events.Event;
-import tech.aroma.thrift.events.EventType;
+import tech.aroma.thrift.events.*;
 import tech.aroma.thrift.notification.service.NotificationService;
 import tech.aroma.thrift.notification.service.SendNotificationRequest;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**

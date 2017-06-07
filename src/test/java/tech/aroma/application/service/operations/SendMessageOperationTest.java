@@ -17,48 +17,37 @@
 package tech.aroma.application.service.operations;
 
 import java.util.function.Function;
+
 import junit.framework.AssertionFailedError;
 import org.apache.thrift.TApplicationException;
 import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
+import org.mockito.*;
 import tech.aroma.application.service.reactions.MessageReactor;
 import tech.aroma.thrift.Application;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.application.service.SendMessageRequest;
 import tech.aroma.thrift.application.service.SendMessageResponse;
-import tech.aroma.thrift.authentication.ApplicationToken;
-import tech.aroma.thrift.authentication.AuthenticationToken;
-import tech.aroma.thrift.authentication.TokenType;
-import tech.aroma.thrift.authentication.service.AuthenticationService;
-import tech.aroma.thrift.authentication.service.GetTokenInfoRequest;
-import tech.aroma.thrift.authentication.service.GetTokenInfoResponse;
+import tech.aroma.thrift.authentication.*;
+import tech.aroma.thrift.authentication.service.*;
 import tech.aroma.thrift.functions.TokenFunctions;
-import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
-import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
-import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
-import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
-import tech.sirwellington.alchemy.test.junit.runners.Repeat;
+import tech.sirwellington.alchemy.test.junit.runners.*;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static tech.aroma.data.assertions.RequestAssertions.validApplicationId;
 import static tech.aroma.data.assertions.RequestAssertions.validMessageId;
 import static tech.aroma.thrift.application.service.ApplicationServiceConstants.MAX_CHARACTERS_IN_BODY;
 import static tech.aroma.thrift.application.service.ApplicationServiceConstants.MAX_TITLE_LENGTH;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
-import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
-import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
-import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.Get.one;
+import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticStrings;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.UUID;
 
 /**
@@ -159,7 +148,7 @@ public class SendMessageOperationTest
     @Test
     public void testWhenTitleExceedsLimit() throws Exception
     {
-        String extraLongTitle = one(alphabeticString(MAX_TITLE_LENGTH * 2));
+        String extraLongTitle = one(alphabeticStrings(MAX_TITLE_LENGTH * 2));
         String truncatedTitle = extraLongTitle.substring(0, MAX_TITLE_LENGTH);
         
         request.setTitle(extraLongTitle);
@@ -179,7 +168,7 @@ public class SendMessageOperationTest
     @Test
     public void testWhenBodyExceedsLimit() throws Exception
     {
-        String extraLongBody = one(alphabeticString(MAX_CHARACTERS_IN_BODY * 2));
+        String extraLongBody = one(alphabeticStrings(MAX_CHARACTERS_IN_BODY * 2));
         String truncatedBody = extraLongBody.substring(0, MAX_CHARACTERS_IN_BODY);
 
         request.setBody(extraLongBody);

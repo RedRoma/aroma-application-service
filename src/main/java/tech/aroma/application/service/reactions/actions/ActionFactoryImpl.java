@@ -16,30 +16,23 @@
 
 package tech.aroma.application.service.reactions.actions;
 
-import com.notnoop.apns.ApnsService;
 import javax.inject.Inject;
+
+import com.notnoop.apns.ApnsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.application.service.reactions.matchers.MatchAlgorithm;
-import tech.aroma.data.FollowerRepository;
-import tech.aroma.data.InboxRepository;
-import tech.aroma.data.MessageRepository;
-import tech.aroma.data.ReactionRepository;
-import tech.aroma.data.UserPreferencesRepository;
+import tech.aroma.data.*;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.User;
 import tech.aroma.thrift.notification.service.NotificationService;
-import tech.aroma.thrift.reactions.ActionForwardToGitter;
-import tech.aroma.thrift.reactions.ActionForwardToSlackChannel;
-import tech.aroma.thrift.reactions.ActionForwardToSlackUser;
-import tech.aroma.thrift.reactions.ActionSendEmail;
-import tech.aroma.thrift.reactions.AromaAction;
+import tech.aroma.thrift.reactions.*;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPattern;
 import tech.sirwellington.alchemy.http.AlchemyHttp;
 
 import static tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPattern.Role.FACTORY;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.NetworkAssertions.validURL;
 

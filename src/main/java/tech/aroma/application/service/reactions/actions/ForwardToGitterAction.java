@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
+
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +37,10 @@ import tech.sirwellington.alchemy.http.exceptions.AlchemyHttpException;
 
 import static tech.aroma.thrift.Urgency.HIGH;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.NetworkAssertions.validURL;
-import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.*;
 
 /**
  *

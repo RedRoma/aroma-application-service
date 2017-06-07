@@ -16,8 +16,9 @@
 
 package tech.aroma.application.service.reactions.matchers;
 
-import com.google.inject.ImplementedBy;
 import java.util.List;
+
+import com.google.inject.ImplementedBy;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.reactions.AromaMatcher;
 import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;

@@ -16,8 +16,9 @@
 
 package tech.aroma.application.service.reactions.actions;
 
-import com.google.inject.ImplementedBy;
 import java.util.List;
+
+import com.google.inject.ImplementedBy;
 import tech.aroma.thrift.Message;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 import tech.sirwellington.alchemy.annotations.concurrency.ThreadSafe;

@@ -16,11 +16,12 @@
 
 package tech.aroma.application.service.operations;
 
-import com.datastax.driver.core.utils.UUIDs;
 import java.time.Instant;
 import java.util.UUID;
 import java.util.function.Function;
 import javax.inject.Inject;
+
+import com.datastax.driver.core.utils.UUIDs;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,25 +29,19 @@ import tech.aroma.application.service.reactions.MessageReactor;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.application.service.SendMessageRequest;
 import tech.aroma.thrift.application.service.SendMessageResponse;
-import tech.aroma.thrift.authentication.ApplicationToken;
-import tech.aroma.thrift.authentication.AuthenticationToken;
-import tech.aroma.thrift.authentication.TokenType;
-import tech.aroma.thrift.authentication.service.AuthenticationService;
-import tech.aroma.thrift.authentication.service.GetTokenInfoRequest;
-import tech.aroma.thrift.authentication.service.GetTokenInfoResponse;
-import tech.aroma.thrift.exceptions.InvalidArgumentException;
-import tech.aroma.thrift.exceptions.InvalidTokenException;
-import tech.aroma.thrift.exceptions.OperationFailedException;
+import tech.aroma.thrift.authentication.*;
+import tech.aroma.thrift.authentication.service.*;
+import tech.aroma.thrift.exceptions.*;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
 import static tech.aroma.data.assertions.RequestAssertions.validApplicationId;
 import static tech.aroma.thrift.application.service.ApplicationServiceConstants.MAX_CHARACTERS_IN_BODY;
 import static tech.aroma.thrift.application.service.ApplicationServiceConstants.MAX_TITLE_LENGTH;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
-import static tech.sirwellington.alchemy.arguments.Checks.Internal.isNullOrEmpty;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
+import static tech.sirwellington.alchemy.arguments.Checks.isNullOrEmpty;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
-import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.*;
 
 /**
  *

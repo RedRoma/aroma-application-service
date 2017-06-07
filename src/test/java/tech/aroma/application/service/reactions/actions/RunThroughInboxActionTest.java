@@ -17,6 +17,7 @@
 package tech.aroma.application.service.reactions.actions;
 
 import java.util.List;
+
 import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,34 +28,23 @@ import tech.aroma.application.service.reactions.matchers.MatchAlgorithm;
 import tech.aroma.data.ReactionRepository;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.User;
-import tech.aroma.thrift.reactions.ActionDontSendPushNotification;
-import tech.aroma.thrift.reactions.ActionDontStoreMessage;
-import tech.aroma.thrift.reactions.ActionSkipInbox;
-import tech.aroma.thrift.reactions.AromaAction;
-import tech.aroma.thrift.reactions.Reaction;
+import tech.aroma.thrift.reactions.*;
 import tech.sirwellington.alchemy.generator.AlchemyGenerator;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static tech.aroma.thrift.generators.MessageGenerators.messages;
 import static tech.aroma.thrift.generators.ReactionGenerators.reactions;
 import static tech.aroma.thrift.generators.UserGenerators.users;
-import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
-import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.Get.one;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
  *

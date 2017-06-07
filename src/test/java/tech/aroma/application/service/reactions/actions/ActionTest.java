@@ -21,15 +21,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.exceptions.InvalidArgumentException;
-import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
-import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
-import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
-import tech.sirwellington.alchemy.test.junit.runners.Repeat;
+import tech.sirwellington.alchemy.test.junit.runners.*;
 
 import static tech.aroma.thrift.generators.MessageGenerators.messages;
-import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
-import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
-import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.Get.one;
+import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticStrings;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.ALPHABETIC;
 
 /**
@@ -80,7 +77,7 @@ public class ActionTest
             .isInstanceOf(InvalidArgumentException.class);
         
         Message messageWithBadId = new Message(goodMessage)
-            .setMessageId(one(alphabeticString()));
+            .setMessageId(one(alphabeticStrings()));
         assertThrows(() -> Action.checkMessage(messageWithBadId))
             .isInstanceOf(InvalidArgumentException.class);
     }

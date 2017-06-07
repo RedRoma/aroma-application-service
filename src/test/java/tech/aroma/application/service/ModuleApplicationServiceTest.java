@@ -17,11 +17,7 @@
 package tech.aroma.application.service;
 
 import com.google.common.util.concurrent.MoreExecutors;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.Provides;
+import com.google.inject.*;
 import com.notnoop.apns.ApnsService;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +33,7 @@ import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 /**
  *

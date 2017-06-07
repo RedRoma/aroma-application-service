@@ -18,10 +18,9 @@
 package tech.aroma.application.service.operations;
 
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-import com.google.inject.TypeLiteral;
 import java.util.function.Function;
+
+import com.google.inject.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.thrift.application.service.SendMessageRequest;

@@ -28,8 +28,8 @@ import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static tech.aroma.thrift.generators.MessageGenerators.messages;
-import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
-import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.Get.one;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
  *

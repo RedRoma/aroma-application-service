@@ -20,6 +20,7 @@ package tech.aroma.application.service.reactions.matchers;
 
 import java.util.Objects;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.sets.Sets;
@@ -30,9 +31,9 @@ import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 import static tech.aroma.data.assertions.RequestAssertions.isNullOrEmpty;
 import static tech.aroma.data.assertions.RequestAssertions.validApplicationId;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
-import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.*;
 
 /**
  *

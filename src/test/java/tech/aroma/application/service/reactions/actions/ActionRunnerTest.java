@@ -17,6 +17,7 @@
 package tech.aroma.application.service.reactions.actions;
 
 import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,15 +26,13 @@ import tech.aroma.thrift.Message;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.*;
 import static tech.aroma.thrift.generators.MessageGenerators.messages;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
-import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.Get.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
 

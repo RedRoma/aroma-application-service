@@ -18,6 +18,7 @@
 package tech.aroma.application.service.reactions.actions;
 
 import java.util.List;
+
 import org.apache.thrift.TException;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.exceptions.InvalidArgumentException;
@@ -30,7 +31,7 @@ import static tech.aroma.data.assertions.RequestAssertions.validApplicationId;
 import static tech.aroma.data.assertions.RequestAssertions.validMessageId;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.FactoryPattern.Role.PRODUCT;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.INTERFACE;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 

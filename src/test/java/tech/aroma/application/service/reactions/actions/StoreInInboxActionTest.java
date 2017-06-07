@@ -17,6 +17,7 @@
 package tech.aroma.application.service.reactions.actions;
 
 import java.util.List;
+
 import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,24 +26,21 @@ import org.mockito.Mock;
 import tech.aroma.data.InboxRepository;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.User;
-import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
-import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
-import tech.sirwellington.alchemy.test.junit.runners.Repeat;
+import tech.sirwellington.alchemy.test.junit.runners.*;
 
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.*;
 import static tech.aroma.thrift.generators.MessageGenerators.messages;
 import static tech.aroma.thrift.generators.UserGenerators.users;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.CollectionAssertions.emptyList;
-import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
-import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.Get.one;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
  *

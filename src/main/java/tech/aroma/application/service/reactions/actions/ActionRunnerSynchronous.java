@@ -16,9 +16,10 @@
 
 package tech.aroma.application.service.reactions.actions;
 
-import com.google.common.collect.Queues;
 import java.util.List;
 import java.util.Queue;
+
+import com.google.common.collect.Queues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;

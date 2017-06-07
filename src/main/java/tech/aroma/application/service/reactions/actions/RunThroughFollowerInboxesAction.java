@@ -17,6 +17,7 @@
 package tech.aroma.application.service.reactions.actions;
 
 import java.util.List;
+
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
 import static java.util.stream.Collectors.toList;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**

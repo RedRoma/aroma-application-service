@@ -18,6 +18,7 @@ package tech.aroma.application.service.reactions.matchers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,16 +27,11 @@ import sir.wellington.alchemy.collections.lists.Lists;
 import sir.wellington.alchemy.collections.maps.Maps;
 import tech.aroma.thrift.Message;
 import tech.aroma.thrift.reactions.AromaMatcher;
-import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
-import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
-import tech.sirwellington.alchemy.test.junit.runners.Repeat;
+import tech.sirwellington.alchemy.test.junit.runners.*;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  *

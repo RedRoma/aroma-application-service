@@ -16,34 +16,25 @@
 
 package tech.aroma.application.service;
 
-import decorice.DecoratedBy;
 import java.util.function.Function;
 import javax.inject.Inject;
+
+import decorice.DecoratedBy;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.aroma.thrift.application.service.ApplicationService;
-import tech.aroma.thrift.application.service.SendMessageRequest;
-import tech.aroma.thrift.application.service.SendMessageResponse;
-import tech.aroma.thrift.authentication.ApplicationToken;
-import tech.aroma.thrift.authentication.AuthenticationToken;
-import tech.aroma.thrift.authentication.TokenType;
-import tech.aroma.thrift.authentication.service.AuthenticationService;
-import tech.aroma.thrift.authentication.service.GetTokenInfoRequest;
-import tech.aroma.thrift.authentication.service.GetTokenInfoResponse;
-import tech.aroma.thrift.authentication.service.VerifyTokenRequest;
-import tech.aroma.thrift.exceptions.InvalidArgumentException;
-import tech.aroma.thrift.exceptions.InvalidCredentialsException;
-import tech.aroma.thrift.exceptions.InvalidTokenException;
-import tech.aroma.thrift.exceptions.OperationFailedException;
+import tech.aroma.thrift.application.service.*;
+import tech.aroma.thrift.authentication.*;
+import tech.aroma.thrift.authentication.service.*;
+import tech.aroma.thrift.exceptions.*;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.designs.patterns.DecoratorPattern;
 
 import static tech.aroma.data.assertions.AuthenticationAssertions.completeToken;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.DecoratorPattern.Role.CONCRETE_DECORATOR;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
-import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.*;
 
 /**
  * This class Decorates an existing Application Service, providing Authentication of incoming requests against an

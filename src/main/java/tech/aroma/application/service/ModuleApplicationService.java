@@ -18,13 +18,12 @@
 package tech.aroma.application.service;
 
 
+import java.util.concurrent.*;
+import javax.inject.Singleton;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import decorice.DecoratorModule;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.application.service.operations.ModuleApplicationServiceOperations;
