@@ -1,1 +1,1 @@
-service: java -jar aroma-application-service-1.2-SNAPSHOT.jar -Xmms:512m --port 5000
+service: java -jar aroma-application-service.jar -Xmms:512m --port 5000

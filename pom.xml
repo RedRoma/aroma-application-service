@@ -186,6 +186,8 @@
 
     <build>
 
+        <finalName>${artifactId}</finalName>
+
         <plugins>
 
             <plugin>
