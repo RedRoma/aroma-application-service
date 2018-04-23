@@ -22,7 +22,6 @@ import java.net.SocketException;
 
 import com.google.inject.*;
 import com.notnoop.apns.ApnsService;
-import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TServerSocket;
@@ -36,7 +35,7 @@ import tech.aroma.thrift.application.service.ApplicationService;
 import tech.aroma.thrift.application.service.ApplicationServiceConstants;
 import tech.aroma.thrift.authentication.service.AuthenticationService;
 import tech.aroma.thrift.notification.service.NotificationService;
-import tech.aroma.thrift.services.Clients;
+import tech.aroma.thrift.services.NoOpAuthenticationService;
 import tech.aroma.thrift.services.NoOpNotificationService;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
@@ -44,7 +43,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * This Main Class runs the Authentication Service on a Server Socket.
- * 
+ *
  * @author SirWellington
  */
 @Internal
@@ -74,14 +73,14 @@ public final class TcpServer
             .requestTimeoutUnit(SECONDS)
             .minWorkerThreads(5)
             .maxWorkerThreads(100);
-        
+
         LOG.info("Starting Application Service at port {}", PORT);
-        
+
         TThreadPoolServer server = new TThreadPoolServer(serverArgs);
         server.serve();
         server.stop();
     }
-    
+
     private static class AromaServicesProvider extends AbstractModule
     {
 
@@ -89,20 +88,21 @@ public final class TcpServer
         protected void configure()
         {
         }
-        
+
         @Provides
         AuthenticationService.Iface provideAuthenticationService()
         {
             try
             {
-                return Clients.newPerRequestAuthenticationServiceClient();
+                return new NoOpAuthenticationService();
+//                return Clients.newPerRequestAuthenticationServiceClient();
             }
-            catch (TException ex)
+            catch (Exception ex)
             {
                 throw new ProvisionException("Could not create Aroma Service Client", ex);
             }
         }
-        
+
         @Provides
         NotificationService.Iface provideNotificationService()
         {
@@ -114,6 +114,6 @@ public final class TcpServer
         {
             return new DoNothingApnsService();
         }
-   
+
     }
 }
