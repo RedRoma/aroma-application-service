@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- 
+
 package tech.aroma.application.service;
 
 
@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import tech.aroma.application.service.operations.ModuleApplicationServiceOperations;
 import tech.aroma.thrift.application.service.ApplicationService;
 import tech.sirwellington.alchemy.http.AlchemyHttp;
+import tech.sirwellington.alchemy.http.AlchemyHttpBuilder;
 
 /**
  *
@@ -43,29 +44,29 @@ public final class ModuleApplicationService extends AbstractModule
     {
         install(new ModuleApplicationServiceOperations());
         install(new ServiceModule());
-        
+
         bind(ExecutorService.class).toInstance(Executors.newWorkStealingPool(8));
     }
-    
+
     @Singleton
     @Provides
     AlchemyHttp provideHttpClient(ExecutorService executor)
     {
-        return AlchemyHttp.newBuilder()
-            .enableAsyncCallbacks()
-            .usingExecutorService(executor)
-            .usingTimeout(45, TimeUnit.SECONDS)
-            .build();
+        return AlchemyHttpBuilder.newInstance()
+                                 .enableAsyncCallbacks()
+                                 .usingExecutor(executor)
+                                 .usingTimeout(45, TimeUnit.SECONDS)
+                                 .build();
     }
-    
+
     private static class ServiceModule extends DecoratorModule
     {
         {
             bind(ApplicationService.Iface.class)
-                .to(ApplicationServiceBase.class)
-                .decoratedBy(AuthenticationLayer.class);
+                    .to(ApplicationServiceBase.class)
+                    .decoratedBy(AuthenticationLayer.class);
         }
     }
 
-    
+
 }
