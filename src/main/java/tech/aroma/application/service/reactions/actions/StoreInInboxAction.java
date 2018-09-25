@@ -23,9 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.data.InboxRepository;
-import tech.aroma.thrift.Message;
-import tech.aroma.thrift.User;
-import tech.aroma.thrift.service.AromaServiceConstants;
+import tech.aroma.thrift.*;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
@@ -44,6 +42,7 @@ final class StoreInInboxAction implements Action
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(StoreInInboxAction.class);
+    private final static LengthOfTime DEFAULT_DURATION = new LengthOfTime(TimeUnit.DAYS, 7);
 
     private final InboxRepository inboxRepo;
     private final User user;
@@ -62,7 +61,7 @@ final class StoreInInboxAction implements Action
     {
         Action.checkMessage(message);
 
-        inboxRepo.saveMessageForUser(user, message, AromaServiceConstants.DEFAULT_INBOX_LIFETIME);
+        inboxRepo.saveMessageForUser(user, message, DEFAULT_DURATION);
         LOG.debug("Saved Message {}/{} in Inbox of User {}", message.applicationId, message.messageId, user);
 
         return Lists.emptyList();
